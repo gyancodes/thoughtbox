@@ -73,4 +73,39 @@
  * @property {string} name - User name
  */
 
-export {};
+// Export validation functions
+export {
+  isValidNoteType,
+  isValidSyncStatus,
+  validateBaseNote,
+  validateTextNoteContent,
+  validateTodoItem,
+  validateTodoNoteContent,
+  validateTimetableEntry,
+  validateTimetableNoteContent,
+  validateNote
+} from './validation.js';
+
+// Export utility functions
+export {
+  generateId,
+  createBaseNote,
+  createTextNote,
+  createTodoNote,
+  createTimetableNote,
+  createTodoItem,
+  createTimetableEntry,
+  updateNoteContent,
+  updateNoteTitle,
+  addTodoItem,
+  updateTodoItem,
+  removeTodoItem,
+  addTimetableEntry,
+  updateTimetableEntry,
+  removeTimetableEntry,
+  sortTimetableEntries,
+  markNoteSynced,
+  markNoteConflicted,
+  cloneNote,
+  createValidatedNote
+} from './noteUtils.js';
