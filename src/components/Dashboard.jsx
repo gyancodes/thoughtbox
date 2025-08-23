@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { account, appwriteConfig } from '../lib/appwrite';
+import { appwriteConfig } from '../lib/appwrite';
 
 const Dashboard = ({ user, onLogout }) => {
   const [loading, setLoading] = useState(false);
@@ -7,8 +7,7 @@ const Dashboard = ({ user, onLogout }) => {
   const handleLogout = async () => {
     setLoading(true);
     try {
-      await account.deleteSession('current');
-      onLogout();
+      await onLogout(); // This will call the AuthContext logout method
     } catch (error) {
       console.error('Logout failed:', error);
     } finally {

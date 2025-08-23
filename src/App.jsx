@@ -1,36 +1,20 @@
 
-import { useState, useEffect } from 'react';
-import { account } from './lib/appwrite';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import LandingPage from './components/LandingPage';
 import Dashboard from './components/Dashboard';
 import './App.css';
 
-function App() {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+// Main App component that uses the auth context
+function AppContent() {
+  const { user, loading, logout } = useAuth();
 
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
-  const checkAuth = async () => {
-    try {
-      const currentUser = await account.get();
-      setUser(currentUser);
-    } catch (error) {
-      // User is not authenticated
-      setUser(null);
-    } finally {
-      setLoading(false);
-    }
+  const handleAuthSuccess = () => {
+    // The AuthContext will automatically update the user state
+    // No need to manually check auth here
   };
 
-  const handleAuthSuccess = async () => {
-    await checkAuth();
-  };
-
-  const handleLogout = () => {
-    setUser(null);
+  const handleLogout = async () => {
+    await logout();
   };
 
   if (loading) {
@@ -57,6 +41,15 @@ function App() {
         <LandingPage onAuthSuccess={handleAuthSuccess} />
       )}
     </>
+  );
+}
+
+// Root App component that provides the AuthProvider
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }
 

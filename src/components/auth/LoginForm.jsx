@@ -1,24 +1,58 @@
-import { useState } from "react";
-import { account } from "../../lib/appwrite";
+import { useState, useEffect } from "react";
+import { useAuth } from "../../contexts/AuthContext";
 
 const LoginForm = ({ onSuccess, onToggleMode }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [localError, setLocalError] = useState("");
+  
+  const { login, loading, error: authError, clearError, isAuthenticated } = useAuth();
+
+  // Clear errors when component mounts or when switching between forms
+  useEffect(() => {
+    setLocalError("");
+    clearError();
+  }, [clearError]);
+
+  // Handle successful authentication
+  useEffect(() => {
+    if (isAuthenticated && onSuccess) {
+      onSuccess();
+    }
+  }, [isAuthenticated, onSuccess]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setError("");
+    setLocalError("");
+    clearError();
+
+    // Client-side validation
+    if (!email.trim()) {
+      setLocalError("Email is required");
+      return;
+    }
+
+    if (!password.trim()) {
+      setLocalError("Password is required");
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setLocalError("Please enter a valid email address");
+      return;
+    }
+
+    if (password.length < 6) {
+      setLocalError("Password must be at least 6 characters long");
+      return;
+    }
 
     try {
-      await account.createEmailPasswordSession(email, password);
-      onSuccess();
+      await login(email.trim(), password);
+      // Success is handled by the useEffect above
     } catch (err) {
-      setError(err.message || "Login failed. Please try again.");
-    } finally {
-      setLoading(false);
+      // Error is handled by the AuthContext and displayed below
+      console.error("Login error:", err);
     }
   };
 
@@ -69,9 +103,9 @@ const LoginForm = ({ onSuccess, onToggleMode }) => {
             />
           </div>
 
-          {error && (
+          {(localError || authError) && (
             <div className="bg-red-50 border border-red-200 rounded-xl p-4">
-              <p className="text-red-600 text-sm">{error}</p>
+              <p className="text-red-600 text-sm">{localError || authError}</p>
             </div>
           )}
 

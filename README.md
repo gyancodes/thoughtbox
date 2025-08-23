@@ -1,12 +1,66 @@
-# React + Vite
+# ThoughtBox
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A secure notes app with client-side encryption. Your notes are encrypted before they leave your device.
 
-Currently, two official plugins are available:
+## What it does
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Create and organize notes, todo lists, and timetables
+- All data is encrypted on your device before syncing
+- Works offline and syncs when connected
+- Your encryption keys never leave your device
 
-## Expanding the ESLint configuration
+## Quick start
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+1. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+2. **Set up Appwrite**
+   - Create account at [cloud.appwrite.io](https://cloud.appwrite.io)
+   - Create a new project
+   - Copy your Project ID
+
+3. **Configure environment**
+   ```bash
+   cp .env.example .env
+   ```
+   
+   Add your Appwrite Project ID to `.env`:
+   ```env
+   VITE_APPWRITE_PROJECT_ID=your_project_id_here
+   ```
+
+4. **Run the app**
+   ```bash
+   npm run dev
+   ```
+
+## Optional: Enable note storage
+
+To save notes to the cloud:
+1. Create a database in Appwrite console
+2. Create a "notes" collection
+3. Add database and collection IDs to `.env`
+
+## Tech stack
+
+- React + Vite
+- Tailwind CSS
+- Appwrite (backend)
+- Client-side AES encryption
+
+## Security
+
+- Notes are encrypted with AES-256 before syncing
+- Your password generates the encryption key
+- Server cannot read your notes
+- Open source and auditable
+
+## Development
+
+```bash
+npm run dev          # Start development server
+npm run build        # Build for production
+npm run preview      # Preview production build
+```
