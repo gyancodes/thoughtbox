@@ -64,10 +64,10 @@ const SignupForm = ({ onSuccess, onToggleMode }) => {
 
   return (
     <div className="w-full max-w-md mx-auto">
-      <div className="bg-white rounded-2xl shadow-xl p-8">
+      <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 card-hover">
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">Create account</h2>
-          <p className="text-gray-600">Start securing your notes today</p>
+          <h2 className="text-2xl font-medium text-gray-900 mb-3">Create account</h2>
+          <p className="text-gray-600 text-sm">Start securing your notes today</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -82,7 +82,7 @@ const SignupForm = ({ onSuccess, onToggleMode }) => {
               value={formData.name}
               onChange={handleChange}
               required
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-black focus:border-transparent transition-colors bg-gray-50 focus:bg-white input-focus enhanced-focus"
               placeholder="Enter your full name"
             />
           </div>
@@ -98,7 +98,7 @@ const SignupForm = ({ onSuccess, onToggleMode }) => {
               value={formData.email}
               onChange={handleChange}
               required
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-black focus:border-transparent transition-colors bg-gray-50 focus:bg-white input-focus enhanced-focus"
               placeholder="Enter your email"
             />
           </div>
@@ -114,7 +114,7 @@ const SignupForm = ({ onSuccess, onToggleMode }) => {
               value={formData.password}
               onChange={handleChange}
               required
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-black focus:border-transparent transition-colors bg-gray-50 focus:bg-white input-focus enhanced-focus"
               placeholder="Create a strong password"
             />
             {passwordErrors.length > 0 && (
@@ -137,13 +137,13 @@ const SignupForm = ({ onSuccess, onToggleMode }) => {
               value={formData.confirmPassword}
               onChange={handleChange}
               required
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-black focus:border-transparent transition-colors bg-gray-50 focus:bg-white input-focus enhanced-focus"
               placeholder="Confirm your password"
             />
           </div>
 
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+            <div className="bg-red-50 border border-red-200 rounded-xl p-4">
               <p className="text-red-600 text-sm">{error}</p>
             </div>
           )}
@@ -151,18 +151,18 @@ const SignupForm = ({ onSuccess, onToggleMode }) => {
           <button
             type="submit"
             disabled={loading || passwordErrors.length > 0}
-            className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium py-3 px-4 rounded-lg transition-colors focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            className="w-full bg-black hover:bg-gray-800 disabled:bg-gray-400 text-white font-medium py-3 px-4 rounded-xl transition-colors focus:ring-2 focus:ring-black focus:ring-offset-2 btn-primary enhanced-focus"
           >
             {loading ? 'Creating account...' : 'Create account'}
           </button>
         </form>
 
-        <div className="mt-6 text-center">
-          <p className="text-gray-600">
+        <div className="mt-8 text-center">
+          <p className="text-gray-600 text-sm">
             Already have an account?{' '}
             <button
               onClick={onToggleMode}
-              className="text-blue-600 hover:text-blue-700 font-medium"
+              className="text-black hover:text-gray-700 font-medium transition-colors hover-lift"
             >
               Sign in
             </button>

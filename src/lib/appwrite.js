@@ -14,7 +14,7 @@ const optionalEnvVars = {
 
 // Check if all required environment variables are present
 const missingRequiredVars = Object.entries(requiredEnvVars)
-  .filter(([key, value]) => !value)
+  .filter(([, value]) => !value)
   .map(([key]) => `VITE_APPWRITE_${key.toUpperCase()}`);
 
 if (missingRequiredVars.length > 0) {
