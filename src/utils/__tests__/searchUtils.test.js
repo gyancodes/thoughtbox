@@ -3,7 +3,9 @@ import {
   highlightSearchTermsReact, 
   getSearchSnippet, 
   formatSearchResults,
-  debounce
+  debounce,
+  advancedSearch,
+  getSearchSuggestions
 } from '../searchUtils';
 
 describe('searchUtils', () => {
@@ -152,6 +154,137 @@ describe('searchUtils', () => {
       vi.advanceTimersByTime(100);
 
       expect(mockFn).toHaveBeenCalledWith('arg1', 'arg2', 'arg3');
+    });
+  });
+
+  describe('advancedSearch', () => {
+    const testNotes = [
+      {
+        id: '1',
+        type: 'text',
+        title: 'JavaScript Tutorial',
+        content: { text: 'Learn JavaScript programming basics' },
+        updatedAt: new Date().toISOString(),
+      },
+      {
+        id: '2',
+        type: 'todo',
+        title: 'Shopping List',
+        content: {
+          items: [
+            { text: 'Buy JavaScript book', completed: false },
+            { text: 'Learn programming', completed: true },
+          ]
+        },
+        updatedAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(), // 1 day ago
+      }
+    ];
+
+    it('returns enhanced search results with metadata', () => {
+      const result = advancedSearch(testNotes, 'JavaScript');
+      
+      expect(result.results).toHaveLength(2);
+      expect(result.query).toBe('JavaScript');
+      expect(result.totalResults).toBe(2);
+      expect(result.searchTime).toBeGreaterThanOrEqual(0);
+      
+      // Check search metadata
+      expect(result.results[0].searchMeta).toBeDefined();
+      expect(result.results[0].searchMeta.score).toBeGreaterThan(0);
+      expect(result.results[0].searchMeta.matches).toBeDefined();
+    });
+
+    it('sorts by relevance by default', () => {
+      const result = advancedSearch(testNotes, 'JavaScript');
+      
+      // Title match should score higher than content match
+      expect(result.results[0].title).toBe('JavaScript Tutorial');
+      expect(result.results[0].searchMeta.score).toBeGreaterThan(
+        result.results[1].searchMeta.score
+      );
+    });
+
+    it('can sort by date', () => {
+      const result = advancedSearch(testNotes, 'JavaScript', { sortBy: 'date' });
+      
+      expect(result.results).toHaveLength(2);
+      // More recent note should be first when sorting by date
+      expect(new Date(result.results[0].updatedAt).getTime()).toBeGreaterThan(
+        new Date(result.results[1].updatedAt).getTime()
+      );
+    });
+
+    it('limits results based on maxResults option', () => {
+      const result = advancedSearch(testNotes, 'JavaScript', { maxResults: 1 });
+      
+      expect(result.results).toHaveLength(1);
+    });
+
+    it('can exclude score metadata', () => {
+      const result = advancedSearch(testNotes, 'JavaScript', { includeScore: false });
+      
+      expect(result.results[0].searchMeta).toBeUndefined();
+    });
+  });
+
+  describe('getSearchSuggestions', () => {
+    const testNotes = [
+      {
+        id: '1',
+        type: 'text',
+        title: 'JavaScript Programming Tutorial',
+        content: { text: 'JavaScript fundamentals and advanced concepts' }
+      },
+      {
+        id: '2',
+        type: 'todo',
+        title: 'Programming Tasks',
+        content: {
+          items: [
+            { text: 'JavaScript debugging session', completed: false }
+          ]
+        }
+      }
+    ];
+
+    it('returns word suggestions based on partial query', () => {
+      const suggestions = getSearchSuggestions(testNotes, 'Java');
+      
+      expect(suggestions).toContain('javascript');
+    });
+
+    it('returns suggestions from both title and content', () => {
+      const suggestions = getSearchSuggestions(testNotes, 'prog');
+      
+      expect(suggestions).toContain('programming');
+    });
+
+    it('limits number of suggestions', () => {
+      const suggestions = getSearchSuggestions(testNotes, 'j', 2);
+      
+      expect(suggestions.length).toBeLessThanOrEqual(2);
+    });
+
+    it('returns empty array for short queries', () => {
+      const suggestions = getSearchSuggestions(testNotes, 'j');
+      
+      expect(suggestions).toEqual([]);
+    });
+
+    it('returns empty array for empty query', () => {
+      const suggestions = getSearchSuggestions(testNotes, '');
+      
+      expect(suggestions).toEqual([]);
+    });
+
+    it('sorts suggestions by length', () => {
+      const suggestions = getSearchSuggestions(testNotes, 'java');
+      
+      if (suggestions.length > 1) {
+        for (let i = 1; i < suggestions.length; i++) {
+          expect(suggestions[i].length).toBeGreaterThanOrEqual(suggestions[i - 1].length);
+        }
+      }
     });
   });
 });

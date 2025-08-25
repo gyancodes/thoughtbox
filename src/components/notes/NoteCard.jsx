@@ -10,7 +10,7 @@ import {
 } from '@heroicons/react/24/outline';
 import SearchHighlight from '../SearchHighlight';
 
-const NoteCard = ({ note, onClick, onEdit, onDelete, searchQuery = "" }) => {
+const NoteCard = ({ note, onClick, onEdit, onDelete, onConflictResolve, searchQuery = "" }) => {
   const [showMenu, setShowMenu] = useState(false);
 
   // Get note type icon
@@ -27,17 +27,33 @@ const NoteCard = ({ note, onClick, onEdit, onDelete, searchQuery = "" }) => {
     }
   };
 
-  // Get sync status indicator
+  // Get sync status indicator with enhanced styling
   const getSyncStatusIndicator = (syncStatus) => {
     switch (syncStatus) {
       case 'synced':
-        return <CheckCircleIcon className="w-4 h-4 text-green-500" />;
+        return (
+          <div className="flex items-center space-x-1" title="Synced">
+            <CheckCircleIcon className="w-4 h-4 text-green-500" />
+          </div>
+        );
       case 'pending':
-        return <ArrowPathIcon className="w-4 h-4 text-yellow-500 animate-spin" />;
+        return (
+          <div className="flex items-center space-x-1" title="Syncing...">
+            <ArrowPathIcon className="w-4 h-4 text-blue-500 animate-spin" />
+          </div>
+        );
       case 'conflict':
-        return <ExclamationTriangleIcon className="w-4 h-4 text-red-500" />;
+        return (
+          <div className="flex items-center space-x-1" title="Sync conflict - click to resolve">
+            <ExclamationTriangleIcon className="w-4 h-4 text-orange-500" />
+          </div>
+        );
       case 'error':
-        return <ExclamationTriangleIcon className="w-4 h-4 text-red-500" />;
+        return (
+          <div className="flex items-center space-x-1" title="Sync failed">
+            <ExclamationTriangleIcon className="w-4 h-4 text-red-500" />
+          </div>
+        );
       default:
         return null;
     }
@@ -132,6 +148,12 @@ const NoteCard = ({ note, onClick, onEdit, onDelete, searchQuery = "" }) => {
     onDelete?.(note);
   };
 
+  const handleConflictResolve = (e) => {
+    e.stopPropagation();
+    setShowMenu(false);
+    onConflictResolve?.(note);
+  };
+
   const previewContent = getPreviewContent(note);
 
   return (
@@ -159,8 +181,18 @@ const NoteCard = ({ note, onClick, onEdit, onDelete, searchQuery = "" }) => {
         </div>
         
         <div className="flex items-center space-x-2">
-          {/* Sync status indicator */}
-          {getSyncStatusIndicator(note.syncStatus)}
+          {/* Sync status indicator - clickable for conflicts */}
+          {note.syncStatus === 'conflict' ? (
+            <button
+              onClick={handleConflictResolve}
+              className="p-1 rounded-full hover:bg-orange-100 transition-colors"
+              title="Click to resolve sync conflict"
+            >
+              {getSyncStatusIndicator(note.syncStatus)}
+            </button>
+          ) : (
+            getSyncStatusIndicator(note.syncStatus)
+          )}
           
           {/* Menu button */}
           <div className="note-menu relative">
@@ -173,13 +205,21 @@ const NoteCard = ({ note, onClick, onEdit, onDelete, searchQuery = "" }) => {
             
             {/* Dropdown menu */}
             {showMenu && (
-              <div className="absolute right-0 top-full mt-1 bg-white rounded-md shadow-lg border border-gray-200 py-1 z-10 min-w-[120px]">
+              <div className="absolute right-0 top-full mt-1 bg-white rounded-md shadow-lg border border-gray-200 py-1 z-10 min-w-[140px]">
                 <button
                   onClick={handleEdit}
                   className="block w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
                 >
                   Edit
                 </button>
+                {note.syncStatus === 'conflict' && (
+                  <button
+                    onClick={handleConflictResolve}
+                    className="block w-full text-left px-3 py-2 text-sm text-orange-600 hover:bg-orange-50"
+                  >
+                    Resolve Conflict
+                  </button>
+                )}
                 <button
                   onClick={handleDelete}
                   className="block w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50"
@@ -224,7 +264,25 @@ const NoteCard = ({ note, onClick, onEdit, onDelete, searchQuery = "" }) => {
 
       {/* Footer */}
       <div className="flex items-center justify-between text-xs text-gray-500">
-        <span>{formatDate(note.updatedAt)}</span>
+        <div className="flex items-center space-x-2">
+          <span>{formatDate(note.updatedAt)}</span>
+          {/* Sync status badge */}
+          {note.syncStatus && note.syncStatus !== 'synced' && (
+            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+              note.syncStatus === 'pending' 
+                ? 'bg-blue-100 text-blue-700'
+                : note.syncStatus === 'conflict'
+                ? 'bg-orange-100 text-orange-700'
+                : note.syncStatus === 'error'
+                ? 'bg-red-100 text-red-700'
+                : 'bg-gray-100 text-gray-700'
+            }`}>
+              {note.syncStatus === 'pending' && 'Syncing'}
+              {note.syncStatus === 'conflict' && 'Conflict'}
+              {note.syncStatus === 'error' && 'Failed'}
+            </span>
+          )}
+        </div>
         <span className="capitalize">{note.type}</span>
       </div>
 

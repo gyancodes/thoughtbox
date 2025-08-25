@@ -7,6 +7,7 @@ const NoteGrid = ({
   onNoteClick, 
   onNoteEdit, 
   onNoteDelete,
+  onConflictResolve,
   emptyMessage = "No notes yet. Create your first note to get started!",
   className = "",
   searchQuery = ""
@@ -104,6 +105,7 @@ const NoteGrid = ({
             onClick={onNoteClick}
             onEdit={onNoteEdit}
             onDelete={onNoteDelete}
+            onConflictResolve={onConflictResolve}
             isSelected={selectedNotes.has(note.id)}
             onSelect={() => handleNoteSelect(note.id)}
             searchQuery={searchQuery}

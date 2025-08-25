@@ -126,6 +126,10 @@ export class AppwriteService {
     }
   }
 
+  get hasDatabaseConfig() {
+    return appwriteConfig.hasDatabaseConfig;
+  }
+
   // Authentication methods
   async authenticate(email, password) {
     try {
@@ -189,6 +193,7 @@ export class AppwriteService {
             type: noteData.type,
             title: noteData.title || '',
             content: noteData.content, // Should be encrypted before calling this method
+            userId: noteData.userId, // Add userId field
             createdAt: noteData.createdAt || new Date().toISOString(),
             updatedAt: noteData.updatedAt || new Date().toISOString(),
             syncStatus: noteData.syncStatus || 'synced'
@@ -330,6 +335,9 @@ export class AppwriteService {
       const user = await this.getCurrentUser();
       return await this.listNotes(user.$id, limit, offset);
     } catch (error) {
+      if (error instanceof AuthenticationError) {
+        throw error; // Re-throw auth errors so they can be handled properly
+      }
       if (error instanceof AppwriteServiceError) {
         throw error;
       }
