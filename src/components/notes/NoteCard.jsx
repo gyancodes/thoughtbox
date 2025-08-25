@@ -8,8 +8,9 @@ import {
   ExclamationTriangleIcon,
   ArrowPathIcon
 } from '@heroicons/react/24/outline';
+import SearchHighlight from '../SearchHighlight';
 
-const NoteCard = ({ note, onClick, onEdit, onDelete }) => {
+const NoteCard = ({ note, onClick, onEdit, onDelete, searchQuery = "" }) => {
   const [showMenu, setShowMenu] = useState(false);
 
   // Get note type icon
@@ -84,6 +85,16 @@ const NoteCard = ({ note, onClick, onEdit, onDelete }) => {
     }
   };
 
+  // Get search relevance indicator
+  const getSearchRelevance = (note) => {
+    if (!searchQuery || !note.searchMeta) return null;
+    
+    const score = note.searchMeta.score;
+    if (score >= 100) return { level: 'high', label: 'Exact match' };
+    if (score >= 50) return { level: 'medium', label: 'Good match' };
+    return { level: 'low', label: 'Partial match' };
+  };
+
   // Format date for display
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -135,7 +146,15 @@ const NoteCard = ({ note, onClick, onEdit, onDelete }) => {
             {getTypeIcon(note.type)}
           </div>
           <h3 className="font-medium text-gray-900 truncate">
-            {note.title || 'Untitled'}
+            {searchQuery ? (
+              <SearchHighlight 
+                text={note.title || 'Untitled'} 
+                query={searchQuery}
+                highlightClassName="bg-yellow-200 px-0.5 rounded font-semibold"
+              />
+            ) : (
+              note.title || 'Untitled'
+            )}
           </h3>
         </div>
         
@@ -176,9 +195,32 @@ const NoteCard = ({ note, onClick, onEdit, onDelete }) => {
       {/* Content preview */}
       <div className="mb-3">
         <p className="text-sm text-gray-600 whitespace-pre-line line-clamp-4">
-          {previewContent}
+          {searchQuery ? (
+            <SearchHighlight 
+              text={previewContent} 
+              query={searchQuery}
+              highlightClassName="bg-yellow-200 px-0.5 rounded"
+            />
+          ) : (
+            previewContent
+          )}
         </p>
       </div>
+
+      {/* Search relevance indicator */}
+      {searchQuery && getSearchRelevance(note) && (
+        <div className="mb-2">
+          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+            getSearchRelevance(note).level === 'high' 
+              ? 'bg-green-100 text-green-800' 
+              : getSearchRelevance(note).level === 'medium'
+              ? 'bg-yellow-100 text-yellow-800'
+              : 'bg-gray-100 text-gray-800'
+          }`}>
+            {getSearchRelevance(note).label}
+          </span>
+        </div>
+      )}
 
       {/* Footer */}
       <div className="flex items-center justify-between text-xs text-gray-500">

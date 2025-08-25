@@ -1,8 +1,14 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { appwriteConfig } from '../lib/appwrite';
+import { NotesProvider, useNotes } from '../contexts/NotesContext';
+import { NoteGrid, NoteEditor, CreateNoteButton } from './notes';
+import SearchBar from './SearchBar';
 
 const Dashboard = ({ user, onLogout }) => {
   const [loading, setLoading] = useState(false);
+  const [isNoteEditorOpen, setIsNoteEditorOpen] = useState(false);
+  const [editingNote, setEditingNote] = useState(null);
+  const [noteTypeToCreate, setNoteTypeToCreate] = useState('text');
 
   const handleLogout = async () => {
     setLoading(true);
@@ -15,8 +21,61 @@ const Dashboard = ({ user, onLogout }) => {
     }
   };
 
+  // Note handling functions
+  const handleCreateNote = (type = 'text') => {
+    setEditingNote(null);
+    setNoteTypeToCreate(type);
+    setIsNoteEditorOpen(true);
+  };
+
+  const handleEditNote = (note) => {
+    setEditingNote(note);
+    setNoteTypeToCreate(note.type);
+    setIsNoteEditorOpen(true);
+  };
+
+  const handleCloseNoteEditor = () => {
+    setIsNoteEditorOpen(false);
+    setEditingNote(null);
+    setNoteTypeToCreate('text');
+  };
+
+  const handleDeleteNote = async (note) => {
+    if (window.confirm(`Are you sure you want to delete "${note.title || 'Untitled'}"?`)) {
+      // The actual deletion will be handled by the NoteGrid component using NotesContext
+      console.log('Delete note confirmed:', note.id);
+    }
+  };
+
+  // Global keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // Ctrl/Cmd + N to create new text note
+      if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
+        e.preventDefault();
+        handleCreateNote('text');
+      }
+      
+      // Ctrl/Cmd + Shift + T to create todo note
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'T') {
+        e.preventDefault();
+        handleCreateNote('todo');
+      }
+      
+      // Ctrl/Cmd + Shift + M to create timetable note
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'M') {
+        e.preventDefault();
+        handleCreateNote('timetable');
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    <NotesProvider>
+      <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white border-b border-gray-100">
         <div className="max-w-6xl mx-auto px-6">
@@ -67,7 +126,10 @@ const Dashboard = ({ user, onLogout }) => {
 
         {/* Quick Actions */}
         <div className="grid md:grid-cols-3 gap-6 mb-12">
-          <button className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 hover:shadow-md transition-all duration-200 group hover:border-gray-200 card-hover">
+          <button 
+            onClick={() => handleCreateNote('text')}
+            className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 hover:shadow-md transition-all duration-200 group hover:border-gray-200 card-hover"
+          >
             <div className="flex items-center space-x-5">
               <div className="w-14 h-14 bg-blue-50 rounded-xl flex items-center justify-center group-hover:bg-blue-100 transition-colors hover-lift">
                 <svg className="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -81,7 +143,10 @@ const Dashboard = ({ user, onLogout }) => {
             </div>
           </button>
 
-          <button className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 hover:shadow-md transition-all duration-200 group hover:border-gray-200 card-hover">
+          <button 
+            onClick={() => handleCreateNote('todo')}
+            className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 hover:shadow-md transition-all duration-200 group hover:border-gray-200 card-hover"
+          >
             <div className="flex items-center space-x-5">
               <div className="w-14 h-14 bg-green-50 rounded-xl flex items-center justify-center group-hover:bg-green-100 transition-colors hover-lift">
                 <svg className="w-7 h-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -95,7 +160,10 @@ const Dashboard = ({ user, onLogout }) => {
             </div>
           </button>
 
-          <button className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 hover:shadow-md transition-all duration-200 group hover:border-gray-200 card-hover">
+          <button 
+            onClick={() => handleCreateNote('timetable')}
+            className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 hover:shadow-md transition-all duration-200 group hover:border-gray-200 card-hover"
+          >
             <div className="flex items-center space-x-5">
               <div className="w-14 h-14 bg-purple-50 rounded-xl flex items-center justify-center group-hover:bg-purple-100 transition-colors hover-lift">
                 <svg className="w-7 h-7 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -110,64 +178,168 @@ const Dashboard = ({ user, onLogout }) => {
           </button>
         </div>
 
-        {/* Recent Notes Section */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 card-hover">
-          <div className="flex items-center justify-between mb-8">
-            <h3 className="text-xl font-medium text-gray-900">Recent Notes</h3>
-            <button className="text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors hover-lift">
-              View all
-            </button>
-          </div>
+        {/* Notes Section */}
+        <DashboardContent 
+          onCreateNote={handleCreateNote}
+          onEditNote={handleEditNote}
+          onDeleteNote={handleDeleteNote}
+        />
 
-          {/* Empty State */}
-          <div className="text-center py-16">
-            <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6 hover-lift">
-              <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-            </div>
-            
-            {appwriteConfig.hasDatabaseConfig ? (
-              <>
-                <h4 className="text-xl font-medium text-gray-900 mb-3">No notes yet</h4>
-                <p className="text-gray-600 mb-8 text-lg leading-relaxed max-w-md mx-auto text-balance">
-                  Create your first encrypted note to get started with secure note-taking
-                </p>
-                <button className="bg-black hover:bg-gray-800 text-white px-8 py-3 rounded-xl font-medium transition-colors btn-primary">
-                  Create Note
-                </button>
-              </>
-            ) : (
-              <>
-                <h4 className="text-xl font-medium text-gray-900 mb-3">Database not configured</h4>
-                <p className="text-gray-600 mb-6 text-lg leading-relaxed max-w-lg mx-auto text-balance">
-                  To store notes, you need to set up a database in Appwrite.
-                </p>
-                <div className="bg-blue-50 border border-blue-100 rounded-xl p-6 text-left max-w-lg mx-auto card-hover">
-                  <h5 className="font-medium text-blue-900 mb-3 text-lg">Quick Setup:</h5>
-                  <ol className="text-sm text-blue-800 space-y-2 leading-relaxed">
-                    <li className="flex items-start space-x-3">
-                      <span className="w-6 h-6 bg-blue-200 rounded-full flex items-center justify-center text-blue-800 text-xs font-medium flex-shrink-0">1</span>
-                      <span>Create a database in your Appwrite console</span>
-                    </li>
-                    <li className="flex items-start space-x-3">
-                      <span className="w-6 h-6 bg-blue-200 rounded-full flex items-center justify-center text-blue-800 text-xs font-medium flex-shrink-0">2</span>
-                      <span>Create a "notes" collection</span>
-                    </li>
-                    <li className="flex items-start space-x-3">
-                      <span className="w-6 h-6 bg-blue-200 rounded-full flex items-center justify-center text-blue-800 text-xs font-medium flex-shrink-0">3</span>
-                      <span>Add the IDs to your .env file</span>
-                    </li>
-                  </ol>
-                  <p className="text-xs text-blue-600 mt-4 font-medium">
-                    See SETUP.md for detailed instructions
-                  </p>
-                </div>
-              </>
-            )}
-          </div>
+        {/* Note Editor Modal */}
+        <NoteEditor
+          isOpen={isNoteEditorOpen}
+          onClose={handleCloseNoteEditor}
+          note={editingNote}
+          initialType={noteTypeToCreate}
+        />
+
+        {/* Floating Create Button */}
+        <CreateNoteButton 
+          onCreateNote={handleCreateNote}
+          variant="floating"
+        />
+
+        {/* Keyboard shortcuts hint */}
+        <div className="fixed bottom-6 left-6 z-30 bg-white rounded-lg shadow-sm border border-gray-200 p-3 text-xs text-gray-500 max-w-xs">
+          <div className="font-medium text-gray-700 mb-1">Keyboard Shortcuts</div>
+          <div>Ctrl+N - New text note</div>
+          <div>Ctrl+Shift+T - New todo</div>
+          <div>Ctrl+Shift+M - New timetable</div>
         </div>
       </main>
+      </div>
+    </NotesProvider>
+  );
+};
+
+// Dashboard content component that uses the NotesProvider
+const DashboardContent = ({ onCreateNote, onEditNote, onDeleteNote }) => {
+  const { notes, loading, error, deleteNote, searchNotes } = useNotes();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState({ results: [], query: '', totalResults: 0 });
+
+  const handleDeleteNote = async (note) => {
+    if (window.confirm(`Are you sure you want to delete "${note.title || 'Untitled'}"?`)) {
+      try {
+        await deleteNote(note.id);
+      } catch (error) {
+        console.error('Failed to delete note:', error);
+      }
+    }
+  };
+
+  // Handle search
+  const handleSearch = (query) => {
+    setSearchQuery(query);
+    const results = searchNotes(query);
+    setSearchResults(results);
+  };
+
+  // Get notes to display (search results or all notes)
+  const displayNotes = searchQuery ? searchResults.results : notes;
+  const isSearching = searchQuery.length > 0;
+
+  if (!appwriteConfig.hasDatabaseConfig) {
+    return (
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 card-hover">
+        <div className="flex items-center justify-between mb-8">
+          <h3 className="text-xl font-medium text-gray-900">Your Notes</h3>
+        </div>
+
+        <div className="text-center py-16">
+          <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6 hover-lift">
+            <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+          </div>
+          
+          <h4 className="text-xl font-medium text-gray-900 mb-3">Database not configured</h4>
+          <p className="text-gray-600 mb-6 text-lg leading-relaxed max-w-lg mx-auto text-balance">
+            To store notes, you need to set up a database in Appwrite.
+          </p>
+          <div className="bg-blue-50 border border-blue-100 rounded-xl p-6 text-left max-w-lg mx-auto card-hover">
+            <h5 className="font-medium text-blue-900 mb-3 text-lg">Quick Setup:</h5>
+            <ol className="text-sm text-blue-800 space-y-2 leading-relaxed">
+              <li className="flex items-start space-x-3">
+                <span className="w-6 h-6 bg-blue-200 rounded-full flex items-center justify-center text-blue-800 text-xs font-medium flex-shrink-0">1</span>
+                <span>Create a database in your Appwrite console</span>
+              </li>
+              <li className="flex items-start space-x-3">
+                <span className="w-6 h-6 bg-blue-200 rounded-full flex items-center justify-center text-blue-800 text-xs font-medium flex-shrink-0">2</span>
+                <span>Create a "notes" collection</span>
+              </li>
+              <li className="flex items-start space-x-3">
+                <span className="w-6 h-6 bg-blue-200 rounded-full flex items-center justify-center text-blue-800 text-xs font-medium flex-shrink-0">3</span>
+                <span>Add the IDs to your .env file</span>
+              </li>
+            </ol>
+            <p className="text-xs text-blue-600 mt-4 font-medium">
+              See SETUP.md for detailed instructions
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 card-hover">
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-xl font-medium text-gray-900">Your Notes</h3>
+        <CreateNoteButton 
+          onCreateNote={onCreateNote}
+          variant="inline"
+        />
+      </div>
+
+      {/* Search Bar */}
+      <div className="mb-6">
+        <SearchBar
+          onSearch={handleSearch}
+          placeholder="Search your notes..."
+          className="w-full"
+        />
+      </div>
+
+      {/* Search Results Info */}
+      {isSearching && (
+        <div className="mb-4 flex items-center justify-between">
+          <p className="text-sm text-gray-600">
+            {searchResults.totalResults === 0 
+              ? `No results found for "${searchQuery}"`
+              : `${searchResults.totalResults} result${searchResults.totalResults !== 1 ? 's' : ''} found for "${searchQuery}"`
+            }
+          </p>
+          {searchResults.totalResults > 0 && (
+            <button
+              onClick={() => handleSearch('')}
+              className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+            >
+              Clear search
+            </button>
+          )}
+        </div>
+      )}
+
+      {error && (
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-red-800 text-sm">{error}</p>
+        </div>
+      )}
+
+      <NoteGrid
+        notes={displayNotes}
+        loading={loading}
+        onNoteClick={onEditNote}
+        onNoteEdit={onEditNote}
+        onNoteDelete={handleDeleteNote}
+        searchQuery={searchQuery}
+        emptyMessage={
+          isSearching 
+            ? `No notes found matching "${searchQuery}". Try a different search term.`
+            : "No notes yet. Create your first encrypted note to get started with secure note-taking!"
+        }
+      />
     </div>
   );
 };

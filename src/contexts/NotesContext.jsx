@@ -427,16 +427,85 @@ export const NotesProvider = ({ children }) => {
     return notes.filter(note => note.type === type);
   }, [notes]);
 
-  // Search notes
+  // Search notes with enhanced functionality
   const searchNotes = useCallback((query) => {
-    if (!query.trim()) return notes;
+    if (!query.trim()) return { results: notes, query: '' };
     
-    const lowercaseQuery = query.toLowerCase();
-    return notes.filter(note => {
-      const titleMatch = note.title?.toLowerCase().includes(lowercaseQuery);
-      const contentMatch = JSON.stringify(note.content).toLowerCase().includes(lowercaseQuery);
-      return titleMatch || contentMatch;
-    });
+    const lowercaseQuery = query.toLowerCase().trim();
+    const searchTerms = lowercaseQuery.split(/\s+/);
+    
+    const searchResults = notes.map(note => {
+      let score = 0;
+      let titleMatches = [];
+      let contentMatches = [];
+      
+      // Search in title
+      const title = note.title?.toLowerCase() || '';
+      searchTerms.forEach(term => {
+        if (title.includes(term)) {
+          score += title === term ? 100 : 50; // Exact match gets higher score
+          titleMatches.push(term);
+        }
+      });
+      
+      // Search in content based on note type
+      let searchableContent = '';
+      if (note.content) {
+        switch (note.type) {
+          case 'text':
+            searchableContent = note.content.text?.toLowerCase() || '';
+            break;
+          case 'todo':
+            searchableContent = note.content.items?.map(item => item.text).join(' ').toLowerCase() || '';
+            break;
+          case 'timetable':
+            searchableContent = note.content.entries?.map(entry => 
+              `${entry.time} ${entry.description}`
+            ).join(' ').toLowerCase() || '';
+            break;
+          default:
+            searchableContent = JSON.stringify(note.content).toLowerCase();
+        }
+      }
+      
+      searchTerms.forEach(term => {
+        if (searchableContent.includes(term)) {
+          score += 10;
+          contentMatches.push(term);
+        }
+      });
+      
+      // Boost score for recent notes (only if there's already a match)
+      if (score > 0) {
+        const daysSinceUpdate = (Date.now() - new Date(note.updatedAt).getTime()) / (1000 * 60 * 60 * 24);
+        if (daysSinceUpdate < 7) score += 5;
+        if (daysSinceUpdate < 1) score += 10;
+      }
+      
+      return {
+        note,
+        score,
+        titleMatches,
+        contentMatches,
+        isMatch: score > 0
+      };
+    })
+    .filter(result => result.isMatch)
+    .sort((a, b) => b.score - a.score) // Sort by relevance score
+    .map(result => ({
+      ...result.note,
+      searchMeta: {
+        score: result.score,
+        titleMatches: result.titleMatches,
+        contentMatches: result.contentMatches
+      }
+    }));
+    
+    return { 
+      results: searchResults, 
+      query: query.trim(),
+      totalResults: searchResults.length 
+    };
   }, [notes]);
 
   // Clear error

@@ -8,7 +8,8 @@ const NoteGrid = ({
   onNoteEdit, 
   onNoteDelete,
   emptyMessage = "No notes yet. Create your first note to get started!",
-  className = ""
+  className = "",
+  searchQuery = ""
 }) => {
   const [selectedNotes, setSelectedNotes] = useState(new Set());
 
@@ -105,6 +106,7 @@ const NoteGrid = ({
             onDelete={onNoteDelete}
             isSelected={selectedNotes.has(note.id)}
             onSelect={() => handleNoteSelect(note.id)}
+            searchQuery={searchQuery}
           />
         ))}
       </div>
