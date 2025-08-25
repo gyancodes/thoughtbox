@@ -12,6 +12,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@heroicons/react": "^2.2.0",
     "@tailwindcss/vite": "^4.1.8",
     "appwrite": "^18.1.1",
     "crypto-js": "^4.2.0",
