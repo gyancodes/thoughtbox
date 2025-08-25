@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import NoteGrid from './NoteGrid';
+import TextNote from './TextNote';
 
 // Demo component to showcase the note components
 const NotesDemo = () => {
@@ -90,14 +91,27 @@ const NotesDemo = () => {
     }
   ]);
 
+  const [selectedNote, setSelectedNote] = useState(null);
+  const [showTextEditor, setShowTextEditor] = useState(false);
+
   const handleNoteClick = (note) => {
     console.log('Note clicked:', note);
-    alert(`Clicked on note: ${note.title || 'Untitled'}`);
+    if (note.type === 'text') {
+      setSelectedNote(note);
+      setShowTextEditor(true);
+    } else {
+      alert(`Clicked on ${note.type} note: ${note.title || 'Untitled'}`);
+    }
   };
 
   const handleNoteEdit = (note) => {
     console.log('Edit note:', note);
-    alert(`Edit note: ${note.title || 'Untitled'}`);
+    if (note.type === 'text') {
+      setSelectedNote(note);
+      setShowTextEditor(true);
+    } else {
+      alert(`Edit ${note.type} note: ${note.title || 'Untitled'}`);
+    }
   };
 
   const handleNoteDelete = (note) => {
@@ -107,27 +121,82 @@ const NotesDemo = () => {
     }
   };
 
+  const handleTextNoteSave = (updatedNote) => {
+    console.log('Text note saved:', updatedNote);
+    alert('Note saved (demo only)');
+  };
+
+  const handleTextNoteCancel = () => {
+    setShowTextEditor(false);
+    setSelectedNote(null);
+  };
+
+  const createNewTextNote = () => {
+    const newNote = {
+      id: 'new-' + Date.now(),
+      type: 'text',
+      title: '',
+      content: { text: '' },
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      userId: 'user1',
+      syncStatus: 'pending'
+    };
+    setSelectedNote(newNote);
+    setShowTextEditor(true);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Notes Demo</h1>
           <p className="text-gray-600">
-            Showcasing the NoteCard and NoteGrid components with different note types and sync statuses.
+            Showcasing the NoteCard, NoteGrid, and TextNote components with different note types and sync statuses.
           </p>
+          <div className="mt-4">
+            <button
+              onClick={createNewTextNote}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Create New Text Note
+            </button>
+          </div>
         </div>
 
-        <NoteGrid
-          notes={notes}
-          onNoteClick={handleNoteClick}
-          onNoteEdit={handleNoteEdit}
-          onNoteDelete={handleNoteDelete}
-          className="mb-8"
-        />
+        {showTextEditor && selectedNote ? (
+          <div className="mb-8 bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold">
+                {selectedNote.id.startsWith('new-') ? 'Create Text Note' : 'Edit Text Note'}
+              </h2>
+              <button
+                onClick={handleTextNoteCancel}
+                className="text-gray-500 hover:text-gray-700 text-xl font-bold"
+              >
+                ×
+              </button>
+            </div>
+            <TextNote
+              note={selectedNote}
+              onSave={handleTextNoteSave}
+              onCancel={handleTextNoteCancel}
+              autoFocus={true}
+            />
+          </div>
+        ) : (
+          <NoteGrid
+            notes={notes}
+            onNoteClick={handleNoteClick}
+            onNoteEdit={handleNoteEdit}
+            onNoteDelete={handleNoteDelete}
+            className="mb-8"
+          />
+        )}
 
         <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
           <h2 className="text-xl font-semibold mb-4">Component Features</h2>
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid md:grid-cols-3 gap-6">
             <div>
               <h3 className="font-medium mb-2">NoteCard Features:</h3>
               <ul className="text-sm text-gray-600 space-y-1">
@@ -149,6 +218,25 @@ const NotesDemo = () => {
                 <li>• Proper spacing and alignment</li>
               </ul>
             </div>
+            <div>
+              <h3 className="font-medium mb-2">TextNote Features:</h3>
+              <ul className="text-sm text-gray-600 space-y-1">
+                <li>• Rich text input with auto-resize</li>
+                <li>• Auto-save with 2-second debouncing</li>
+                <li>• Manual save with Ctrl+S</li>
+                <li>• Real-time save status indicators</li>
+                <li>• Character count display</li>
+                <li>• Keyboard shortcuts (Ctrl+S, Esc)</li>
+                <li>• Title and content editing</li>
+              </ul>
+            </div>
+          </div>
+          <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+            <p className="text-sm text-blue-800">
+              <strong>Try it:</strong> Click on any text note (like "Meeting Notes" or "Ideas") to open the TextNote editor, 
+              or click "Create New Text Note" to start from scratch. The editor features auto-save, keyboard shortcuts, 
+              and real-time status indicators.
+            </p>
           </div>
         </div>
       </div>
