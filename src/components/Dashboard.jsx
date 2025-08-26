@@ -1,345 +1,211 @@
-import { useState, useEffect } from 'react';
-import { appwriteConfig } from '../lib/appwrite';
-import { NotesProvider, useNotes } from '../contexts/NotesContext';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { UserButton, useUser } from '@clerk/clerk-react';
+import { useClerkAuth } from '../contexts/ClerkAuthContext';
+import { useNotes } from '../contexts/NotesContext';
 import { NoteGrid, NoteEditor, CreateNoteButton } from './notes';
 import SearchBar from './SearchBar';
+import SyncIndicator from './SyncIndicator';
+import OfflineIndicator from './OfflineIndicator';
+import ConflictResolutionModal from './ConflictResolutionModal';
+import Documentation from './Documentation';
 
-const Dashboard = ({ user, onLogout }) => {
-  const [loading, setLoading] = useState(false);
+const Dashboard = () => {
+  const { user } = useUser();
+  const { isLoading } = useClerkAuth();
   const [isNoteEditorOpen, setIsNoteEditorOpen] = useState(false);
   const [editingNote, setEditingNote] = useState(null);
   const [noteTypeToCreate, setNoteTypeToCreate] = useState('text');
-
-  const handleLogout = async () => {
-    setLoading(true);
-    try {
-      await onLogout(); // This will call the AuthContext logout method
-    } catch (error) {
-      console.error('Logout failed:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [showDocumentation, setShowDocumentation] = useState(false);
 
   // Note handling functions
   const handleCreateNote = (type = 'text') => {
-    setEditingNote(null);
     setNoteTypeToCreate(type);
+    setEditingNote(null);
     setIsNoteEditorOpen(true);
   };
 
   const handleEditNote = (note) => {
     setEditingNote(note);
-    setNoteTypeToCreate(note.type);
     setIsNoteEditorOpen(true);
   };
 
-  const handleCloseNoteEditor = () => {
+  const handleCloseEditor = () => {
     setIsNoteEditorOpen(false);
     setEditingNote(null);
-    setNoteTypeToCreate('text');
   };
 
-  const handleDeleteNote = async (note) => {
-    if (window.confirm(`Are you sure you want to delete "${note.title || 'Untitled'}"?`)) {
-      // The actual deletion will be handled by the NoteGrid component using NotesContext
-      console.log('Delete note confirmed:', note.id);
-    }
-  };
-
-  // Global keyboard shortcuts
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      // Ctrl/Cmd + N to create new text note
-      if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
-        e.preventDefault();
-        handleCreateNote('text');
-      }
-      
-      // Ctrl/Cmd + Shift + T to create todo note
-      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'T') {
-        e.preventDefault();
-        handleCreateNote('todo');
-      }
-      
-      // Ctrl/Cmd + Shift + M to create timetable note
-      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'M') {
-        e.preventDefault();
-        handleCreateNote('timetable');
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, []);
-
-  return (
-    <NotesProvider>
-      <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-100">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center hover-lift">
-                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-              </div>
-              <h1 className="text-lg font-medium text-gray-900">ThoughtBox</h1>
-            </div>
-
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center hover-lift">
-                  <span className="text-sm font-medium text-gray-700">
-                    {user?.name?.charAt(0).toUpperCase() || 'U'}
-                  </span>
-                </div>
-                <span className="text-sm text-gray-700 font-medium">{user?.name || 'User'}</span>
-              </div>
-              
-              <button
-                onClick={handleLogout}
-                disabled={loading}
-                className="text-gray-500 hover:text-gray-700 p-2 rounded-lg hover:bg-gray-100 transition-colors hover-lift"
-                title="Sign out"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                </svg>
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="max-w-6xl mx-auto px-6 py-10">
-        {/* Welcome Section */}
-        <div className="mb-12 hero-content">
-          <h2 className="text-3xl font-light text-gray-900 mb-3 leading-tight text-balance">
-            Welcome back, {user?.name?.split(' ')[0] || 'there'}!
-          </h2>
-          <p className="text-gray-600 text-lg">Ready to capture your thoughts securely?</p>
-        </div>
-
-        {/* Quick Actions */}
-        <div className="grid md:grid-cols-3 gap-6 mb-12">
-          <button 
-            onClick={() => handleCreateNote('text')}
-            className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 hover:shadow-md transition-all duration-200 group hover:border-gray-200 card-hover"
-          >
-            <div className="flex items-center space-x-5">
-              <div className="w-14 h-14 bg-blue-50 rounded-xl flex items-center justify-center group-hover:bg-blue-100 transition-colors hover-lift">
-                <svg className="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                </svg>
-              </div>
-              <div className="text-left">
-                <h3 className="font-medium text-gray-900 text-lg mb-1">New Text Note</h3>
-                <p className="text-gray-600 text-sm leading-relaxed">Quick thoughts and ideas</p>
-              </div>
-            </div>
-          </button>
-
-          <button 
-            onClick={() => handleCreateNote('todo')}
-            className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 hover:shadow-md transition-all duration-200 group hover:border-gray-200 card-hover"
-          >
-            <div className="flex items-center space-x-5">
-              <div className="w-14 h-14 bg-green-50 rounded-xl flex items-center justify-center group-hover:bg-green-100 transition-colors hover-lift">
-                <svg className="w-7 h-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-                </svg>
-              </div>
-              <div className="text-left">
-                <h3 className="font-medium text-gray-900 text-lg mb-1">Todo List</h3>
-                <p className="text-gray-600 text-sm leading-relaxed">Track your tasks</p>
-              </div>
-            </div>
-          </button>
-
-          <button 
-            onClick={() => handleCreateNote('timetable')}
-            className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 hover:shadow-md transition-all duration-200 group hover:border-gray-200 card-hover"
-          >
-            <div className="flex items-center space-x-5">
-              <div className="w-14 h-14 bg-purple-50 rounded-xl flex items-center justify-center group-hover:bg-purple-100 transition-colors hover-lift">
-                <svg className="w-7 h-7 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <div className="text-left">
-                <h3 className="font-medium text-gray-900 text-lg mb-1">Timetable</h3>
-                <p className="text-gray-600 text-sm leading-relaxed">Schedule your day</p>
-              </div>
-            </div>
-          </button>
-        </div>
-
-        {/* Notes Section */}
-        <DashboardContent 
-          onCreateNote={handleCreateNote}
-          onEditNote={handleEditNote}
-          onDeleteNote={handleDeleteNote}
-        />
-
-        {/* Note Editor Modal */}
-        <NoteEditor
-          isOpen={isNoteEditorOpen}
-          onClose={handleCloseNoteEditor}
-          note={editingNote}
-          initialType={noteTypeToCreate}
-        />
-
-        {/* Floating Create Button */}
-        <CreateNoteButton 
-          onCreateNote={handleCreateNote}
-          variant="floating"
-        />
-
-        {/* Keyboard shortcuts hint */}
-        <div className="fixed bottom-6 left-6 z-30 bg-white rounded-lg shadow-sm border border-gray-200 p-3 text-xs text-gray-500 max-w-xs">
-          <div className="font-medium text-gray-700 mb-1">Keyboard Shortcuts</div>
-          <div>Ctrl+N - New text note</div>
-          <div>Ctrl+Shift+T - New todo</div>
-          <div>Ctrl+Shift+M - New timetable</div>
-        </div>
-      </main>
-      </div>
-    </NotesProvider>
-  );
-};
-
-// Dashboard content component that uses the NotesProvider
-const DashboardContent = ({ onCreateNote, onEditNote, onDeleteNote }) => {
-  const { notes, loading, error, deleteNote, searchNotes } = useNotes();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState({ results: [], query: '', totalResults: 0 });
-
-  const handleDeleteNote = async (note) => {
-    if (window.confirm(`Are you sure you want to delete "${note.title || 'Untitled'}"?`)) {
-      try {
-        await deleteNote(note.id);
-      } catch (error) {
-        console.error('Failed to delete note:', error);
-      }
-    }
-  };
-
-  // Handle search
-  const handleSearch = (query) => {
-    setSearchQuery(query);
-    const results = searchNotes(query);
-    setSearchResults(results);
-  };
-
-  // Get notes to display (search results or all notes)
-  const displayNotes = searchQuery ? searchResults.results : notes;
-  const isSearching = searchQuery.length > 0;
-
-  if (!appwriteConfig.hasDatabaseConfig) {
+  if (isLoading) {
     return (
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 card-hover">
-        <div className="flex items-center justify-between mb-8">
-          <h3 className="text-xl font-medium text-gray-900">Your Notes</h3>
-        </div>
-
-        <div className="text-center py-16">
-          <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6 hover-lift">
-            <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-          </div>
-          
-          <h4 className="text-xl font-medium text-gray-900 mb-3">Database not configured</h4>
-          <p className="text-gray-600 mb-6 text-lg leading-relaxed max-w-lg mx-auto text-balance">
-            To store notes, you need to set up a database in Appwrite.
-          </p>
-          <div className="bg-blue-50 border border-blue-100 rounded-xl p-6 text-left max-w-lg mx-auto card-hover">
-            <h5 className="font-medium text-blue-900 mb-3 text-lg">Quick Setup:</h5>
-            <ol className="text-sm text-blue-800 space-y-2 leading-relaxed">
-              <li className="flex items-start space-x-3">
-                <span className="w-6 h-6 bg-blue-200 rounded-full flex items-center justify-center text-blue-800 text-xs font-medium flex-shrink-0">1</span>
-                <span>Create a database in your Appwrite console</span>
-              </li>
-              <li className="flex items-start space-x-3">
-                <span className="w-6 h-6 bg-blue-200 rounded-full flex items-center justify-center text-blue-800 text-xs font-medium flex-shrink-0">2</span>
-                <span>Create a "notes" collection</span>
-              </li>
-              <li className="flex items-start space-x-3">
-                <span className="w-6 h-6 bg-blue-200 rounded-full flex items-center justify-center text-blue-800 text-xs font-medium flex-shrink-0">3</span>
-                <span>Add the IDs to your .env file</span>
-              </li>
-            </ol>
-            <p className="text-xs text-blue-600 mt-4 font-medium">
-              See SETUP.md for detailed instructions
-            </p>
-          </div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading your secure workspace...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 card-hover">
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-xl font-medium text-gray-900">Your Notes</h3>
-        <CreateNoteButton 
-          onCreateNote={onCreateNote}
-          variant="inline"
-        />
-      </div>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white shadow-sm border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-4">
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-3">
+                <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </div>
+                <h1 className="text-xl font-semibold text-gray-900">ThoughtBox</h1>
+              </div>
+              
+              <div className="hidden sm:block">
+                <SearchBar />
+              </div>
+            </div>
 
-      {/* Search Bar */}
-      <div className="mb-6">
-        <SearchBar
-          onSearch={handleSearch}
-          placeholder="Search your notes..."
-          className="w-full"
-        />
-      </div>
+            <div className="flex items-center space-x-4">
+              <OfflineIndicator />
+              <SyncIndicator />
+              
+              <Link
+                to="/docs"
+                className="text-sm text-gray-600 hover:text-gray-900 transition-colors flex items-center gap-1"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                Docs
+              </Link>
 
-      {/* Search Results Info */}
-      {isSearching && (
-        <div className="mb-4 flex items-center justify-between">
-          <p className="text-sm text-gray-600">
-            {searchResults.totalResults === 0 
-              ? `No results found for "${searchQuery}"`
-              : `${searchResults.totalResults} result${searchResults.totalResults !== 1 ? 's' : ''} found for "${searchQuery}"`
-            }
-          </p>
-          {searchResults.totalResults > 0 && (
-            <button
-              onClick={() => handleSearch('')}
-              className="text-sm text-blue-600 hover:text-blue-800 font-medium"
-            >
-              Clear search
-            </button>
+              <div className="flex items-center space-x-3">
+                <span className="text-sm text-gray-600 hidden sm:block">
+                  Welcome, {user?.firstName || user?.emailAddresses[0]?.emailAddress}
+                </span>
+                <UserButton 
+                  appearance={{
+                    elements: {
+                      avatarBox: "w-8 h-8"
+                    }
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Mobile Search */}
+          <div className="sm:hidden pb-4">
+            <SearchBar />
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <DashboardContent 
+          onCreateNote={handleCreateNote}
+          onEditNote={handleEditNote}
+        />
+      </main>
+
+      {/* Note Editor Modal */}
+      {isNoteEditorOpen && (
+        <NoteEditor
+          note={editingNote}
+          noteType={noteTypeToCreate}
+          onClose={handleCloseEditor}
+        />
+      )}
+
+      {/* Conflict Resolution Modal */}
+      <ConflictResolutionModal />
+
+      {/* Documentation Modal */}
+      {showDocumentation && (
+        <Documentation onClose={() => setShowDocumentation(false)} />
+      )}
+    </div>
+  );
+};
+
+// Dashboard Content Component
+const DashboardContent = ({ onCreateNote, onEditNote }) => {
+  const { 
+    notes, 
+    loading, 
+    error, 
+    searchTerm, 
+    filteredNotes,
+    stats 
+  } = useNotes();
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading your notes...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+        <svg className="w-12 h-12 text-red-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+        </svg>
+        <h3 className="text-lg font-medium text-red-900 mb-2">Error Loading Notes</h3>
+        <p className="text-red-700">{error}</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Stats and Create Button */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex items-center space-x-6">
+          <div className="text-sm text-gray-600">
+            <span className="font-medium">{stats.total}</span> notes
+          </div>
+          {stats.offline > 0 && (
+            <div className="text-sm text-orange-600">
+              <span className="font-medium">{stats.offline}</span> pending sync
+            </div>
+          )}
+          {searchTerm && (
+            <div className="text-sm text-blue-600">
+              <span className="font-medium">{filteredNotes.length}</span> results for "{searchTerm}"
+            </div>
           )}
         </div>
-      )}
+        
+        <CreateNoteButton onCreateNote={onCreateNote} />
+      </div>
 
-      {error && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-red-800 text-sm">{error}</p>
+      {/* Notes Grid */}
+      {notes.length === 0 ? (
+        <div className="text-center py-12">
+          <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+          </div>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">No notes yet</h3>
+          <p className="text-gray-600 mb-6">Create your first encrypted note to get started.</p>
+          <CreateNoteButton onCreateNote={onCreateNote} />
         </div>
+      ) : (
+        <NoteGrid 
+          notes={searchTerm ? filteredNotes : notes}
+          onEditNote={onEditNote}
+        />
       )}
-
-      <NoteGrid
-        notes={displayNotes}
-        loading={loading}
-        onNoteClick={onEditNote}
-        onNoteEdit={onEditNote}
-        onNoteDelete={handleDeleteNote}
-        searchQuery={searchQuery}
-        emptyMessage={
-          isSearching 
-            ? `No notes found matching "${searchQuery}". Try a different search term.`
-            : "No notes yet. Create your first encrypted note to get started with secure note-taking!"
-        }
-      />
     </div>
   );
 };

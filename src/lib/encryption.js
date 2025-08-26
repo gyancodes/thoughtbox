@@ -15,15 +15,15 @@ class EncryptionService {
   /**
    * Derives encryption key from user credentials using PBKDF2
    * @param {string} userId - User identifier for salt
-   * @param {string} password - User password
+   * @param {string} password - User password (optional for OAuth users)
    * @returns {string} Derived key in hex format
    */
-  generateUserKey(userId, password) {
-    if (!userId || !password) {
-      throw new Error('User ID and password are required for key generation');
+  generateUserKey(userId, password = null) {
+    if (!userId) {
+      throw new Error('User ID is required for key generation');
     }
 
-    const cacheKey = `${userId}:${password}`;
+    const cacheKey = `${userId}:${password || 'oauth'}`;
     
     // Check cache first
     if (this.keyCache.has(cacheKey)) {
@@ -33,8 +33,11 @@ class EncryptionService {
     // Create salt from userId (consistent across sessions)
     const salt = CryptoJS.SHA256(userId).toString();
     
+    // For OAuth users (no password), use userId as the base for key derivation
+    const keySource = password || userId + 'clerk-oauth-key';
+    
     // Derive key using PBKDF2
-    const key = CryptoJS.PBKDF2(password, salt, {
+    const key = CryptoJS.PBKDF2(keySource, salt, {
       keySize: this.KEY_SIZE,
       iterations: this.PBKDF2_ITERATIONS,
       hasher: CryptoJS.algo.SHA256
@@ -46,6 +49,19 @@ class EncryptionService {
     this.keyCache.set(cacheKey, keyHex);
     
     return keyHex;
+  }
+
+  /**
+   * Generates encryption key for Clerk OAuth users
+   * @param {string} userId - Clerk user ID
+   * @returns {string} Derived key in hex format
+   */
+  generateClerkKey(userId) {
+    if (!userId) {
+      throw new Error('Clerk user ID is required for key generation');
+    }
+
+    return this.generateUserKey(userId, null);
   }
 
   /**
