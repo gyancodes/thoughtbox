@@ -68,7 +68,7 @@
 
 /**
  * @typedef {Object} User
- * @property {string} $id - User ID from Appwrite
+ * @property {string} id - User ID from Clerk
  * @property {string} email - User email
  * @property {string} name - User name
  */

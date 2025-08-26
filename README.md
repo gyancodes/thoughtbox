@@ -1,13 +1,13 @@
 # ThoughtBox
 
-A secure notes app with client-side encryption. Your notes are encrypted before they leave your device.
+A modern, secure note-taking application with PostgreSQL database and Clerk authentication.
 
 ## What it does
 
 - Create and organize notes, todo lists, and timetables
-- All data is encrypted on your device before syncing
-- Works offline and syncs when connected
-- Your encryption keys never leave your device
+- Secure authentication with Clerk
+- Real-time synchronization with PostgreSQL/Neon database
+- Search and filter your notes efficiently
 
 ## Quick start
 
@@ -16,45 +16,52 @@ A secure notes app with client-side encryption. Your notes are encrypted before 
    npm install
    ```
 
-2. **Set up Appwrite**
-   - Create account at [cloud.appwrite.io](https://cloud.appwrite.io)
-   - Create a new project
-   - Copy your Project ID
+2. **Set up Clerk Authentication**
+   - Create account at [clerk.com](https://clerk.com)
+   - Create a new application
+   - Copy your publishable key
 
 3. **Configure environment**
    ```bash
    cp .env.example .env
    ```
    
-   Add your Appwrite Project ID to `.env`:
+   Add your Clerk key to `.env`:
    ```env
-   VITE_APPWRITE_PROJECT_ID=your_project_id_here
+   VITE_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key_here
+   VITE_API_BASE_URL=http://localhost:3001/api
    ```
 
-4. **Run the app**
+4. **Set up Database**
+   - Create a Neon account at [neon.tech](https://neon.tech)
+   - Create a new project and database
+   - Set up your backend API server (not included in this repo)
+
+5. **Run the app**
    ```bash
    npm run dev
    ```
 
-## Optional: Enable note storage
+## Backend Requirements
 
-To save notes to the cloud:
-1. Create a database in Appwrite console
-2. Create a "notes" collection
-3. Add database and collection IDs to `.env`
+This frontend requires a backend API server with the following endpoints:
+- `GET /api/notes` - Fetch user's notes
+- `POST /api/notes` - Create new note
+- `PUT /api/notes/:id` - Update note
+- `DELETE /api/notes/:id` - Delete note
 
 ## Tech stack
 
 - React + Vite
 - Tailwind CSS
-- Appwrite (backend)
-- Client-side AES encryption
+- PostgreSQL/Neon (database)
+- Clerk (authentication)
 
 ## Security
 
-- Notes are encrypted with AES-256 before syncing
-- Your password generates the encryption key
-- Server cannot read your notes
+- Secure authentication with Clerk
+- User session management and token handling
+- Database-level user isolation
 - Open source and auditable
 
 ## Development

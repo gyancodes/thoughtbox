@@ -144,9 +144,9 @@ coverage/
 .local/
 local/
 
-# Appwrite specific (if you have local Appwrite setup)
-appwrite/
-.appwrite/
+# Backend API logs and configs (if running locally)
+api/
+.api/
 
 # Documentation that might contain sensitive info
-APPWRITE_SETUP_CHECK.md
+*.setup.md
