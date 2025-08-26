@@ -158,7 +158,8 @@ const NoteCard = ({ note, onClick, onEdit, onDelete, onConflictResolve, searchQu
 
   return (
     <div 
-      className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 cursor-pointer hover:shadow-md transition-shadow duration-200 relative group"
+      className="rounded-lg shadow-sm border border-gray-300 p-4 cursor-pointer hover:shadow-md transition-all duration-200 relative group"
+      style={{ backgroundColor: note.color || '#ffffff' }}
       onClick={handleCardClick}
     >
       {/* Header */}

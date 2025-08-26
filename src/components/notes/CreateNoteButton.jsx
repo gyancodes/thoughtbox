@@ -3,217 +3,312 @@ import {
   PlusIcon,
   DocumentTextIcon,
   ListBulletIcon,
-  ClockIcon
+  ClockIcon,
+  XMarkIcon,
+  PencilIcon
 } from '@heroicons/react/24/outline';
+import { useNotes } from '../../contexts/NotesContext';
 
 const CreateNoteButton = ({ 
   onCreateNote, 
   className = "",
-  variant = "floating" // "floating" or "inline"
+  variant = "keep" // "keep", "floating" or "inline"
 }) => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const menuRef = useRef(null);
-  const buttonRef = useRef(null);
+  const { createNote } = useNotes();
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [noteTitle, setNoteTitle] = useState('');
+  const [noteContent, setNoteContent] = useState('');
+  const [selectedType, setSelectedType] = useState('text');
+  const [todoItems, setTodoItems] = useState([]);
+  const [timetableEntries, setTimetableEntries] = useState([]);
+  const inputRef = useRef(null);
+  const containerRef = useRef(null);
 
-  // Close menu when clicking outside
+  // Close when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (
-        menuRef.current && 
-        !menuRef.current.contains(event.target) &&
-        buttonRef.current &&
-        !buttonRef.current.contains(event.target)
-      ) {
-        setIsMenuOpen(false);
+      if (containerRef.current && !containerRef.current.contains(event.target)) {
+        handleClose();
       }
     };
 
-    if (isMenuOpen) {
+    if (isExpanded) {
       document.addEventListener('mousedown', handleClickOutside);
       return () => document.removeEventListener('mousedown', handleClickOutside);
     }
-  }, [isMenuOpen]);
+  }, [isExpanded]);
 
-  // Handle keyboard navigation
+  // Focus input when expanded
   useEffect(() => {
-    const handleKeyDown = (event) => {
-      if (!isMenuOpen) return;
-
-      if (event.key === 'Escape') {
-        setIsMenuOpen(false);
-        buttonRef.current?.focus();
-      }
-    };
-
-    if (isMenuOpen) {
-      document.addEventListener('keydown', handleKeyDown);
-      return () => document.removeEventListener('keydown', handleKeyDown);
+    if (isExpanded && inputRef.current) {
+      inputRef.current.focus();
     }
-  }, [isMenuOpen]);
+  }, [isExpanded]);
 
-  const handleButtonClick = () => {
-    setIsMenuOpen(!isMenuOpen);
+  const handleExpand = () => {
+    setIsExpanded(true);
   };
 
-  const handleNoteTypeSelect = (type) => {
-    setIsMenuOpen(false);
-    onCreateNote?.(type);
-  };
-
-  const noteTypes = [
-    {
-      type: 'text',
-      label: 'Text Note',
-      description: 'Quick thoughts and ideas',
-      icon: DocumentTextIcon,
-      color: 'blue'
-    },
-    {
-      type: 'todo',
-      label: 'Todo List',
-      description: 'Track your tasks',
-      icon: ListBulletIcon,
-      color: 'green'
-    },
-    {
-      type: 'timetable',
-      label: 'Timetable',
-      description: 'Schedule your day',
-      icon: ClockIcon,
-      color: 'purple'
+  const handleClose = async () => {
+    if (noteTitle.trim() || noteContent.trim() || todoItems.length > 0 || timetableEntries.length > 0) {
+      await handleSave();
     }
-  ];
-
-  const getColorClasses = (color, variant = 'bg') => {
-    const colorMap = {
-      blue: {
-        bg: 'bg-blue-50 hover:bg-blue-100',
-        text: 'text-blue-600',
-        border: 'border-blue-200'
-      },
-      green: {
-        bg: 'bg-green-50 hover:bg-green-100',
-        text: 'text-green-600',
-        border: 'border-green-200'
-      },
-      purple: {
-        bg: 'bg-purple-50 hover:bg-purple-100',
-        text: 'text-purple-600',
-        border: 'border-purple-200'
-      }
-    };
-    return colorMap[color]?.[variant] || '';
+    
+    setIsExpanded(false);
+    setNoteTitle('');
+    setNoteContent('');
+    setTodoItems([]);
+    setTimetableEntries([]);
+    setSelectedType('text');
   };
 
-  if (variant === "floating") {
+  const handleSave = async () => {
+    if (!noteTitle.trim() && !noteContent.trim() && todoItems.length === 0 && timetableEntries.length === 0) {
+      return;
+    }
+
+    try {
+      let content;
+      switch (selectedType) {
+        case 'text':
+          content = { text: noteContent };
+          break;
+        case 'todo':
+          content = { items: todoItems.filter(item => item.text.trim()) };
+          break;
+        case 'timetable':
+          content = { entries: timetableEntries.filter(entry => entry.description.trim()) };
+          break;
+        default:
+          content = { text: noteContent };
+      }
+
+      await createNote(selectedType, content, noteTitle);
+    } catch (error) {
+      console.error('Failed to create note:', error);
+    }
+  };
+
+  const handleTypeChange = (type) => {
+    setSelectedType(type);
+    if (type === 'todo' && todoItems.length === 0) {
+      setTodoItems([{ id: Date.now(), text: '', completed: false }]);
+    }
+    if (type === 'timetable' && timetableEntries.length === 0) {
+      setTimetableEntries([{ id: Date.now(), time: '', description: '', completed: false, date: new Date().toISOString().split('T')[0] }]);
+    }
+  };
+
+  const addTodoItem = () => {
+    setTodoItems([...todoItems, { id: Date.now(), text: '', completed: false }]);
+  };
+
+  const updateTodoItem = (id, text) => {
+    setTodoItems(todoItems.map(item => 
+      item.id === id ? { ...item, text } : item
+    ));
+  };
+
+  const removeTodoItem = (id) => {
+    setTodoItems(todoItems.filter(item => item.id !== id));
+  };
+
+  const addTimetableEntry = () => {
+    setTimetableEntries([...timetableEntries, { 
+      id: Date.now(), 
+      time: '', 
+      description: '', 
+      completed: false, 
+      date: new Date().toISOString().split('T')[0] 
+    }]);
+  };
+
+  const updateTimetableEntry = (id, field, value) => {
+    setTimetableEntries(timetableEntries.map(entry => 
+      entry.id === id ? { ...entry, [field]: value } : entry
+    ));
+  };
+
+  const removeTimetableEntry = (id) => {
+    setTimetableEntries(timetableEntries.filter(entry => entry.id !== id));
+  };
+
+  if (variant === "keep") {
     return (
-      <div className={`fixed bottom-6 right-6 z-40 ${className}`}>
-        {/* Menu */}
-        {isMenuOpen && (
+      <div className={`max-w-2xl mx-auto mb-8 ${className}`} ref={containerRef}>
+        {!isExpanded ? (
+          // Collapsed state - Google Keep style
           <div 
-            ref={menuRef}
-            className="absolute bottom-16 right-0 bg-white rounded-lg shadow-lg border border-gray-200 py-2 min-w-[280px] animate-in slide-in-from-bottom-2 duration-200"
-            data-testid="create-note-menu"
+            onClick={handleExpand}
+            className="bg-white border border-gray-300 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-text p-4"
           >
-            <div className="px-3 py-2 border-b border-gray-100">
-              <h3 className="text-sm font-medium text-gray-900">Create New Note</h3>
-            </div>
-            
-            {noteTypes.map((noteType) => {
-              const Icon = noteType.icon;
-              return (
-                <button
-                  key={noteType.type}
-                  onClick={() => handleNoteTypeSelect(noteType.type)}
-                  className="w-full px-3 py-3 text-left hover:bg-gray-50 transition-colors focus:outline-none focus:bg-gray-50"
-                  data-testid={`create-note-${noteType.type}`}
+            <div className="flex items-center space-x-3">
+              <PencilIcon className="w-5 h-5 text-gray-400" />
+              <span className="text-gray-500 flex-1">Take a note...</span>
+              <div className="flex space-x-2">
+                <button 
+                  onClick={(e) => { e.stopPropagation(); handleTypeChange('todo'); handleExpand(); }}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                  title="Create todo list"
                 >
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 rounded flex items-center justify-center bg-gray-100">
-                      <Icon className="w-5 h-5 text-gray-600" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="text-sm font-medium text-gray-900">
-                        {noteType.label}
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        {noteType.description}
-                      </div>
-                    </div>
-                  </div>
+                  <ListBulletIcon className="w-5 h-5 text-gray-600" />
                 </button>
-              );
-            })}
+                <button 
+                  onClick={(e) => { e.stopPropagation(); handleTypeChange('timetable'); handleExpand(); }}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                  title="Create timetable"
+                >
+                  <ClockIcon className="w-5 h-5 text-gray-600" />
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : (
+          // Expanded state
+          <div className="bg-white border border-gray-300 rounded-lg shadow-lg p-4">
+            {/* Title input */}
+            <input
+              ref={inputRef}
+              type="text"
+              placeholder="Title"
+              value={noteTitle}
+              onChange={(e) => setNoteTitle(e.target.value)}
+              className="w-full text-lg font-medium placeholder-gray-500 border-none outline-none resize-none mb-3"
+            />
+
+            {/* Content based on type */}
+            {selectedType === 'text' && (
+              <textarea
+                placeholder="Take a note..."
+                value={noteContent}
+                onChange={(e) => setNoteContent(e.target.value)}
+                className="w-full placeholder-gray-500 border-none outline-none resize-none min-h-[100px]"
+                rows={4}
+              />
+            )}
+
+            {selectedType === 'todo' && (
+              <div className="space-y-2">
+                {todoItems.map((item, index) => (
+                  <div key={item.id} className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      checked={item.completed}
+                      onChange={(e) => updateTodoItem(item.id, item.text)}
+                      className="rounded"
+                    />
+                    <input
+                      type="text"
+                      placeholder="List item"
+                      value={item.text}
+                      onChange={(e) => updateTodoItem(item.id, e.target.value)}
+                      className="flex-1 border-none outline-none"
+                    />
+                    {todoItems.length > 1 && (
+                      <button
+                        onClick={() => removeTodoItem(item.id)}
+                        className="p-1 hover:bg-gray-100 rounded"
+                      >
+                        <XMarkIcon className="w-4 h-4 text-gray-400" />
+                      </button>
+                    )}
+                  </div>
+                ))}
+                <button
+                  onClick={addTodoItem}
+                  className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 p-1"
+                >
+                  <PlusIcon className="w-4 h-4" />
+                  <span className="text-sm">Add item</span>
+                </button>
+              </div>
+            )}
+
+            {selectedType === 'timetable' && (
+              <div className="space-y-2">
+                {timetableEntries.map((entry, index) => (
+                  <div key={entry.id} className="flex items-center space-x-2">
+                    <input
+                      type="time"
+                      value={entry.time}
+                      onChange={(e) => updateTimetableEntry(entry.id, 'time', e.target.value)}
+                      className="border border-gray-300 rounded px-2 py-1 text-sm"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Activity"
+                      value={entry.description}
+                      onChange={(e) => updateTimetableEntry(entry.id, 'description', e.target.value)}
+                      className="flex-1 border-none outline-none"
+                    />
+                    {timetableEntries.length > 1 && (
+                      <button
+                        onClick={() => removeTimetableEntry(entry.id)}
+                        className="p-1 hover:bg-gray-100 rounded"
+                      >
+                        <XMarkIcon className="w-4 h-4 text-gray-400" />
+                      </button>
+                    )}
+                  </div>
+                ))}
+                <button
+                  onClick={addTimetableEntry}
+                  className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 p-1"
+                >
+                  <PlusIcon className="w-4 h-4" />
+                  <span className="text-sm">Add entry</span>
+                </button>
+              </div>
+            )}
+
+            {/* Footer */}
+            <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-200">
+              <div className="flex space-x-2">
+                <button
+                  onClick={() => handleTypeChange('text')}
+                  className={`p-2 rounded-full transition-colors ${selectedType === 'text' ? 'bg-blue-100 text-blue-600' : 'hover:bg-gray-100 text-gray-600'}`}
+                  title="Text note"
+                >
+                  <DocumentTextIcon className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={() => handleTypeChange('todo')}
+                  className={`p-2 rounded-full transition-colors ${selectedType === 'todo' ? 'bg-blue-100 text-blue-600' : 'hover:bg-gray-100 text-gray-600'}`}
+                  title="Todo list"
+                >
+                  <ListBulletIcon className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={() => handleTypeChange('timetable')}
+                  className={`p-2 rounded-full transition-colors ${selectedType === 'timetable' ? 'bg-blue-100 text-blue-600' : 'hover:bg-gray-100 text-gray-600'}`}
+                  title="Timetable"
+                >
+                  <ClockIcon className="w-5 h-5" />
+                </button>
+              </div>
+              
+              <button
+                onClick={handleClose}
+                className="px-6 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                Close
+              </button>
+            </div>
           </div>
         )}
-
-        {/* Floating Action Button */}
-        <button
-          ref={buttonRef}
-          onClick={handleButtonClick}
-          className={`w-14 h-14 bg-black hover:bg-gray-800 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center group ${
-            isMenuOpen ? 'rotate-45' : ''
-          }`}
-          data-testid="create-note-fab"
-          aria-label="Create new note"
-        >
-          <PlusIcon className="w-6 h-6 transition-transform duration-200" />
-        </button>
       </div>
     );
   }
 
-  // Inline variant
+  // Fallback to original floating button for other variants
   return (
-    <div className={`relative ${className}`}>
-      {/* Menu */}
-      {isMenuOpen && (
-        <div 
-          ref={menuRef}
-          className="absolute top-full left-0 mt-2 bg-white rounded-lg shadow-lg border border-gray-200 py-2 min-w-[280px] z-50 animate-in slide-in-from-top-2 duration-200"
-          data-testid="create-note-menu"
-        >
-          <div className="px-3 py-2 border-b border-gray-100">
-            <h3 className="text-sm font-medium text-gray-900">Create New Note</h3>
-          </div>
-          
-          {noteTypes.map((noteType) => {
-            const Icon = noteType.icon;
-            return (
-              <button
-                key={noteType.type}
-                onClick={() => handleNoteTypeSelect(noteType.type)}
-                className="w-full px-3 py-3 text-left hover:bg-gray-50 transition-colors focus:outline-none focus:bg-gray-50"
-                data-testid={`create-note-${noteType.type}`}
-              >
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 rounded flex items-center justify-center bg-gray-100">
-                    <Icon className="w-5 h-5 text-gray-600" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="text-sm font-medium text-gray-900">
-                      {noteType.label}
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      {noteType.description}
-                    </div>
-                  </div>
-                </div>
-              </button>
-            );
-          })}
-        </div>
-      )}
-
-      {/* Inline Button */}
+    <div className={`fixed bottom-6 right-6 z-40 ${className}`}>
       <button
-        ref={buttonRef}
-        onClick={handleButtonClick}
-        className="px-4 py-2 bg-black hover:bg-gray-800 text-white rounded-lg font-medium transition-colors flex items-center space-x-2"
-        data-testid="create-note-button"
+        onClick={() => onCreateNote?.('text')}
+        className="w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center"
+        aria-label="Create new note"
       >
-        <PlusIcon className="w-4 h-4" />
-        <span>Create Note</span>
+        <PlusIcon className="w-6 h-6" />
       </button>
     </div>
   );

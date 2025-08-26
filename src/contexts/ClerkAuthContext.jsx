@@ -1,6 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useUser, useAuth } from '@clerk/clerk-react';
-import { generateEncryptionKey, clearEncryptedData } from '../lib/crypto';
 
 const ClerkAuthContext = createContext();
 
@@ -15,7 +14,6 @@ export const useClerkAuth = () => {
 export const ClerkAuthProvider = ({ children }) => {
   const { user, isLoaded: userLoaded } = useUser();
   const { isSignedIn, signOut } = useAuth();
-  const [encryptionKey, setEncryptionKey] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -23,15 +21,9 @@ export const ClerkAuthProvider = ({ children }) => {
       if (!userLoaded) return;
 
       if (isSignedIn && user) {
-        // Generate encryption key based on user ID
-        const key = await generateEncryptionKey(user.id);
-        setEncryptionKey(key);
         console.log('User authenticated with Clerk:', user.emailAddresses[0]?.emailAddress);
       } else {
-        // Clear encryption key and local data when signed out
-        setEncryptionKey(null);
-        clearEncryptedData();
-        console.log('User signed out, clearing encrypted data');
+        console.log('User signed out');
       }
       
       setIsLoading(false);
@@ -42,8 +34,6 @@ export const ClerkAuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      clearEncryptedData();
-      setEncryptionKey(null);
       await signOut();
     } catch (error) {
       console.error('Logout error:', error);
@@ -55,11 +45,19 @@ export const ClerkAuthProvider = ({ children }) => {
       id: user?.id,
       email: user?.emailAddresses[0]?.emailAddress,
       name: user?.fullName || user?.firstName || 'User',
-      avatar: user?.imageUrl
+      avatar: user?.imageUrl,
+      getToken: async () => {
+        try {
+          // Get the session token from Clerk
+          return await user?.getToken?.();
+        } catch (error) {
+          console.error('Failed to get token:', error);
+          return null;
+        }
+      }
     } : null,
     isAuthenticated: isSignedIn,
     isLoading,
-    encryptionKey,
     logout
   };
 

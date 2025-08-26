@@ -96,20 +96,21 @@ const NoteGrid = ({
 
   return (
     <div className={`w-full ${className}`}>
-      {/* Grid container with responsive columns */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+      {/* Masonry-style grid container */}
+      <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 2xl:columns-5 gap-4 space-y-4">
         {notes.map((note) => (
-          <NoteCard
-            key={note.id}
-            note={note}
-            onClick={onNoteClick}
-            onEdit={onNoteEdit}
-            onDelete={onNoteDelete}
-            onConflictResolve={onConflictResolve}
-            isSelected={selectedNotes.has(note.id)}
-            onSelect={() => handleNoteSelect(note.id)}
-            searchQuery={searchQuery}
-          />
+          <div key={note.id} className="break-inside-avoid mb-4">
+            <NoteCard
+              note={note}
+              onClick={onNoteClick}
+              onEdit={onNoteEdit}
+              onDelete={onNoteDelete}
+              onConflictResolve={onConflictResolve}
+              isSelected={selectedNotes.has(note.id)}
+              onSelect={() => handleNoteSelect(note.id)}
+              searchQuery={searchQuery}
+            />
+          </div>
         ))}
       </div>
 

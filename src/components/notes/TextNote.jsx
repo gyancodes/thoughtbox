@@ -64,7 +64,7 @@ const TextNote = ({
     }
   }, [note, title, content, hasChanges, updateNote, onSave]);
 
-  // Auto-save with debouncing
+  // Auto-save with debouncing - reduced delay for instant sync
   useEffect(() => {
     if (!hasChanges || !note) return;
 
@@ -73,10 +73,10 @@ const TextNote = ({
       clearTimeout(saveTimeoutRef.current);
     }
 
-    // Set new timeout for auto-save (2 seconds delay)
+    // Set new timeout for auto-save (500ms delay for instant feel)
     saveTimeoutRef.current = setTimeout(() => {
       debouncedSave();
-    }, 2000);
+    }, 500);
 
     // Cleanup timeout on unmount or dependency change
     return () => {
@@ -85,6 +85,17 @@ const TextNote = ({
       }
     };
   }, [hasChanges, debouncedSave, note]);
+
+  // Auto-save on blur/focus loss for instant sync
+  const handleBlur = useCallback(() => {
+    if (hasChanges && note) {
+      // Clear timeout and save immediately
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+      debouncedSave();
+    }
+  }, [hasChanges, note, debouncedSave]);
 
   // Manual save function
   const handleSave = useCallback(async () => {
@@ -142,6 +153,24 @@ const TextNote = ({
     }
   }, [content]);
 
+  // Listen for force save events (page visibility change, etc.)
+  useEffect(() => {
+    const handleForceSave = () => {
+      if (hasChanges && note) {
+        if (saveTimeoutRef.current) {
+          clearTimeout(saveTimeoutRef.current);
+        }
+        debouncedSave();
+      }
+    };
+
+    window.addEventListener('force-save-notes', handleForceSave);
+    
+    return () => {
+      window.removeEventListener('force-save-notes', handleForceSave);
+    };
+  }, [hasChanges, note, debouncedSave]);
+
   // Cleanup timeout on unmount
   useEffect(() => {
     return () => {
@@ -160,6 +189,7 @@ const TextNote = ({
           type="text"
           value={title}
           onChange={handleTitleChange}
+          onBlur={handleBlur}
           placeholder="Note title..."
           className="w-full text-xl font-semibold text-gray-900 placeholder-gray-400 border-none outline-none bg-transparent resize-none"
           data-testid="text-note-title"
@@ -172,6 +202,7 @@ const TextNote = ({
           ref={contentRefCallback}
           value={content}
           onChange={handleContentChange}
+          onBlur={handleBlur}
           placeholder="Start writing your note..."
           className="w-full text-gray-700 placeholder-gray-400 border-none outline-none bg-transparent resize-none min-h-[200px] leading-relaxed"
           data-testid="text-note-content"

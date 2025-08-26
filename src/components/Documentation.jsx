@@ -131,8 +131,9 @@ const OverviewSection = ({ setActiveSection }) => (
   </div>
 );
 
-export default Documentation;// Feat
-ures Section Component
+export default Documentation;
+
+// Features Section Component
 const FeaturesSection = () => (
   <div className="prose max-w-none">
     <h2 className="text-3xl font-bold text-gray-900 mb-6">Features</h2>

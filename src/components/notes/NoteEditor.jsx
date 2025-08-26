@@ -141,7 +141,13 @@ const NoteEditor = ({
 
   // Handle modal close
   const handleClose = useCallback(() => {
-    onClose?.();
+    // Trigger force save before closing
+    window.dispatchEvent(new CustomEvent('force-save-notes'));
+    
+    // Small delay to allow save to complete
+    setTimeout(() => {
+      onClose?.();
+    }, 100);
   }, [onClose]);
 
   // Handle keyboard shortcuts
@@ -174,7 +180,13 @@ const NoteEditor = ({
   // Handle backdrop click
   const handleBackdropClick = useCallback((e) => {
     if (e.target === e.currentTarget) {
-      handleClose();
+      // Trigger force save before closing
+      window.dispatchEvent(new CustomEvent('force-save-notes'));
+      
+      // Small delay to allow save to complete
+      setTimeout(() => {
+        handleClose();
+      }, 100);
     }
   }, [handleClose]);
 
