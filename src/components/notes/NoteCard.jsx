@@ -9,6 +9,7 @@ import {
   ArrowPathIcon
 } from '@heroicons/react/24/outline';
 import SearchHighlight from '../SearchHighlight';
+import { motion, AnimatePresence } from 'motion/react';
 
 const NoteCard = ({ note, onClick, onEdit, onDelete, onConflictResolve, searchQuery = "" }) => {
   const [showMenu, setShowMenu] = useState(false);
@@ -113,7 +114,15 @@ const NoteCard = ({ note, onClick, onEdit, onDelete, onConflictResolve, searchQu
 
   // Format date for display
   const formatDate = (dateString) => {
+    if (!dateString) return 'Unknown date';
+    
     const date = new Date(dateString);
+    
+    // Check if date is valid
+    if (isNaN(date.getTime())) {
+      return 'Invalid date';
+    }
+    
     const now = new Date();
     const diffTime = Math.abs(now - date);
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -122,7 +131,11 @@ const NoteCard = ({ note, onClick, onEdit, onDelete, onConflictResolve, searchQu
     if (diffDays === 2) return 'Yesterday';
     if (diffDays <= 7) return `${diffDays - 1} days ago`;
     
-    return date.toLocaleDateString();
+    try {
+      return date.toLocaleDateString();
+    } catch (error) {
+      return 'Invalid date';
+    }
   };
 
   const handleCardClick = (e) => {
@@ -157,9 +170,25 @@ const NoteCard = ({ note, onClick, onEdit, onDelete, onConflictResolve, searchQu
   const previewContent = getPreviewContent(note);
 
   return (
-    <div 
-      className="rounded-lg shadow-sm border border-gray-300 p-4 cursor-pointer hover:shadow-md transition-all duration-200 relative group"
-      style={{ backgroundColor: note.color || '#ffffff' }}
+    <motion.div 
+      initial={{ opacity: 0, y: 20, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: -20, scale: 0.95 }}
+      whileHover={{ 
+        y: -2,
+        boxShadow: '0 8px 25px rgba(0,0,0,0.15), 0 4px 10px rgba(0,0,0,0.1)'
+      }}
+      whileTap={{ scale: 0.98 }}
+      transition={{ 
+        type: "spring", 
+        stiffness: 300, 
+        damping: 30,
+        duration: 0.2 
+      }}
+      className="rounded-xl border border-gray-200 p-4 cursor-pointer relative group bg-white/80 backdrop-blur-sm"
+      style={{ 
+        backgroundColor: note.color || '#ffffff',
+      }}
       onClick={handleCardClick}
     >
       {/* Header */}
@@ -205,30 +234,47 @@ const NoteCard = ({ note, onClick, onEdit, onDelete, onConflictResolve, searchQu
             </button>
             
             {/* Dropdown menu */}
-            {showMenu && (
-              <div className="absolute right-0 top-full mt-1 bg-white rounded-md shadow-lg border border-gray-200 py-1 z-10 min-w-[140px]">
-                <button
-                  onClick={handleEdit}
-                  className="block w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
+            <AnimatePresence>
+              {showMenu && (
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                  transition={{ duration: 0.15 }}
+                  className="absolute right-0 top-full mt-1 bg-white/95 backdrop-blur-xl rounded-xl shadow-xl border border-gray-200/50 py-2 z-10 min-w-[140px]"
+                  style={{
+                    boxShadow: '0 10px 25px rgba(0, 0, 0, 0.15), 0 4px 6px rgba(0, 0, 0, 0.1)',
+                  }}
                 >
-                  Edit
-                </button>
-                {note.syncStatus === 'conflict' && (
-                  <button
-                    onClick={handleConflictResolve}
-                    className="block w-full text-left px-3 py-2 text-sm text-orange-600 hover:bg-orange-50"
+                  <motion.button
+                    whileHover={{ backgroundColor: 'rgba(59, 130, 246, 0.05)' }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={handleEdit}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 transition-colors"
                   >
-                    Resolve Conflict
-                  </button>
-                )}
-                <button
-                  onClick={handleDelete}
-                  className="block w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50"
-                >
-                  Delete
-                </button>
-              </div>
-            )}
+                    Edit
+                  </motion.button>
+                  {note.syncStatus === 'conflict' && (
+                    <motion.button
+                      whileHover={{ backgroundColor: 'rgba(249, 115, 22, 0.05)' }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={handleConflictResolve}
+                      className="block w-full text-left px-4 py-2 text-sm text-orange-600 transition-colors"
+                    >
+                      Resolve Conflict
+                    </motion.button>
+                  )}
+                  <motion.button
+                    whileHover={{ backgroundColor: 'rgba(239, 68, 68, 0.05)' }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={handleDelete}
+                    className="block w-full text-left px-4 py-2 text-sm text-red-600 transition-colors"
+                  >
+                    Delete
+                  </motion.button>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
       </div>
@@ -266,7 +312,7 @@ const NoteCard = ({ note, onClick, onEdit, onDelete, onConflictResolve, searchQu
       {/* Footer */}
       <div className="flex items-center justify-between text-xs text-gray-500">
         <div className="flex items-center space-x-2">
-          <span>{formatDate(note.updatedAt)}</span>
+          <span>{formatDate(note.updatedAt || note.updated_at || note.createdAt || note.created_at)}</span>
           {/* Sync status badge */}
           {note.syncStatus && note.syncStatus !== 'synced' && (
             <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
@@ -294,7 +340,7 @@ const NoteCard = ({ note, onClick, onEdit, onDelete, onConflictResolve, searchQu
           onClick={() => setShowMenu(false)}
         />
       )}
-    </div>
+    </motion.div>
   );
 };
 

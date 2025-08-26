@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNotes } from '../../contexts/NotesContext';
+import { motion } from 'motion/react';
 
 const TextNote = ({ 
   note, 
@@ -181,62 +182,111 @@ const TextNote = ({
   }, []);
 
   return (
-    <div className={`text-note-editor ${className}`} onKeyDown={handleKeyDown}>
+    <motion.div 
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      className={`text-note-editor ${className}`} 
+      onKeyDown={handleKeyDown}
+    >
       {/* Title input */}
-      <div className="mb-4">
-        <input
+      <motion.div 
+        className="mb-4"
+        initial={{ opacity: 0, x: -10 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.3, delay: 0.1 }}
+      >
+        <motion.input
           ref={titleRef}
           type="text"
           value={title}
           onChange={handleTitleChange}
           onBlur={handleBlur}
           placeholder="Note title..."
-          className="w-full text-xl font-semibold text-gray-900 placeholder-gray-400 border-none outline-none bg-transparent resize-none"
+          className="w-full text-xl font-semibold text-gray-900 placeholder-gray-400 border-none outline-none bg-transparent resize-none transition-all duration-200 focus:placeholder-gray-300"
           data-testid="text-note-title"
+          whileFocus={{ scale: 1.01 }}
+          transition={{ type: "spring", stiffness: 300, damping: 30 }}
         />
-      </div>
+      </motion.div>
 
       {/* Content textarea */}
-      <div className="flex-1">
-        <textarea
+      <motion.div 
+        className="flex-1"
+        initial={{ opacity: 0, x: -10 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.3, delay: 0.2 }}
+      >
+        <motion.textarea
           ref={contentRefCallback}
           value={content}
           onChange={handleContentChange}
           onBlur={handleBlur}
           placeholder="Start writing your note..."
-          className="w-full text-gray-700 placeholder-gray-400 border-none outline-none bg-transparent resize-none min-h-[200px] leading-relaxed"
+          className="w-full text-gray-700 placeholder-gray-400 border-none outline-none bg-transparent resize-none min-h-[200px] leading-relaxed transition-all duration-200 focus:placeholder-gray-300"
           data-testid="text-note-content"
+          whileFocus={{ scale: 1.005 }}
+          transition={{ type: "spring", stiffness: 300, damping: 30 }}
         />
-      </div>
+      </motion.div>
 
       {/* Status indicator */}
-      <div className="flex items-center justify-between mt-4 text-sm text-gray-500">
+      <motion.div 
+        className="flex items-center justify-between mt-4 text-sm text-gray-500"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, delay: 0.3 }}
+      >
         <div className="flex items-center space-x-2">
           {isSaving && (
-            <span className="flex items-center space-x-1">
+            <motion.span 
+              className="flex items-center space-x-1"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+            >
               <div className="w-3 h-3 border border-gray-300 border-t-blue-500 rounded-full animate-spin"></div>
               <span>Saving...</span>
-            </span>
+            </motion.span>
           )}
           {hasChanges && !isSaving && (
-            <span className="text-yellow-600">Unsaved changes</span>
+            <motion.span 
+              className="text-yellow-600"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+            >
+              Unsaved changes
+            </motion.span>
           )}
           {!hasChanges && !isSaving && note && (
-            <span className="text-green-600">Saved</span>
+            <motion.span 
+              className="text-green-600"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+            >
+              Saved
+            </motion.span>
           )}
         </div>
         
         <div className="text-xs text-gray-400">
           {content.length} characters
         </div>
-      </div>
+      </motion.div>
 
       {/* Keyboard shortcuts hint */}
-      <div className="mt-2 text-xs text-gray-400">
+      <motion.div 
+        className="mt-2 text-xs text-gray-400"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3, delay: 0.4 }}
+      >
         <span>Ctrl+S to save</span>
         {onCancel && <span className="ml-4">Esc to cancel</span>}
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 

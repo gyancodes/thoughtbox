@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { useClerkAuth } from './ClerkAuthContext';
+import toast from 'react-hot-toast';
 
 const NotesContext = createContext();
 
@@ -24,7 +25,7 @@ export const NotesProvider = ({ children }) => {
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api';
   
   // Use localStorage as fallback if API is not available
-  const [useLocalStorage, setUseLocalStorage] = useState(true);
+  const [useLocalStorage, setUseLocalStorage] = useState(false);
 
   // Generate unique ID for new notes
   const generateId = () => {
@@ -111,10 +112,9 @@ export const NotesProvider = ({ children }) => {
     }
 
     try {
-      const token = await user.getToken();
+      // For development, we'll use a simple fetch without auth token
       const response = await fetch(`${API_BASE_URL}/notes`, {
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       });
@@ -125,26 +125,33 @@ export const NotesProvider = ({ children }) => {
 
       const fetchedNotes = await response.json();
       setNotes(fetchedNotes);
+      console.log('✅ Loaded notes from API:', fetchedNotes.length, 'notes');
     } catch (error) {
       console.error('Failed to load notes from API:', error);
       setError('Failed to load notes from server - using local storage as fallback');
+      toast.error('Failed to load notes from server, using local storage');
       setUseLocalStorage(true);
       loadNotesFromStorage();
     } finally {
       setLoading(false);
     }
-  }, [user, API_BASE_URL, useLocalStorage, loadNotesFromStorage, checkApiHealth]);
+  }, [user, API_BASE_URL, useLocalStorage, loadNotesFromStorage]);
 
   // Check API availability on mount
   useEffect(() => {
     const initializeStorage = async () => {
-      const apiAvailable = await checkApiHealth();
-      setUseLocalStorage(!apiAvailable);
-      
-      if (apiAvailable) {
-        console.log('✅ API is available - using server storage');
-      } else {
-        console.log('📱 API not available - using local storage');
+      try {
+        const apiAvailable = await checkApiHealth();
+        setUseLocalStorage(!apiAvailable);
+        
+        if (apiAvailable) {
+          console.log('✅ API is available - using server storage');
+        } else {
+          console.log('📱 API not available - using local storage');
+        }
+      } catch (error) {
+        console.log('📱 API check failed - using local storage');
+        setUseLocalStorage(true);
       }
     };
 
@@ -215,11 +222,9 @@ export const NotesProvider = ({ children }) => {
         return newNote;
       } else {
         // Save to API
-        const token = await user.getToken();
         const response = await fetch(`${API_BASE_URL}/notes`, {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(newNote),
@@ -236,12 +241,14 @@ export const NotesProvider = ({ children }) => {
           note.id === noteId ? savedNote : note
         ));
 
+        toast.success('Note created successfully');
         return savedNote;
       }
     } catch (error) {
       // Remove from state if save failed
       setNotes(prev => prev.filter(note => note.id !== noteId));
       console.error('Failed to create note:', error);
+      toast.error('Failed to create note');
       throw new Error('Failed to create note');
     }
   };
@@ -275,11 +282,9 @@ export const NotesProvider = ({ children }) => {
         return updatedNote;
       } else {
         // Save to API
-        const token = await user.getToken();
         const response = await fetch(`${API_BASE_URL}/notes/${noteId}`, {
           method: 'PUT',
           headers: {
-            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(updatedNote),
@@ -296,6 +301,7 @@ export const NotesProvider = ({ children }) => {
           note.id === noteId ? savedNote : note
         ));
 
+        toast.success('Note updated successfully');
         return savedNote;
       }
     } catch (error) {
@@ -304,6 +310,7 @@ export const NotesProvider = ({ children }) => {
       revertedNotes[noteIndex] = notes[noteIndex];
       setNotes(revertedNotes);
       console.error('Failed to update note:', error);
+      toast.error('Failed to update note');
       throw new Error('Failed to update note');
     }
   };
@@ -329,11 +336,10 @@ export const NotesProvider = ({ children }) => {
         saveNotesToStorage(updatedNotes);
       } else {
         // Delete from API
-        const token = await user.getToken();
         const response = await fetch(`${API_BASE_URL}/notes/${noteId}`, {
           method: 'DELETE',
           headers: {
-            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
           },
         });
 
@@ -341,10 +347,13 @@ export const NotesProvider = ({ children }) => {
           throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
       }
+      
+      toast.success('Note deleted successfully');
     } catch (error) {
       // Restore note if delete failed
       setNotes(prev => [noteToDelete, ...prev]);
       console.error('Failed to delete note:', error);
+      toast.error('Failed to delete note');
       throw new Error('Failed to delete note');
     }
   };

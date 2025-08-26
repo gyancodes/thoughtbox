@@ -96,10 +96,10 @@ const NoteGrid = ({
 
   return (
     <div className={`w-full ${className}`}>
-      {/* Masonry-style grid container */}
-      <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 2xl:columns-5 gap-4 space-y-4">
+      {/* Google Keep style masonry grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 auto-rows-min">
         {notes.map((note) => (
-          <div key={note.id} className="break-inside-avoid mb-4">
+          <div key={note.id} className="break-inside-avoid">
             <NoteCard
               note={note}
               onClick={onNoteClick}
