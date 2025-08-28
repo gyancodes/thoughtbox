@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 
 const SearchBar = ({ 
   onSearch, 
@@ -146,15 +147,37 @@ const SearchBar = ({
 
   return (
     <div className={`relative ${className}`}>
-      <div className={`
-        relative flex items-center bg-white border rounded-lg transition-all duration-200
-        ${isFocused 
-          ? 'border-blue-300 shadow-sm ring-1 ring-blue-100' 
-          : 'border-gray-200 hover:border-gray-300'
-        }
-      `}>
+      <motion.div 
+        className={`
+          relative flex items-center rounded-xl transition-all duration-300 border
+          ${isFocused 
+            ? 'border-white/40 shadow-lg ring-1 ring-blue-200/50' 
+            : 'border-white/20 hover:border-white/30'
+          }
+        `}
+        style={{
+          background: isFocused 
+            ? 'rgba(255, 255, 255, 0.9)' 
+            : 'rgba(255, 255, 255, 0.7)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          boxShadow: isFocused 
+            ? '0 8px 32px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.6)'
+            : '0 4px 16px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.4)',
+        }}
+        whileFocus={{ scale: 1.02 }}
+        whileHover={{ scale: 1.01 }}
+        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+      >
         {/* Search Icon */}
-        <div className="absolute left-3 flex items-center pointer-events-none">
+        <motion.div 
+          className="absolute left-3 flex items-center pointer-events-none"
+          animate={{ 
+            scale: isFocused ? 1.1 : 1,
+            rotate: isFocused ? 5 : 0 
+          }}
+          transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        >
           <svg 
             className={`w-5 h-5 transition-colors ${
               isFocused ? 'text-blue-500' : 'text-gray-400'
@@ -170,7 +193,7 @@ const SearchBar = ({
               d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" 
             />
           </svg>
-        </div>
+        </motion.div>
 
         {/* Input Field */}
         <input
@@ -187,17 +210,24 @@ const SearchBar = ({
         />
 
         {/* Clear Button */}
-        {query && (
-          <button
-            onClick={handleClear}
-            className="absolute right-3 p-1 text-gray-400 hover:text-gray-600 transition-colors"
-            type="button"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        )}
+        <AnimatePresence>
+          {query && (
+            <motion.button
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              onClick={handleClear}
+              className="absolute right-3 p-1 text-gray-400 hover:text-gray-600 transition-colors rounded-full hover:bg-white/50"
+              type="button"
+              whileHover={{ scale: 1.1, rotate: 90 }}
+              whileTap={{ scale: 0.9 }}
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </motion.button>
+          )}
+        </AnimatePresence>
 
         {/* Keyboard Shortcut Hint */}
         {!isFocused && !query && (
@@ -207,7 +237,7 @@ const SearchBar = ({
             </kbd>
           </div>
         )}
-      </div>
+      </motion.div>
 
       {/* Search Results Count */}
       {showResultsCount && query && (
@@ -230,26 +260,43 @@ const SearchBar = ({
       )}
 
       {/* Search Suggestions */}
-      {showSuggestionsList && (
-        <div 
-          ref={suggestionsRef}
-          className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-48 overflow-y-auto"
-        >
-          {suggestions.map((suggestion, index) => (
-            <button
-              key={suggestion}
-              onClick={() => handleSuggestionClick(suggestion)}
-              className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${
-                index === selectedSuggestionIndex ? 'bg-blue-50 text-blue-700' : 'text-gray-700'
-              } ${index === 0 ? 'rounded-t-lg' : ''} ${
-                index === suggestions.length - 1 ? 'rounded-b-lg' : ''
-              }`}
-            >
-              <span className="font-medium">{suggestion}</span>
-            </button>
-          ))}
-        </div>
-      )}
+      <AnimatePresence>
+        {showSuggestionsList && (
+          <motion.div 
+            ref={suggestionsRef}
+            initial={{ opacity: 0, y: -10, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -10, scale: 0.95 }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            className="absolute top-full left-0 right-0 mt-2 rounded-xl border border-white/30 z-50 max-h-48 overflow-y-auto"
+            style={{
+              background: 'rgba(255, 255, 255, 0.9)',
+              backdropFilter: 'blur(25px)',
+              WebkitBackdropFilter: 'blur(25px)',
+              boxShadow: '0 12px 40px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.6)',
+            }}
+          >
+            {suggestions.map((suggestion, index) => (
+              <motion.button
+                key={suggestion}
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.05 }}
+                onClick={() => handleSuggestionClick(suggestion)}
+                className={`w-full text-left px-4 py-2 text-sm hover:bg-white/50 transition-colors ${
+                  index === selectedSuggestionIndex ? 'bg-blue-500/20 text-blue-700' : 'text-gray-700'
+                } ${index === 0 ? 'rounded-t-xl' : ''} ${
+                  index === suggestions.length - 1 ? 'rounded-b-xl' : ''
+                }`}
+                whileHover={{ scale: 1.02, x: 5 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <span className="font-medium">{suggestion}</span>
+              </motion.button>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

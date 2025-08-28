@@ -256,9 +256,12 @@ const NoteEditor = ({
               damping: 30,
               duration: 0.3 
             }}
-            className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col border border-white/20"
+            className="rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col border border-white/30 overflow-hidden"
             style={{
-              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.1)',
+              background: 'rgba(255, 255, 255, 0.9)',
+              backdropFilter: 'blur(30px)',
+              WebkitBackdropFilter: 'blur(30px)',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.2)',
             }}
             onClick={(e) => e.stopPropagation()}
             tabIndex={-1}
@@ -267,7 +270,7 @@ const NoteEditor = ({
             aria-labelledby="note-editor-title"
           >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+        <div className="flex items-center justify-between p-6 border-b border-white/30 bg-white/20 backdrop-blur-sm">
           <div className="flex items-center space-x-4">
             <h2 id="note-editor-title" className="text-xl font-semibold text-gray-900">
               {isCreating ? 'Create Note' : 'Edit Note'}
@@ -316,7 +319,7 @@ const NoteEditor = ({
         </div>
 
         {/* Footer */}
-        <div className="p-6 border-t border-gray-200 bg-gray-50">
+        <div className="p-6 border-t border-white/30 bg-white/20 backdrop-blur-sm">
           <div className="flex items-center justify-between">
             <div className="text-sm text-gray-500">
               <div>

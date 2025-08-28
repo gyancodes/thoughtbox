@@ -191,7 +191,7 @@ const TextNote = ({
     >
       {/* Title input */}
       <motion.div 
-        className="mb-4"
+        className="mb-6 relative"
         initial={{ opacity: 0, x: -10 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.3, delay: 0.1 }}
@@ -203,16 +203,25 @@ const TextNote = ({
           onChange={handleTitleChange}
           onBlur={handleBlur}
           placeholder="Note title..."
-          className="w-full text-xl font-semibold text-gray-900 placeholder-gray-400 border-none outline-none bg-transparent resize-none transition-all duration-200 focus:placeholder-gray-300"
+          className="w-full text-xl font-semibold text-gray-900 placeholder-gray-400 border-none outline-none bg-transparent resize-none transition-all duration-300 focus:placeholder-gray-300 p-2 rounded-lg"
           data-testid="text-note-title"
-          whileFocus={{ scale: 1.01 }}
+          style={{
+            background: 'rgba(255, 255, 255, 0.3)',
+            backdropFilter: 'blur(10px)',
+            WebkitBackdropFilter: 'blur(10px)',
+          }}
+          whileFocus={{ 
+            scale: 1.02,
+            background: 'rgba(255, 255, 255, 0.5)',
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.4)',
+          }}
           transition={{ type: "spring", stiffness: 300, damping: 30 }}
         />
       </motion.div>
 
       {/* Content textarea */}
       <motion.div 
-        className="flex-1"
+        className="flex-1 relative"
         initial={{ opacity: 0, x: -10 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.3, delay: 0.2 }}
@@ -223,9 +232,20 @@ const TextNote = ({
           onChange={handleContentChange}
           onBlur={handleBlur}
           placeholder="Start writing your note..."
-          className="w-full text-gray-700 placeholder-gray-400 border-none outline-none bg-transparent resize-none min-h-[200px] leading-relaxed transition-all duration-200 focus:placeholder-gray-300"
+          className="w-full text-gray-700 placeholder-gray-400 border-none outline-none resize-none min-h-[200px] leading-relaxed transition-all duration-300 focus:placeholder-gray-300 p-4 rounded-xl"
           data-testid="text-note-content"
-          whileFocus={{ scale: 1.005 }}
+          style={{
+            background: 'rgba(255, 255, 255, 0.2)',
+            backdropFilter: 'blur(15px)',
+            WebkitBackdropFilter: 'blur(15px)',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+          }}
+          whileFocus={{ 
+            scale: 1.01,
+            background: 'rgba(255, 255, 255, 0.4)',
+            boxShadow: '0 8px 30px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.5)',
+            borderColor: 'rgba(255, 255, 255, 0.4)',
+          }}
           transition={{ type: "spring", stiffness: 300, damping: 30 }}
         />
       </motion.div>
