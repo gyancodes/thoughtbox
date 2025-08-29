@@ -1,10 +1,12 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SignInButton, SignUpButton, useUser } from '@clerk/clerk-react';
+import { motion } from 'motion/react';
 
 const LandingPage = () => {
   const { isSignedIn } = useUser();
   const navigate = useNavigate();
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
   // Redirect to dashboard if already signed in
   useEffect(() => {
@@ -13,413 +15,720 @@ const LandingPage = () => {
     }
   }, [isSignedIn, navigate]);
 
+  // Mouse tracking for subtle parallax
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      setMousePosition({ 
+        x: (e.clientX - window.innerWidth / 2) * 0.01,
+        y: (e.clientY - window.innerHeight / 2) * 0.01
+      });
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
+
+
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white relative overflow-hidden">
+      {/* Subtle background pattern */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <motion.div
+          className="absolute top-1/4 right-1/4 w-64 h-64 bg-blue-50 rounded-full opacity-20 floating-bg"
+          style={{
+            transform: `translate(${mousePosition.x}px, ${mousePosition.y}px)`,
+          }}
+          animate={{
+            scale: [1, 1.1, 1],
+            opacity: [0.2, 0.3, 0.2],
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
+        <motion.div
+          className="absolute bottom-1/3 left-1/3 w-48 h-48 bg-blue-50 rounded-full opacity-15 floating-bg"
+          style={{
+            transform: `translate(${-mousePosition.x}px, ${-mousePosition.y}px)`,
+          }}
+          animate={{
+            scale: [1, 0.9, 1],
+            opacity: [0.15, 0.25, 0.15],
+          }}
+          transition={{
+            duration: 10,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 2
+          }}
+        />
+        {/* Easter egg: Hidden floating dot */}
+        <motion.div
+          className="absolute top-1/2 right-1/3 w-2 h-2 bg-blue-400 rounded-full opacity-0"
+          animate={{
+            opacity: [0, 1, 0],
+            y: [0, -20, 0],
+            x: [0, 10, 0],
+          }}
+          transition={{
+            duration: 15,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 5
+          }}
+        />
+      </div>
+
       {/* Navigation */}
-      <nav className="relative z-50">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+      <motion.nav 
+        className="relative z-50 border-b border-gray-100 bg-white/80 backdrop-blur-sm"
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.6 }}
+      >
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center">
+            <motion.div 
+              className="flex items-center space-x-2"
+              whileHover={{ scale: 1.02 }}
+            >
+              <div className="w-7 h-7 bg-blue-600 rounded-lg flex items-center justify-center">
                 <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                 </svg>
               </div>
-              <span className="text-xl font-semibold text-gray-900">ThoughtBox</span>
-            </div>
+              <span className="text-lg font-medium text-gray-900">ThoughtBox</span>
+            </motion.div>
 
             {/* Navigation Links */}
-            <div className="hidden md:flex items-center space-x-8">
-              <a href="https://docs.thoughtbox.dev" target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-gray-900 transition-colors">
-                Docs
-              </a>
-              <a href="https://github.com/your-username/thoughtbox" target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-gray-900 transition-colors">
-                GitHub
-              </a>
-              <SignInButton mode="modal">
-                <button className="text-gray-600 hover:text-gray-900 transition-colors">
-                  Sign in
-                </button>
-              </SignInButton>
-              <SignUpButton mode="modal">
-                <button className="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors">
-                  Get started
-                </button>
-              </SignUpButton>
+            <div className="hidden md:flex items-center space-x-6">
+              <a href="#features" className="text-gray-600 hover:text-blue-600 transition-colors text-sm font-medium">Features</a>
+              <a href="#pricing" className="text-gray-600 hover:text-blue-600 transition-colors text-sm font-medium">Pricing</a>
+              <a href="https://docs.thoughtbox.dev" target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-blue-600 transition-colors text-sm font-medium">Docs</a>
+              
+              <div className="flex items-center space-x-3 border-l border-gray-200 pl-6">
+                <SignInButton mode="modal">
+                  <button className="text-gray-600 hover:text-blue-600 transition-colors text-sm font-medium">
+                    Sign in
+                  </button>
+                </SignInButton>
+                <SignUpButton mode="modal">
+                  <motion.button 
+                    className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    Get Started
+                  </motion.button>
+                </SignUpButton>
+              </div>
             </div>
 
-            {/* Mobile menu button */}
+            {/* Mobile CTA */}
             <div className="md:hidden">
               <SignUpButton mode="modal">
-                <button className="bg-black text-white px-4 py-2 rounded-lg text-sm">
-                  Get started
-                </button>
+                <motion.button 
+                  className="bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Start
+                </motion.button>
               </SignUpButton>
             </div>
           </div>
         </div>
-      </nav>
+      </motion.nav>
 
-      {/* Hero Section */}
+      {/* Hero Section - Fits on one page */}
       <main className="relative">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 pt-20 pb-16">
-          <div className="text-center max-w-4xl mx-auto">
-            {/* Badge */}
-            <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800 mb-8">
-              <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
-              Open source note-taking
-            </div>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-20">
+          
+          {/* Hero Content */}
+          <div className="text-center max-w-4xl mx-auto mb-16">
+            {/* Status Badge */}
+            <motion.div 
+              className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium mb-6 bg-blue-50 border border-blue-200 text-blue-700"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+            >
+              <span className="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
+              Open Source • Privacy First • Self-Hostable
+            </motion.div>
 
             {/* Main Headline */}
-            <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-6 leading-tight">
-              Your notes,
+            <motion.h1 
+              className="text-4xl sm:text-5xl lg:text-6xl font-light mb-6 text-gray-900 leading-tight tracking-tight"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.1 }}
+            >
+              Your digital workspace
               <br />
-              <span className="text-gray-500">beautifully simple</span>
-            </h1>
+              <span className="text-blue-600 font-normal">for capturing thoughts</span>
+            </motion.h1>
 
             {/* Subheadline */}
-            <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
-              A modern note-taking app that works offline, syncs everywhere, and keeps your thoughts organized.
-            </p>
-
-            {/* Stats */}
-            <div className="flex flex-wrap justify-center gap-8 mb-12 text-sm text-gray-500">
-              <div className="flex items-center space-x-2">
-                <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-                <span>Open Source</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <svg className="w-4 h-4 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
-                </svg>
-                <span>Privacy First</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <svg className="w-4 h-4 text-purple-500" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
-                </svg>
-                <span>Self-Hostable</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <svg className="w-4 h-4 text-orange-500" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
-                </svg>
-                <span>Works Offline</span>
-              </div>
-            </div>
+            <motion.p 
+              className="text-lg sm:text-xl text-gray-600 mb-8 leading-relaxed max-w-2xl mx-auto font-light"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+            >
+              A minimal, fast note-taking application that works offline and puts your privacy first. 
+              Organize your thoughts with text notes, todo lists, and timetables—all synced across your devices.
+            </motion.p>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+            <motion.div 
+              className="flex flex-col sm:flex-row gap-4 justify-center mb-12"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.5 }}
+            >
               <SignUpButton mode="modal">
-                <button className="bg-black text-white px-8 py-4 rounded-lg font-medium hover:bg-gray-800 transition-colors text-lg">
-                  Start taking notes
-                </button>
+                <motion.button 
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium transition-colors shadow-lg hover:shadow-xl"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  Start Free Trial
+                </motion.button>
               </SignUpButton>
-              <a
-                href="https://github.com/your-username/thoughtbox"
+              
+              <motion.a
+                href="https://demo.thoughtbox.dev"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="border border-gray-300 text-gray-700 px-8 py-4 rounded-lg font-medium hover:bg-gray-50 transition-colors text-lg inline-flex items-center justify-center space-x-2"
+                className="border border-gray-300 hover:border-blue-400 text-gray-700 hover:text-blue-600 px-8 py-3 rounded-lg font-medium transition-colors inline-flex items-center justify-center"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
               >
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-                </svg>
-                <span>View on GitHub</span>
-              </a>
-            </div>
+                View Demo
+              </motion.a>
+            </motion.div>
 
-            {/* Documentation Link */}
-            <div className="mb-16">
-              <a
-                href="https://docs.thoughtbox.dev"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 hover:text-blue-700 font-medium inline-flex items-center justify-center space-x-2"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                </svg>
-                <span>Read the documentation</span>
-              </a>
-            </div>
+            {/* Trust Indicators */}
+            <motion.div 
+              className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.7 }}
+            >
+              <div className="space-y-1">
+                <div className="text-xl font-medium text-gray-900">10,000+</div>
+                <div className="text-sm text-gray-500">Active Users</div>
+              </div>
+              <div className="space-y-1">
+                <div className="text-xl font-medium text-gray-900">99.9%</div>
+                <div className="text-sm text-gray-500">Uptime</div>
+              </div>
+              <div className="space-y-1">
+                <div className="text-xl font-medium text-gray-900">Open Source</div>
+                <div className="text-sm text-gray-500">MIT Licensed</div>
+              </div>
+            </motion.div>
+          </div>
 
-            {/* Demo Image Placeholder */}
-            <div className="relative max-w-5xl mx-auto">
-              <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl border border-gray-200 p-8 shadow-2xl">
-                <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-                  {/* Mock browser bar */}
-                  <div className="bg-gray-50 px-4 py-3 border-b border-gray-200 flex items-center space-x-2">
-                    <div className="flex space-x-2">
-                      <div className="w-3 h-3 bg-red-400 rounded-full"></div>
-                      <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
-                      <div className="w-3 h-3 bg-green-400 rounded-full"></div>
-                    </div>
-                    <div className="flex-1 text-center">
-                      <div className="bg-white rounded px-3 py-1 text-sm text-gray-500 inline-block">
-                        thoughtbox.dev
-                      </div>
+          {/* Product Preview - Compact */}
+          <motion.div 
+            className="relative max-w-4xl mx-auto"
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.9 }}
+          >
+            <div className="relative rounded-xl shadow-xl overflow-hidden border border-gray-200 bg-white">
+              {/* Browser Bar */}
+              <div className="bg-gray-50 px-4 py-2 border-b border-gray-200 flex items-center space-x-3">
+                <div className="flex space-x-2">
+                  <div className="w-3 h-3 bg-red-400 rounded-full"></div>
+                  <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
+                  <div className="w-3 h-3 bg-green-400 rounded-full"></div>
+                </div>
+                <div className="flex-1 text-center">
+                  <div className="bg-white rounded-md px-3 py-1 text-xs text-gray-600 inline-block border border-gray-200">
+                    app.thoughtbox.dev
+                  </div>
+                </div>
+              </div>
+              
+              {/* App Interface - Compact */}
+              <div className="p-4 bg-gray-50 min-h-64">
+                <div className="space-y-3">
+                  {/* Search/Input Bar */}
+                  <div className="bg-white rounded-lg p-3 border border-gray-200 shadow-sm">
+                    <div className="flex items-center space-x-2 text-gray-500">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                      </svg>
+                      <span className="text-xs">Search notes or create new...</span>
                     </div>
                   </div>
                   
-                  {/* Mock app interface */}
-                  <div className="p-6 space-y-4">
-                    {/* Mock input */}
-                    <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                      <div className="flex items-center space-x-3">
-                        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                        </svg>
-                        <span className="text-gray-500">Take a note...</span>
-                      </div>
-                    </div>
+                  {/* Sample Notes Grid - Compact */}
+                  <div className="grid md:grid-cols-3 gap-3">
+                    <motion.div 
+                      className="bg-white rounded-lg p-3 border border-gray-200 shadow-sm"
+                      whileHover={{ y: -1, shadow: "0 4px 12px rgba(0,0,0,0.1)" }}
+                    >
+                      <div className="text-xs font-medium text-gray-900 mb-1">Project Planning</div>
+                      <div className="text-xs text-gray-600 mb-2">Define project scope and timeline...</div>
+                      <div className="text-xs text-gray-400">2 hours ago</div>
+                    </motion.div>
                     
-                    {/* Mock notes */}
-                    <div className="grid md:grid-cols-3 gap-4">
-                      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                        <h3 className="font-medium text-gray-900 mb-2">Meeting Notes</h3>
-                        <p className="text-sm text-gray-600">Discussed project timeline and deliverables...</p>
-                      </div>
-                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                        <h3 className="font-medium text-gray-900 mb-2">Todo List</h3>
-                        <div className="space-y-1">
-                          <div className="flex items-center space-x-2 text-sm">
-                            <div className="w-4 h-4 bg-green-500 rounded-sm"></div>
-                            <span className="line-through text-gray-500">Review designs</span>
-                          </div>
-                          <div className="flex items-center space-x-2 text-sm">
-                            <div className="w-4 h-4 border border-gray-300 rounded-sm"></div>
-                            <span>Update documentation</span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                        <h3 className="font-medium text-gray-900 mb-2">Ideas</h3>
-                        <p className="text-sm text-gray-600">New feature concepts for the mobile app...</p>
-                      </div>
-                    </div>
+                    <motion.div 
+                      className="bg-white rounded-lg p-3 border border-gray-200 shadow-sm"
+                      whileHover={{ y: -1, shadow: "0 4px 12px rgba(0,0,0,0.1)" }}
+                    >
+                      <div className="text-xs font-medium text-gray-900 mb-1">Meeting Notes</div>
+                      <div className="text-xs text-gray-600 mb-2">• Review design mockups...</div>
+                      <div className="text-xs text-gray-400">Yesterday</div>
+                    </motion.div>
+                    
+                    <motion.div 
+                      className="bg-white rounded-lg p-3 border border-gray-200 shadow-sm"
+                      whileHover={{ y: -1, shadow: "0 4px 12px rgba(0,0,0,0.1)" }}
+                    >
+                      <div className="text-xs font-medium text-gray-900 mb-1">Ideas</div>
+                      <div className="text-xs text-gray-600 mb-2">New feature concepts...</div>
+                      <div className="text-xs text-gray-400">3 days ago</div>
+                    </motion.div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
 
         {/* Features Section */}
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-24">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Everything you need
+        <div id="features" className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+          <motion.div 
+            className="text-center mb-16"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-3xl sm:text-4xl font-light text-gray-900 mb-4 tracking-tight">
+              Everything you need to capture ideas
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Simple, powerful, and designed for the way you think.
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto font-light">
+              Designed for productivity with features that help you organize, search, and sync your thoughts seamlessly.
             </p>
-          </div>
+          </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-8 mb-16">
-            {/* Feature 1 */}
-            <div className="text-center">
-              <div className="w-16 h-16 bg-black rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">Lightning fast</h3>
-              <p className="text-gray-600">
-                Works offline and syncs instantly when you're back online. Your notes are always available.
-              </p>
-            </div>
-
-            {/* Feature 2 */}
-            <div className="text-center">
-              <div className="w-16 h-16 bg-black rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">Multiple formats</h3>
-              <p className="text-gray-600">
-                Text notes, todo lists, and timetables. Organize your thoughts the way that works for you.
-              </p>
-            </div>
-
-            {/* Feature 3 */}
-            <div className="text-center">
-              <div className="w-16 h-16 bg-black rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">Secure & private</h3>
-              <p className="text-gray-600">
-                Your notes are encrypted and only you can access them. Open source and transparent.
-              </p>
-            </div>
-          </div>
-
-          {/* Technical Details */}
-          <div className="bg-gray-50 rounded-2xl p-8 border border-gray-200">
-            <div className="text-center mb-12">
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Built with modern technology</h3>
-              <p className="text-gray-600 max-w-2xl mx-auto">
-                ThoughtBox uses cutting-edge technologies to deliver a fast, secure, and reliable experience.
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-              <div className="text-center">
-                <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M14.23 12.004a2.236 2.236 0 0 1-2.235 2.236 2.236 2.236 0 0 1-2.236-2.236 2.236 2.236 0 0 1 2.235-2.236 2.236 2.236 0 0 1 2.236 2.236zm2.648-10.69c-1.346 0-3.107.96-4.888 2.622-1.78-1.653-3.542-2.602-4.887-2.602-.41 0-.783.093-1.106.278-1.375.793-1.683 3.264-.973 6.365C1.98 8.917 0 10.42 0 12.004c0 1.59 1.99 3.097 5.043 4.03-.704 3.113-.39 5.588.988 6.38.32.187.69.275 1.102.275 1.345 0 3.107-.96 4.888-2.624 1.78 1.654 3.542 2.603 4.887 2.603.41 0 .783-.09 1.106-.275 1.374-.792 1.683-3.263.973-6.365C22.02 15.096 24 13.59 24 12.004c0-1.59-1.99-3.097-5.043-4.032.704-3.11.39-5.587-.988-6.38-.318-.184-.688-.277-1.092-.278zm-.005 1.09v.006c.225 0 .406.044.558.127.666.382.955 1.835.73 3.704-.054.46-.142.945-.25 1.44-.96-.236-2.006-.417-3.107-.534-.66-.905-1.345-1.727-2.035-2.447 1.592-1.48 3.087-2.292 4.105-2.295zm-9.77.02c1.012 0 2.514.808 4.11 2.28-.686.72-1.37 1.537-2.02 2.442-1.107.117-2.154.298-3.113.538-.112-.49-.195-.964-.254-1.42-.23-1.868.054-3.32.714-3.707.19-.09.4-.127.563-.132zm4.882 3.05c.455.468.91.992 1.36 1.564-.44-.02-.89-.034-1.36-.034-.47 0-.92.014-1.36.034.44-.572.895-1.096 1.36-1.564zM12 8.1c.74 0 1.477.034 2.202.093.406.582.802 1.203 1.183 1.86.372.64.71 1.29 1.018 1.946-.308.655-.646 1.31-1.013 1.95-.38.66-.773 1.288-1.18 1.87-.728.063-1.466.098-2.21.098-.74 0-1.477-.035-2.202-.093-.406-.582-.802-1.204-1.183-1.86-.372-.64-.71-1.29-1.018-1.946.303-.657.646-1.313 1.013-1.954.38-.66.773-1.286 1.18-1.868.728-.064 1.466-.098 2.21-.098zm-3.635.254c-.24.377-.48.763-.704 1.16-.225.39-.435.782-.635 1.174-.265-.656-.49-1.31-.676-1.947.64-.15 1.315-.283 2.015-.386zm7.26 0c.695.103 1.365.23 2.006.387-.18.632-.405 1.282-.66 1.933-.2-.39-.41-.783-.64-1.174-.225-.392-.465-.774-.705-1.146zm3.063.675c.484.15.944.317 1.375.498 1.732.74 2.852 1.708 2.852 2.476-.005.768-1.125 1.74-2.857 2.475-.42.18-.88.342-1.355.493-.28-.958-.646-1.956-1.1-2.98.45-1.017.81-2.01 1.085-2.964zm-13.395.004c.278.96.645 1.957 1.1 2.98-.45 1.017-.812 2.01-1.086 2.964-.484-.15-.944-.318-1.37-.5-1.732-.737-2.852-1.706-2.852-2.474 0-.768 1.12-1.742 2.852-2.476.42-.18.88-.342 1.356-.494zm11.678 4.28c.265.657.49 1.312.676 1.948-.64.157-1.316.29-2.016.39.24-.375.48-.762.705-1.158.225-.39.435-.788.636-1.18zm-9.945.02c.2.392.41.783.64 1.175.23.39.465.772.705 1.143-.695-.102-1.365-.23-2.006-.386.18-.63.406-1.282.66-1.933zM17.92 16.32c.112.493.2.968.254 1.423.23 1.868-.054 3.32-.714 3.708-.147.09-.338.128-.563.128-1.012 0-2.514-.807-4.11-2.28.686-.72 1.37-1.536 2.02-2.44 1.107-.118 2.154-.3 3.113-.54zm-11.83.01c.96.234 2.006.415 3.107.532.66.905 1.345 1.727 2.035 2.446-1.595 1.483-3.092 2.295-4.11 2.295-.22-.005-.406-.05-.553-.132-.666-.38-.955-1.834-.73-3.703.054-.46.142-.944.25-1.438zm4.56.64c.44.02.89.034 1.36.034.47 0 .92-.014 1.36-.034-.44.572-.895 1.095-1.36 1.56-.465-.467-.92-.992-1.36-1.56z"/>
+          <div className="grid lg:grid-cols-3 gap-8 mb-16">
+            {[
+              {
+                title: "Lightning Fast Search",
+                description: "Find any note instantly with our advanced full-text search. Search across all your content, including tags and metadata.",
+                icon: (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
-                </div>
-                <h4 className="font-semibold text-gray-900 mb-2">React 19</h4>
-                <p className="text-sm text-gray-600">Modern UI with latest React features</p>
-              </div>
-
-              <div className="text-center">
-                <div className="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 0C5.374 0 0 5.373 0 12s5.374 12 12 12 12-5.373 12-12S18.626 0 12 0zm-.568 1.34c.492 0 .892.4.892.892s-.4.892-.892.892-.892-.4-.892-.892.4-.892.892-.892zm-3.133.892c0-.492.4-.892.892-.892s.892.4.892.892-.4.892-.892.892-.892-.4-.892-.892zm6.266 0c0-.492.4-.892.892-.892s.892.4.892.892-.4.892-.892.892-.892-.4-.892-.892zM12 2.108c5.39 0 9.892 4.502 9.892 9.892S17.39 21.892 12 21.892 2.108 17.39 2.108 12 6.61 2.108 12 2.108z"/>
+                )
+              },
+              {
+                title: "Offline First",
+                description: "Your notes are always accessible. Work offline and sync automatically when you're back online. No internet dependency.",
+                icon: (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                   </svg>
-                </div>
-                <h4 className="font-semibold text-gray-900 mb-2">PostgreSQL</h4>
-                <p className="text-sm text-gray-600">Reliable database with Neon hosting</p>
-              </div>
-
-              <div className="text-center">
-                <div className="w-12 h-12 bg-purple-600 rounded-lg flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 2.4c5.302 0 9.6 4.298 9.6 9.6s-4.298 9.6-9.6 9.6S2.4 17.302 2.4 12 6.698 2.4 12 2.4z"/>
+                )
+              },
+              {
+                title: "Multiple Formats",
+                description: "Create text notes, todo lists, and timetables. Organize content with tags, folders, and custom categories.",
+                icon: (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14-7H5m14 14H5" />
                   </svg>
-                </div>
-                <h4 className="font-semibold text-gray-900 mb-2">Clerk Auth</h4>
-                <p className="text-sm text-gray-600">Enterprise-grade authentication</p>
-              </div>
-
-              <div className="text-center">
-                <div className="w-12 h-12 bg-orange-600 rounded-lg flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12.001 4.8c-3.2 0-5.2 1.6-6 4.8 1.2-1.6 2.6-2.2 4.2-1.8.913.228 1.565.89 2.288 1.624C13.666 10.618 15.027 12 18.001 12c3.2 0 5.2-1.6 6-4.8-1.2 1.6-2.6 2.2-4.2 1.8-.913-.228-1.565-.89-2.288-1.624C16.337 6.182 14.976 4.8 12.001 4.8zm-6 7.2c-3.2 0-5.2 1.6-6 4.8 1.2-1.6 2.6-2.2 4.2-1.8.913.228 1.565.89 2.288 1.624 1.177 1.194 2.538 2.576 5.512 2.576 3.2 0 5.2-1.6 6-4.8-1.2 1.6-2.6 2.2-4.2 1.8-.913-.228-1.565-.89-2.288-1.624C10.337 13.382 8.976 12 6.001 12z"/>
+                )
+              },
+              {
+                title: "Privacy Focused",
+                description: "End-to-end encryption ensures your data stays private. We can't read your notes—only you can access them.",
+                icon: (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                   </svg>
+                )
+              },
+              {
+                title: "Real-time Sync",
+                description: "Access your notes on any device. Changes sync instantly across web, desktop, and mobile applications.",
+                icon: (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                )
+              },
+              {
+                title: "Open Source",
+                description: "Fully open source under MIT license. Self-host on your infrastructure or contribute to the codebase on GitHub.",
+                icon: (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                  </svg>
+                )
+              }
+            ].map((feature, index) => (
+              <motion.div
+                key={feature.title}
+                className="text-center group"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                viewport={{ once: true }}
+              >
+                <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center mx-auto mb-4 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-300">
+                  {feature.icon}
                 </div>
-                <h4 className="font-semibold text-gray-900 mb-2">Tailwind CSS</h4>
-                <p className="text-sm text-gray-600">Beautiful, responsive design system</p>
-              </div>
-            </div>
+                <h3 className="text-lg font-medium text-gray-900 mb-3">{feature.title}</h3>
+                <p className="text-gray-600 leading-relaxed text-sm">{feature.description}</p>
+              </motion.div>
+            ))}
           </div>
         </div>
 
-        {/* Architecture Section */}
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-24">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Designed for developers
-            </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Modern architecture, comprehensive documentation, and developer-friendly APIs.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-6">Self-host with confidence</h3>
-              <div className="space-y-4">
-                <div className="flex items-start space-x-3">
-                  <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mt-1">
-                    <svg className="w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-900">Docker Ready</h4>
-                    <p className="text-gray-600">One-command deployment with Docker Compose</p>
-                  </div>
-                </div>
-                <div className="flex items-start space-x-3">
-                  <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mt-1">
-                    <svg className="w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-900">Environment Variables</h4>
-                    <p className="text-gray-600">Simple configuration with .env files</p>
-                  </div>
-                </div>
-                <div className="flex items-start space-x-3">
-                  <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mt-1">
-                    <svg className="w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-900">Production Ready</h4>
-                    <p className="text-gray-600">SSL, security headers, and monitoring included</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-gray-900 rounded-xl p-6 text-green-400 font-mono text-sm">
-              <div className="mb-4">
-                <span className="text-gray-500"># Clone and deploy in seconds</span>
-              </div>
-              <div className="space-y-2">
-                <div><span className="text-blue-400">git</span> clone thoughtbox.git</div>
-                <div><span className="text-blue-400">cd</span> thoughtbox</div>
-                <div><span className="text-blue-400">docker-compose</span> up -d</div>
-                <div className="text-gray-500"># ✅ Running on http://localhost:3000</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* CTA Section */}
+        {/* Technical Details */}
         <div className="bg-gray-50 border-t border-gray-200">
-          <div className="max-w-7xl mx-auto px-6 lg:px-8 py-24">
-            <div className="text-center">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                Start organizing your thoughts
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+            <motion.div 
+              className="grid lg:grid-cols-2 gap-12 items-center"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: true }}
+            >
+              <div>
+                <h2 className="text-3xl sm:text-4xl font-light text-gray-900 mb-6 tracking-tight">
+                  Built for developers and teams
+                </h2>
+                <p className="text-lg text-gray-600 mb-8 font-light">
+                  Deploy ThoughtBox in minutes with Docker, or integrate it into your existing infrastructure. 
+                  Built with modern technologies for scalability and performance.
+                </p>
+                
+                <div className="space-y-4">
+                  <div className="flex items-start space-x-3">
+                    <div className="w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
+                      <svg className="w-3 h-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-gray-900 mb-1">Docker Deployment</h4>
+                      <p className="text-gray-600 text-sm">One-command deployment with docker-compose. Production-ready with SSL and monitoring included.</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start space-x-3">
+                    <div className="w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
+                      <svg className="w-3 h-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.031 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-gray-900 mb-1">Enterprise Security</h4>
+                      <p className="text-gray-600 text-sm">End-to-end encryption, SOC 2 compliance, and audit logs for enterprise deployments.</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start space-x-3">
+                    <div className="w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
+                      <svg className="w-3 h-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-gray-900 mb-1">API Integration</h4>
+                      <p className="text-gray-600 text-sm">RESTful API for custom integrations. Webhooks, SSO, and third-party service connections.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <motion.div 
+                className="bg-gray-900 rounded-xl p-6 text-white relative overflow-hidden"
+                whileHover={{ scale: 1.01 }}
+                transition={{ duration: 0.3 }}
+              >
+                <div className="relative z-10">
+                  <div className="flex items-center space-x-2 mb-4">
+                    <div className="w-3 h-3 bg-red-400 rounded-full"></div>
+                    <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
+                    <div className="w-3 h-3 bg-green-400 rounded-full"></div>
+                    <span className="text-gray-400 text-xs ml-3">terminal</span>
+                  </div>
+                  
+                  <div className="font-mono text-xs space-y-2">
+                    <div className="text-gray-400"># Deploy ThoughtBox in seconds</div>
+                    <div className="flex items-center space-x-2">
+                      <span className="text-green-400">$</span>
+                      <span>git clone https://github.com/thoughtbox/thoughtbox.git</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <span className="text-green-400">$</span>
+                      <span>cd thoughtbox && docker-compose up -d</span>
+                    </div>
+                    <div className="text-green-400 mt-3">✓ Running on http://localhost:3000</div>
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          </div>
+        </div>
+
+        {/* Pricing Section */}
+        <div id="pricing" className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+          <motion.div 
+            className="text-center mb-16"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-3xl sm:text-4xl font-light text-gray-900 mb-4 tracking-tight">Simple, transparent pricing</h2>
+            <p className="text-lg text-gray-600 font-light">Start free, upgrade when you need more features</p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+            {[
+              {
+                name: "Free",
+                price: "$0",
+                period: "forever",
+                features: [
+                  "Up to 1,000 notes",
+                  "Basic search",
+                  "Web access",
+                  "Community support"
+                ],
+                cta: "Get Started",
+                popular: false
+              },
+              {
+                name: "Pro",
+                price: "$8",
+                period: "per month",
+                features: [
+                  "Unlimited notes",
+                  "Advanced search",
+                  "Mobile & desktop apps",
+                  "Priority support",
+                  "End-to-end encryption",
+                  "API access"
+                ],
+                cta: "Start Free Trial",
+                popular: true
+              },
+              {
+                name: "Enterprise",
+                price: "Custom",
+                period: "contact us",
+                features: [
+                  "Everything in Pro",
+                  "Self-hosted deployment",
+                  "SSO integration",
+                  "Audit logs",
+                  "Dedicated support",
+                  "Custom integrations"
+                ],
+                cta: "Contact Sales",
+                popular: false
+              }
+            ].map((plan, index) => (
+              <motion.div
+                key={plan.name}
+                className={`relative rounded-xl p-6 ${plan.popular ? 'bg-blue-600 text-white' : 'bg-white border border-gray-200'}`}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                whileHover={{ y: -2 }}
+              >
+                {plan.popular && (
+                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                    <span className="bg-blue-800 text-white px-3 py-1 rounded-full text-xs font-medium">
+                      Most Popular
+                    </span>
+                  </div>
+                )}
+                
+                <div className="text-center">
+                  <h3 className={`text-lg font-medium mb-3 ${plan.popular ? 'text-white' : 'text-gray-900'}`}>
+                    {plan.name}
+                  </h3>
+                  
+                  <div className="mb-6">
+                    <span className={`text-3xl font-light ${plan.popular ? 'text-white' : 'text-gray-900'}`}>
+                      {plan.price}
+                    </span>
+                    <span className={`text-sm ${plan.popular ? 'text-blue-100' : 'text-gray-600'}`}>
+                      /{plan.period}
+                    </span>
+                  </div>
+                  
+                  <ul className="space-y-2 mb-6">
+                    {plan.features.map((feature, featureIndex) => (
+                      <li key={featureIndex} className="flex items-center text-sm">
+                        <svg className={`w-4 h-4 mr-2 flex-shrink-0 ${plan.popular ? 'text-blue-200' : 'text-blue-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span className={plan.popular ? 'text-blue-100' : 'text-gray-600'}>
+                          {feature}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                  
+                  <SignUpButton mode="modal">
+                    <motion.button 
+                      className={`w-full py-2 px-4 rounded-lg font-medium transition-colors text-sm ${
+                        plan.popular 
+                          ? 'bg-white text-blue-600 hover:bg-gray-50' 
+                          : 'bg-blue-600 text-white hover:bg-blue-700'
+                      }`}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      {plan.cta}
+                    </motion.button>
+                  </SignUpButton>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+
+        {/* Final CTA */}
+        <div className="bg-gray-900 text-white">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+            <motion.div 
+              className="text-center max-w-2xl mx-auto"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: true }}
+            >
+              <h2 className="text-3xl sm:text-4xl font-light mb-6 tracking-tight">
+                Ready to organize your thoughts?
               </h2>
-              <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-                Join thousands of users who trust ThoughtBox with their ideas.
+              <p className="text-lg text-gray-300 mb-8 font-light">
+                Join thousands of users who have made ThoughtBox their digital brain. 
+                Start your free trial today—no credit card required.
               </p>
-              <SignUpButton mode="modal">
-                <button className="bg-black text-white px-8 py-4 rounded-lg font-medium hover:bg-gray-800 transition-colors text-lg">
-                  Get started for free
-                </button>
-              </SignUpButton>
-            </div>
+              
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <SignUpButton mode="modal">
+                  <motion.button 
+                    className="bg-blue-600 text-white px-8 py-3 rounded-lg font-medium text-lg hover:bg-blue-700 transition-colors shadow-lg hover:shadow-xl"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    Start Free Trial
+                  </motion.button>
+                </SignUpButton>
+                
+                <motion.a
+                  href="https://docs.thoughtbox.dev"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="border border-gray-600 hover:border-gray-500 text-white px-8 py-3 rounded-lg font-medium text-lg transition-colors inline-flex items-center justify-center"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Read Documentation
+                </motion.a>
+              </div>
+              
+              <div className="mt-10 text-center">
+                <p className="text-gray-400 text-sm">
+                  No setup fees • Cancel anytime • 30-day money-back guarantee
+                </p>
+              </div>
+            </motion.div>
           </div>
         </div>
 
         {/* Footer */}
-        <footer className="border-t border-gray-200 bg-white">
-          <div className="max-w-7xl mx-auto px-6 lg:px-8 py-12">
-            <div className="flex flex-col md:flex-row items-center justify-between">
-              <div className="flex items-center space-x-3 mb-4 md:mb-0">
-                <div className="w-6 h-6 bg-black rounded-md flex items-center justify-center">
-                  <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                  </svg>
+        <footer className="bg-white border-t border-gray-200">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+            <div className="grid md:grid-cols-4 gap-8">
+              {/* Company */}
+              <div>
+                <div className="flex items-center space-x-2 mb-4">
+                  <div className="w-7 h-7 bg-blue-600 rounded-lg flex items-center justify-center">
+                    <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                  </div>
+                  <span className="font-medium text-gray-900">ThoughtBox</span>
                 </div>
-                <span className="font-medium text-gray-900">ThoughtBox</span>
+                <p className="text-gray-600 text-sm leading-relaxed font-light">
+                  Your digital workspace for capturing and organizing thoughts, built with privacy and performance in mind.
+                </p>
               </div>
               
-              <div className="flex items-center space-x-6 text-sm text-gray-600">
-                <a href="https://docs.thoughtbox.dev" target="_blank" rel="noopener noreferrer" className="hover:text-gray-900 transition-colors">
-                  Documentation
+              {/* Product */}
+              <div>
+                <h4 className="font-medium text-gray-900 mb-4">Product</h4>
+                <ul className="space-y-2">
+                  <li><a href="#features" className="text-gray-600 hover:text-blue-600 text-sm transition-colors font-light">Features</a></li>
+                  <li><a href="#pricing" className="text-gray-600 hover:text-blue-600 text-sm transition-colors font-light">Pricing</a></li>
+                  <li><a href="/changelog" className="text-gray-600 hover:text-blue-600 text-sm transition-colors font-light">Changelog</a></li>
+                  <li><a href="/roadmap" className="text-gray-600 hover:text-blue-600 text-sm transition-colors font-light">Roadmap</a></li>
+                </ul>
+              </div>
+              
+              {/* Resources */}
+              <div>
+                <h4 className="font-medium text-gray-900 mb-4">Resources</h4>
+                <ul className="space-y-2">
+                  <li><a href="https://docs.thoughtbox.dev" target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-blue-600 text-sm transition-colors font-light">Documentation</a></li>
+                  <li><a href="https://github.com/thoughtbox/thoughtbox" target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-blue-600 text-sm transition-colors font-light">GitHub</a></li>
+                  <li><a href="/api" className="text-gray-600 hover:text-blue-600 text-sm transition-colors font-light">API Reference</a></li>
+                  <li><a href="/blog" className="text-gray-600 hover:text-blue-600 text-sm transition-colors font-light">Blog</a></li>
+                </ul>
+              </div>
+              
+              {/* Support */}
+              <div>
+                <h4 className="font-medium text-gray-900 mb-4">Support</h4>
+                <ul className="space-y-2">
+                  <li><a href="/help" className="text-gray-600 hover:text-blue-600 text-sm transition-colors font-light">Help Center</a></li>
+                  <li><a href="/contact" className="text-gray-600 hover:text-blue-600 text-sm transition-colors font-light">Contact Us</a></li>
+                  <li><a href="/status" className="text-gray-600 hover:text-blue-600 text-sm transition-colors font-light">System Status</a></li>
+                  <li><a href="/security" className="text-gray-600 hover:text-blue-600 text-sm transition-colors font-light">Security</a></li>
+                </ul>
+              </div>
+            </div>
+            
+            {/* Bottom Footer */}
+            <div className="border-t border-gray-200 mt-10 pt-8 flex flex-col md:flex-row items-center justify-between">
+              <div className="flex items-center space-x-6 mb-4 md:mb-0">
+                <span className="text-gray-500 text-sm font-light">© 2025 ThoughtBox. All rights reserved.</span>
+              </div>
+              
+              <div className="flex items-center space-x-6">
+                <a href="/privacy" className="text-gray-500 hover:text-blue-600 text-sm transition-colors font-light">Privacy Policy</a>
+                <a href="/terms" className="text-gray-500 hover:text-blue-600 text-sm transition-colors font-light">Terms of Service</a>
+                <a href="https://twitter.com/thoughtboxapp" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-blue-600 transition-colors">
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                  </svg>
                 </a>
-                <a href="https://github.com/your-username/thoughtbox" target="_blank" rel="noopener noreferrer" className="hover:text-gray-900 transition-colors">
-                  GitHub
+                <a href="https://github.com/thoughtbox/thoughtbox" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-blue-600 transition-colors">
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                  </svg>
                 </a>
-                <a href="https://discord.gg/thoughtbox" target="_blank" rel="noopener noreferrer" className="hover:text-gray-900 transition-colors">
-                  Community
-                </a>
-                <span>© 2025 ThoughtBox</span>
               </div>
             </div>
           </div>
