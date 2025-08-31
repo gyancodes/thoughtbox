@@ -166,16 +166,16 @@ const CreateNoteButton = ({ className = "" }) => {
       >
         <motion.div
           onClick={handleOpenModal}
-          className="relative overflow-hidden cursor-text p-4 rounded-xl border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300"
+          className="relative overflow-hidden cursor-text p-4 rounded-xl border border-[var(--border-primary)] shadow-lg hover:shadow-xl transition-all duration-300"
           style={{
-            background: 'rgba(255, 255, 255, 0.7)',
+            background: 'var(--bg-secondary)',
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.5)',
+            boxShadow: 'var(--shadow-lg)',
           }}
           whileHover={{ 
             scale: 1.02,
-            boxShadow: '0 12px 40px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.6)',
+            boxShadow: 'var(--shadow-xl)',
           }}
           whileTap={{ scale: 0.98 }}
         >
@@ -196,40 +196,43 @@ const CreateNoteButton = ({ className = "" }) => {
             </motion.div>
             
             <motion.span 
-              className="text-gray-600 flex-1 font-medium"
+              className="text-[var(--text-secondary)] text-sm"
               initial={{ opacity: 0.7 }}
               whileHover={{ opacity: 1 }}
             >
-              Take a note...
+              Type to create a new note...
             </motion.span>
             
-            <div className="flex space-x-1">
-              <motion.button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleTypeChange("todo");
-                  handleOpenModal();
-                }}
-                className="p-2 hover:bg-white/50 rounded-full transition-all duration-200"
-                title="Create todo list"
-                whileHover={{ scale: 1.1, rotate: 5 }}
-                whileTap={{ scale: 0.95 }}
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => handleTypeChange("text")}
+                className="px-3 py-1.5 bg-[var(--accent-primary)] text-white text-sm rounded-lg hover:bg-opacity-90 transition-opacity flex items-center space-x-2"
               >
-                <ListBulletIcon className="w-5 h-5 text-gray-600" />
-              </motion.button>
-              <motion.button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleTypeChange("timetable");
-                  handleOpenModal();
-                }}
-                className="p-2 hover:bg-white/50 rounded-full transition-all duration-200"
-                title="Create timetable"
-                whileHover={{ scale: 1.1, rotate: -5 }}
-                whileTap={{ scale: 0.95 }}
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <span>Text</span>
+              </button>
+              
+              <button
+                onClick={() => handleTypeChange("todo")}
+                className="px-3 py-1.5 bg-[var(--success)] text-white text-sm rounded-lg hover:bg-opacity-90 transition-opacity flex items-center space-x-2"
               >
-                <ClockIcon className="w-5 h-5 text-gray-600" />
-              </motion.button>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+                <span>Todo</span>
+              </button>
+              
+              <button
+                onClick={() => handleTypeChange("timetable")}
+                className="px-3 py-1.5 bg-[var(--warning)] text-white text-sm rounded-lg hover:bg-opacity-90 transition-opacity flex items-center space-x-2"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <span>Schedule</span>
+              </button>
             </div>
           </div>
         </motion.div>

@@ -198,8 +198,8 @@ const NoteEditor = ({
       return (
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
-            <div className="w-8 h-8 border-2 border-gray-300 border-t-blue-500 rounded-full animate-spin mx-auto mb-2"></div>
-            <p className="text-gray-600">Creating note...</p>
+            <div className="w-8 h-8 border-2 border-[var(--border-primary)] border-t-[var(--accent-primary)] rounded-full animate-spin mx-auto mb-2"></div>
+            <p className="text-[var(--text-secondary)]">Creating note...</p>
           </div>
         </div>
       );
@@ -256,12 +256,12 @@ const NoteEditor = ({
               damping: 30,
               duration: 0.3 
             }}
-            className="rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col border border-white/30 overflow-hidden"
+            className="rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col border border-[var(--border-primary)] overflow-hidden"
             style={{
-              background: 'rgba(255, 255, 255, 0.9)',
+              background: 'var(--bg-secondary)',
               backdropFilter: 'blur(30px)',
               WebkitBackdropFilter: 'blur(30px)',
-              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.2)',
+              boxShadow: 'var(--shadow-xl)',
             }}
             onClick={(e) => e.stopPropagation()}
             tabIndex={-1}
@@ -270,20 +270,20 @@ const NoteEditor = ({
             aria-labelledby="note-editor-title"
           >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-white/30 bg-white/20 backdrop-blur-sm">
+        <div className="flex items-center justify-between p-6 border-b border-[var(--border-primary)] bg-[var(--bg-tertiary)] backdrop-blur-sm">
           <div className="flex items-center space-x-4">
-            <h2 id="note-editor-title" className="text-xl font-semibold text-gray-900">
+            <h2 id="note-editor-title" className="text-xl font-semibold text-[var(--text-primary)]">
               {isCreating ? 'Create Note' : 'Edit Note'}
             </h2>
             
             {/* Note type selector (only for new notes) */}
             {isCreating && (
               <div className="flex items-center space-x-2">
-                <span className="text-sm text-gray-600">Type:</span>
+                <span className="text-sm text-[var(--text-secondary)]">Type:</span>
                 <select
                   value={noteType}
                   onChange={(e) => handleTypeChange(e.target.value)}
-                  className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="px-3 py-1 border border-[var(--border-primary)] rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)] focus:border-transparent bg-[var(--bg-secondary)] text-[var(--text-primary)]"
                   data-testid="note-type-selector"
                 >
                   <option value="text">Text Note</option>
@@ -295,7 +295,7 @@ const NoteEditor = ({
             
             {/* Existing note type indicator */}
             {!isCreating && (
-              <span className="px-2 py-1 bg-gray-100 text-gray-700 text-sm rounded-md capitalize">
+              <span className="px-2 py-1 bg-[var(--bg-secondary)] text-[var(--text-primary)] text-sm rounded-md capitalize">
                 {noteType}
               </span>
             )}
@@ -304,7 +304,7 @@ const NoteEditor = ({
           {/* Close button */}
           <button
             onClick={handleClose}
-            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] rounded-lg transition-colors"
             data-testid="note-editor-close"
           >
             <XMarkIcon className="w-5 h-5" />
@@ -319,9 +319,9 @@ const NoteEditor = ({
         </div>
 
         {/* Footer */}
-        <div className="p-6 border-t border-white/30 bg-white/20 backdrop-blur-sm">
+        <div className="p-6 border-t border-[var(--border-primary)] bg-[var(--bg-tertiary)] backdrop-blur-sm">
           <div className="flex items-center justify-between">
-            <div className="text-sm text-gray-500">
+                          <div className="text-sm text-[var(--text-secondary)]">
               <div>
                 {isCreating ? (
                   <span>Note will be saved automatically as you type</span>
@@ -329,7 +329,7 @@ const NoteEditor = ({
                   <span>Changes are saved automatically</span>
                 )}
               </div>
-              <div className="text-xs text-gray-400 mt-1">
+              <div className="text-xs text-[var(--text-tertiary)] mt-1">
                 <span>Esc to close</span>
                 {isCreating && <span className="ml-4">Ctrl+Enter to save & close</span>}
                 <span className="ml-4">Ctrl+N for new note</span>
@@ -339,7 +339,7 @@ const NoteEditor = ({
             <div className="flex items-center space-x-3">
               <button
                 onClick={handleClose}
-                className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+                className="px-4 py-2 text-[var(--text-primary)] bg-[var(--bg-secondary)] border border-[var(--border-primary)] rounded-md hover:bg-[var(--bg-tertiary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)] focus:ring-offset-2 transition-colors"
                 data-testid="note-editor-cancel"
               >
                 Close

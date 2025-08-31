@@ -151,19 +151,19 @@ const SearchBar = ({
         className={`
           relative flex items-center rounded-xl transition-all duration-300 border
           ${isFocused 
-            ? 'border-white/40 shadow-lg ring-1 ring-blue-200/50' 
-            : 'border-white/20 hover:border-white/30'
+            ? 'border-[var(--accent-primary)]/40 shadow-lg ring-1 ring-[var(--accent-primary)]/50' 
+            : 'border-[var(--border-primary)] hover:border-[var(--border-secondary)]'
           }
         `}
         style={{
           background: isFocused 
-            ? 'rgba(255, 255, 255, 0.9)' 
-            : 'rgba(255, 255, 255, 0.7)',
+            ? 'var(--bg-secondary)' 
+            : 'var(--bg-tertiary)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
           boxShadow: isFocused 
-            ? '0 8px 32px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.6)'
-            : '0 4px 16px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.4)',
+            ? 'var(--shadow-lg)'
+            : 'var(--shadow-sm)',
         }}
         whileFocus={{ scale: 1.02 }}
         whileHover={{ scale: 1.01 }}

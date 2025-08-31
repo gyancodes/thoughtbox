@@ -176,7 +176,7 @@ const NoteCard = ({ note, onClick, onEdit, onDelete, onConflictResolve, searchQu
       exit={{ opacity: 0, y: -20, scale: 0.95 }}
       whileHover={{ 
         y: -2,
-        boxShadow: '0 8px 25px rgba(0,0,0,0.15), 0 4px 10px rgba(0,0,0,0.1)'
+        boxShadow: 'var(--shadow-lg)'
       }}
       whileTap={{ scale: 0.98 }}
       transition={{ 
@@ -185,161 +185,161 @@ const NoteCard = ({ note, onClick, onEdit, onDelete, onConflictResolve, searchQu
         damping: 30,
         duration: 0.2 
       }}
-      className="rounded-xl border border-gray-200 p-4 cursor-pointer relative group bg-white/80 backdrop-blur-sm"
+      className="note-card rounded-xl border border-[var(--border-primary)] p-4 cursor-pointer relative group bg-[var(--bg-secondary)]/80 backdrop-blur-sm"
       style={{ 
-        backgroundColor: note.color || '#ffffff',
+        backgroundColor: note.color || 'var(--bg-secondary)',
       }}
       onClick={handleCardClick}
     >
-      {/* Header */}
+      {/* Note Header */}
       <div className="flex items-start justify-between mb-3">
-        <div className="flex items-center space-x-2 flex-1 min-w-0">
-          <div className="text-gray-600 flex-shrink-0">
-            {getTypeIcon(note.type)}
-          </div>
-          <h3 className="font-medium text-gray-900 truncate">
-            {searchQuery ? (
-              <SearchHighlight 
-                text={note.title || 'Untitled'} 
-                query={searchQuery}
-                highlightClassName="bg-yellow-200 px-0.5 rounded font-semibold"
-              />
-            ) : (
-              note.title || 'Untitled'
-            )}
+        <div className="flex-1 min-w-0">
+          <h3 className="text-lg font-medium text-[var(--text-primary)] truncate mb-1">
+            {note.title || 'Untitled'}
           </h3>
+          <div className="flex items-center space-x-2 text-sm text-[var(--text-secondary)]">
+            <span className="capitalize">{note.type}</span>
+            {note.updatedAt && (
+              <>
+                <span>•</span>
+                <span>{formatDate(note.updatedAt)}</span>
+              </>
+            )}
+          </div>
         </div>
         
-        <div className="flex items-center space-x-2">
-          {/* Sync status indicator - clickable for conflicts */}
-          {note.syncStatus === 'conflict' ? (
-            <button
-              onClick={handleConflictResolve}
-              className="p-1 rounded-full hover:bg-orange-100 transition-colors"
-              title="Click to resolve sync conflict"
-            >
-              {getSyncStatusIndicator(note.syncStatus)}
-            </button>
+        {/* Note Type Icon */}
+        <div className="flex-shrink-0 ml-3">
+          {note.type === 'todo' ? (
+            <div className="w-8 h-8 bg-[var(--success)] bg-opacity-10 rounded-lg flex items-center justify-center">
+              <svg className="w-4 h-4 text-[var(--success)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
+            </div>
+          ) : note.type === 'timetable' ? (
+            <div className="w-8 h-8 bg-[var(--warning)] bg-opacity-10 rounded-lg flex items-center justify-center">
+              <svg className="w-4 h-4 text-[var(--warning)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
           ) : (
-            getSyncStatusIndicator(note.syncStatus)
+            <div className="w-8 h-8 bg-[var(--accent-primary)] bg-opacity-10 rounded-lg flex items-center justify-center">
+              <svg className="w-4 h-4 text-[var(--accent-primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
           )}
-          
-          {/* Menu button */}
-          <div className="note-menu relative">
-            <button
-              onClick={handleMenuClick}
-              className="p-1 rounded-full hover:bg-gray-100 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-            >
-              <EllipsisVerticalIcon className="w-4 h-4 text-gray-500" />
-            </button>
-            
-            {/* Dropdown menu */}
-            <AnimatePresence>
-              {showMenu && (
-                <motion.div 
-                  initial={{ opacity: 0, scale: 0.95, y: -10 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                  transition={{ duration: 0.15 }}
-                  className="absolute right-0 top-full mt-1 bg-white/95 backdrop-blur-xl rounded-xl shadow-xl border border-gray-200/50 py-2 z-10 min-w-[140px]"
-                  style={{
-                    boxShadow: '0 10px 25px rgba(0, 0, 0, 0.15), 0 4px 6px rgba(0, 0, 0, 0.1)',
-                  }}
-                >
-                  <motion.button
-                    whileHover={{ backgroundColor: 'rgba(59, 130, 246, 0.05)' }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={handleEdit}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 transition-colors"
-                  >
-                    Edit
-                  </motion.button>
-                  {note.syncStatus === 'conflict' && (
-                    <motion.button
-                      whileHover={{ backgroundColor: 'rgba(249, 115, 22, 0.05)' }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={handleConflictResolve}
-                      className="block w-full text-left px-4 py-2 text-sm text-orange-600 transition-colors"
-                    >
-                      Resolve Conflict
-                    </motion.button>
-                  )}
-                  <motion.button
-                    whileHover={{ backgroundColor: 'rgba(239, 68, 68, 0.05)' }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={handleDelete}
-                    className="block w-full text-left px-4 py-2 text-sm text-red-600 transition-colors"
-                  >
-                    Delete
-                  </motion.button>
-                </motion.div>
-              )}
-            </AnimatePresence>
+        </div>
+      </div>
+
+      {/* Note Content Preview */}
+      <div className="mb-4">
+        {note.type === 'todo' ? (
+          <div className="space-y-2">
+            {note.todos && note.todos.slice(0, 3).map((todo, index) => (
+              <div key={index} className="flex items-center space-x-2">
+                <div className={`w-3 h-3 rounded-full border-2 ${
+                  todo.completed 
+                    ? 'bg-[var(--success)] border-[var(--success)]' 
+                    : 'border-[var(--border-secondary)]'
+                }`}></div>
+                <span className={`text-sm ${
+                  todo.completed 
+                    ? 'text-[var(--text-tertiary)] line-through' 
+                    : 'text-[var(--text-secondary)]'
+                }`}>
+                  {todo.text}
+                </span>
+              </div>
+            ))}
+            {note.todos && note.todos.length > 3 && (
+              <p className="text-xs text-[var(--text-tertiary)]">
+                +{note.todos.length - 3} more items
+              </p>
+            )}
           </div>
-        </div>
+        ) : note.type === 'timetable' ? (
+          <div className="space-y-2">
+            {note.schedule && note.schedule.slice(0, 3).map((item, index) => (
+              <div key={index} className="flex items-center space-x-2 text-sm">
+                <span className="text-[var(--accent-primary)] font-medium">
+                  {item.time}
+                </span>
+                <span className="text-[var(--text-secondary)]">
+                  {item.activity}
+                </span>
+              </div>
+            ))}
+            {note.schedule && note.schedule.length > 3 && (
+              <p className="text-xs text-[var(--text-tertiary)]">
+                +{note.schedule.length - 3} more activities
+              </p>
+            )}
+          </div>
+        ) : (
+          <p className="text-[var(--text-secondary)] text-sm leading-relaxed">
+            {note.content ? (
+              note.content.length > 120 
+                ? `${note.content.substring(0, 120)}...` 
+                : note.content
+            ) : (
+              'No content'
+            )}
+          </p>
+        )}
       </div>
 
-      {/* Content preview */}
-      <div className="mb-3">
-        <p className="text-sm text-gray-600 whitespace-pre-line line-clamp-4">
-          {searchQuery ? (
-            <SearchHighlight 
-              text={previewContent} 
-              query={searchQuery}
-              highlightClassName="bg-yellow-200 px-0.5 rounded"
-            />
-          ) : (
-            previewContent
-          )}
-        </p>
-      </div>
-
-      {/* Search relevance indicator */}
-      {searchQuery && getSearchRelevance(note) && (
-        <div className="mb-2">
-          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-            getSearchRelevance(note).level === 'high' 
-              ? 'bg-green-100 text-green-800' 
-              : getSearchRelevance(note).level === 'medium'
-              ? 'bg-yellow-100 text-yellow-800'
-              : 'bg-gray-100 text-gray-800'
-          }`}>
-            {getSearchRelevance(note).label}
-          </span>
-        </div>
-      )}
-
-      {/* Footer */}
-      <div className="flex items-center justify-between text-xs text-gray-500">
+      {/* Note Footer */}
+      <div className="flex items-center justify-between text-xs text-[var(--text-tertiary)]">
         <div className="flex items-center space-x-2">
-          <span>{formatDate(note.updatedAt || note.updated_at || note.createdAt || note.created_at)}</span>
-          {/* Sync status badge */}
-          {note.syncStatus && note.syncStatus !== 'synced' && (
-            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-              note.syncStatus === 'pending' 
-                ? 'bg-blue-100 text-blue-700'
-                : note.syncStatus === 'conflict'
-                ? 'bg-orange-100 text-orange-700'
-                : note.syncStatus === 'error'
-                ? 'bg-red-100 text-red-700'
-                : 'bg-gray-100 text-gray-700'
+          <span>ID: {note.id}</span>
+          {note.syncStatus && (
+            <span className={`px-2 py-1 rounded-full text-xs ${
+              note.syncStatus === 'synced' 
+                ? 'bg-[var(--success)] bg-opacity-10 text-[var(--success)]'
+                : note.syncStatus === 'pending'
+                ? 'bg-[var(--warning)] bg-opacity-10 text-[var(--warning)]'
+                : 'bg-[var(--error)] bg-opacity-10 text-[var(--error)]'
             }`}>
-              {note.syncStatus === 'pending' && 'Syncing'}
-              {note.syncStatus === 'conflict' && 'Conflict'}
-              {note.syncStatus === 'error' && 'Failed'}
+              {note.syncStatus}
             </span>
           )}
         </div>
-        <span className="capitalize">{note.type}</span>
+        
+        <div className="flex items-center space-x-1">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onEdit?.(note);
+            }}
+            className="p-1 text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors"
+            title="Edit note"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+          </button>
+          
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete?.(note, e);
+            }}
+            className="p-1 text-[var(--text-tertiary)] hover:text-[var(--error)] transition-colors"
+            title="Delete note"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+          </button>
+        </div>
       </div>
 
-      {/* Click outside handler for menu */}
-      {showMenu && (
-        <div 
-          className="fixed inset-0 z-0" 
-          onClick={() => setShowMenu(false)}
-        />
-      )}
+      {/* Selection Indicator */}
+      {/* isSelected prop is not defined in the original file, so this block is removed */}
+      {/* {isSelected && (
+        <div className="absolute inset-0 border-2 border-[var(--accent-primary)] rounded-xl pointer-events-none"></div>
+      )} */}
     </motion.div>
   );
 };

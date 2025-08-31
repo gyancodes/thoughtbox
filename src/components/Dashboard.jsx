@@ -1,14 +1,27 @@
 import { useState } from 'react';
-import { UserButton, useUser } from '@clerk/clerk-react';
+import { UserButton } from '@clerk/clerk-react';
 import { useClerkAuth } from '../contexts/ClerkAuthContext';
 import { useNotes } from '../contexts/NotesContext';
+import { useTheme } from '../contexts/ThemeContext';
 import { NoteGrid, NoteEditor, CreateNoteButton } from './notes';
 import SearchBar from './SearchBar';
 import toast from 'react-hot-toast';
-
+import { 
+  SunIcon, 
+  MoonIcon, 
+  ChartBarIcon, 
+  ClockIcon, 
+  CheckCircleIcon,
+  ExclamationTriangleIcon,
+  DocumentTextIcon,
+  ListBulletIcon,
+  CalendarIcon
+} from '@heroicons/react/24/outline';
+  
 const Dashboard = () => {
   const { isLoading } = useClerkAuth();
   const { setSearchTerm } = useNotes();
+  const { isDarkMode, toggleTheme } = useTheme();
   const [isNoteEditorOpen, setIsNoteEditorOpen] = useState(false);
   const [editingNote, setEditingNote] = useState(null);
   const [noteTypeToCreate, setNoteTypeToCreate] = useState('text');
@@ -71,11 +84,24 @@ const Dashboard = () => {
             </div>
 
             <div className="flex items-center space-x-4">
+              {/* Theme Toggle */}
+              <button
+                onClick={toggleTheme}
+                className="p-2 rounded-lg bg-[var(--bg-tertiary)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--border-primary)] transition-all duration-200"
+                title={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+              >
+                {isDarkMode ? (
+                  <SunIcon className="w-5 h-5" />
+                ) : (
+                  <MoonIcon className="w-5 h-5" />
+                )}
+              </button>
+
               <a
                 href="https://docs.thoughtbox.dev"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-600 hover:text-gray-900 transition-colors hidden sm:flex items-center space-x-1"
+                className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors hidden sm:flex items-center space-x-1"
                 title="Documentation"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
