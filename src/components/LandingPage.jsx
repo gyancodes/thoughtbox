@@ -2,10 +2,13 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { SignInButton, SignUpButton, useUser } from "@clerk/clerk-react";
 import { motion } from "motion/react";
+import { useTheme } from "../contexts/ThemeContext";
+import { SunIcon, MoonIcon } from "@heroicons/react/24/outline";
 
 const LandingPage = () => {
   const { isSignedIn } = useUser();
   const navigate = useNavigate();
+  const { isDarkMode, toggleTheme } = useTheme();
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
   // Redirect to dashboard if already signed in
@@ -29,11 +32,11 @@ const LandingPage = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-white relative overflow-hidden">
+    <div className="min-h-screen bg-[var(--bg-primary)] relative overflow-hidden">
       {/* Subtle background pattern */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
-          className="absolute top-1/4 right-1/4 w-64 h-64 bg-blue-50 rounded-full opacity-20 floating-bg"
+          className="absolute top-1/4 right-1/4 w-64 h-64 bg-[var(--bg-tertiary)] rounded-full opacity-20 floating-bg"
           style={{
             transform: `translate(${mousePosition.x}px, ${mousePosition.y}px)`,
           }}
@@ -48,7 +51,7 @@ const LandingPage = () => {
           }}
         />
         <motion.div
-          className="absolute bottom-1/3 left-1/3 w-48 h-48 bg-blue-50 rounded-full opacity-15 floating-bg"
+          className="absolute bottom-1/3 left-1/3 w-48 h-48 bg-[var(--bg-tertiary)] rounded-full opacity-15 floating-bg"
           style={{
             transform: `translate(${-mousePosition.x}px, ${-mousePosition.y}px)`,
           }}
@@ -65,7 +68,7 @@ const LandingPage = () => {
         />
         {/* Easter egg: Hidden floating dot */}
         <motion.div
-          className="absolute top-1/2 right-1/3 w-2 h-2 bg-blue-400 rounded-full opacity-0"
+          className="absolute top-1/2 right-1/3 w-2 h-2 bg-[var(--accent-primary)] rounded-full opacity-0"
           animate={{
             opacity: [0, 1, 0],
             y: [0, -20, 0],
@@ -82,7 +85,7 @@ const LandingPage = () => {
 
       {/* Navigation */}
       <motion.nav
-        className="relative z-50 border-b border-gray-100 bg-white/80 backdrop-blur-sm"
+        className="relative z-50 border-b border-[var(--border-primary)] bg-[var(--bg-primary)]/80 backdrop-blur-sm"
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6 }}
@@ -109,7 +112,7 @@ const LandingPage = () => {
                   />
                 </svg>
               </div>
-              <span className="text-lg font-medium text-gray-900">
+              <span className="text-lg font-medium text-[var(--text-primary)]">
                 ThoughtBox
               </span>
             </motion.div>
@@ -118,13 +121,13 @@ const LandingPage = () => {
             <div className="hidden md:flex items-center space-x-6">
               <a
                 href="#features"
-                className="text-gray-600 hover:text-blue-600 transition-colors text-sm font-medium"
+                className="text-[var(--text-secondary)] hover:text-[var(--accent-primary)] transition-colors text-sm font-medium"
               >
                 Features
               </a>
               <a
                 href="#pricing"
-                className="text-gray-600 hover:text-blue-600 transition-colors text-sm font-medium"
+                className="text-[var(--text-secondary)] hover:text-[var(--accent-primary)] transition-colors text-sm font-medium"
               >
                 Pricing
               </a>
@@ -132,20 +135,35 @@ const LandingPage = () => {
                 href="https://docs.thoughtbox.dev"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-600 hover:text-blue-600 transition-colors text-sm font-medium"
+                className="text-[var(--text-secondary)] hover:text-[var(--accent-primary)] transition-colors text-sm font-medium"
               >
                 Docs
               </a>
 
-              <div className="flex items-center space-x-3 border-l border-gray-200 pl-6">
+              {/* Theme Toggle */}
+              <motion.button
+                onClick={toggleTheme}
+                className="p-2 rounded-lg text-[var(--text-secondary)] hover:text-[var(--accent-primary)] hover:bg-[var(--bg-tertiary)] transition-colors"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                aria-label="Toggle theme"
+              >
+                {isDarkMode ? (
+                  <SunIcon className="w-5 h-5" />
+                ) : (
+                  <MoonIcon className="w-5 h-5" />
+                )}
+              </motion.button>
+
+              <div className="flex items-center space-x-3 border-l border-[var(--border-primary)] pl-6">
                 <SignInButton mode="modal">
-                  <button className="text-gray-600 hover:text-blue-600 transition-colors text-sm font-medium">
+                  <button className="text-[var(--text-secondary)] hover:text-[var(--accent-primary)] transition-colors text-sm font-medium">
                     Sign in
                   </button>
                 </SignInButton>
                 <SignUpButton mode="modal">
                   <motion.button
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                    className="bg-[var(--accent-primary)] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[var(--accent-secondary)] transition-colors"
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
@@ -156,10 +174,25 @@ const LandingPage = () => {
             </div>
 
             {/* Mobile CTA */}
-            <div className="md:hidden">
+            <div className="md:hidden flex items-center space-x-2">
+              {/* Mobile Theme Toggle */}
+              <motion.button
+                onClick={toggleTheme}
+                className="p-2 rounded-lg text-[var(--text-secondary)] hover:text-[var(--accent-primary)] hover:bg-[var(--bg-tertiary)] transition-colors"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                aria-label="Toggle theme"
+              >
+                {isDarkMode ? (
+                  <SunIcon className="w-5 h-5" />
+                ) : (
+                  <MoonIcon className="w-5 h-5" />
+                )}
+              </motion.button>
+              
               <SignUpButton mode="modal">
                 <motion.button
-                  className="bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
+                  className="bg-[var(--accent-primary)] text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-[var(--accent-secondary)] transition-colors"
                   whileTap={{ scale: 0.95 }}
                 >
                   Start
@@ -177,32 +210,32 @@ const LandingPage = () => {
           <div className="text-center max-w-4xl mx-auto mb-16">
             {/* Status Badge */}
             <motion.div
-              className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium mb-6 bg-blue-50 border border-blue-200 text-blue-700"
+              className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium mb-6 bg-[var(--bg-tertiary)] border border-[var(--border-primary)] text-[var(--accent-primary)]"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
             >
-              <span className="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
-              Open Source • Privacy First • Self-Hostable
+              <span className="w-2 h-2 bg-[var(--accent-primary)] rounded-full mr-2"></span>
+              Open Source • Privacy First • Non-Commercial
             </motion.div>
 
             {/* Main Headline */}
             <motion.h1
-              className="text-4xl sm:text-5xl lg:text-6xl font-light mb-6 text-gray-900 leading-tight tracking-tight"
+              className="text-4xl sm:text-5xl lg:text-6xl font-light mb-6 text-[var(--text-primary)] leading-tight tracking-tight"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.1 }}
             >
               Your digital workspace
               <br />
-              <span className="text-blue-600 font-normal">
+              <span className="text-[var(--accent-primary)] font-normal">
                 for capturing thoughts
               </span>
             </motion.h1>
 
             {/* Subheadline */}
             <motion.p
-              className="text-lg sm:text-xl text-gray-600 mb-8 leading-relaxed max-w-2xl mx-auto font-light"
+              className="text-lg sm:text-xl text-[var(--text-secondary)] mb-8 leading-relaxed max-w-2xl mx-auto font-light"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.3 }}
@@ -221,7 +254,7 @@ const LandingPage = () => {
             >
               <SignUpButton mode="modal">
                 <motion.button
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium transition-colors shadow-lg hover:shadow-xl"
+                  className="bg-[var(--accent-primary)] hover:bg-[var(--accent-secondary)] text-white px-8 py-3 rounded-lg font-medium transition-colors shadow-lg hover:shadow-xl"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
@@ -233,7 +266,7 @@ const LandingPage = () => {
                 href="https://demo.thoughtbox.dev"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="border border-gray-300 hover:border-blue-400 text-gray-700 hover:text-blue-600 px-8 py-3 rounded-lg font-medium transition-colors inline-flex items-center justify-center"
+                className="border border-[var(--border-primary)] hover:border-[var(--accent-primary)] text-[var(--text-primary)] hover:text-[var(--accent-primary)] px-8 py-3 rounded-lg font-medium transition-colors inline-flex items-center justify-center"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
@@ -249,18 +282,18 @@ const LandingPage = () => {
               transition={{ duration: 0.8, delay: 0.7 }}
             >
               <div className="space-y-1">
-                <div className="text-xl font-medium text-gray-900">10,000+</div>
-                <div className="text-sm text-gray-500">Active Users</div>
+                <div className="text-xl font-medium text-[var(--text-primary)]">10,000+</div>
+                <div className="text-sm text-[var(--text-tertiary)]">Active Users</div>
               </div>
               <div className="space-y-1">
-                <div className="text-xl font-medium text-gray-900">99.9%</div>
-                <div className="text-sm text-gray-500">Uptime</div>
+                <div className="text-xl font-medium text-[var(--text-primary)]">99.9%</div>
+                <div className="text-sm text-[var(--text-tertiary)]">Uptime</div>
               </div>
               <div className="space-y-1">
-                <div className="text-xl font-medium text-gray-900">
+                <div className="text-xl font-medium text-[var(--text-primary)]">
                   Open Source
                 </div>
-                <div className="text-sm text-gray-500">MIT Licensed</div>
+                <div className="text-sm text-[var(--text-tertiary)]">CC BY-NC-SA 4.0</div>
               </div>
             </motion.div>
           </div>
@@ -272,27 +305,27 @@ const LandingPage = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.9 }}
           >
-            <div className="relative rounded-xl shadow-xl overflow-hidden border border-gray-200 bg-white">
+            <div className="relative rounded-xl shadow-xl overflow-hidden border border-[var(--border-primary)] bg-[var(--bg-primary)]">
               {/* Browser Bar */}
-              <div className="bg-gray-50 px-4 py-2 border-b border-gray-200 flex items-center space-x-3">
+              <div className="bg-[var(--bg-secondary)] px-4 py-2 border-b border-[var(--border-primary)] flex items-center space-x-3">
                 <div className="flex space-x-2">
                   <div className="w-3 h-3 bg-red-400 rounded-full"></div>
                   <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
                   <div className="w-3 h-3 bg-green-400 rounded-full"></div>
                 </div>
                 <div className="flex-1 text-center">
-                  <div className="bg-white rounded-md px-3 py-1 text-xs text-gray-600 inline-block border border-gray-200">
+                  <div className="bg-[var(--bg-primary)] rounded-md px-3 py-1 text-xs text-[var(--text-secondary)] inline-block border border-[var(--border-primary)]">
                     app.thoughtbox.dev
                   </div>
                 </div>
               </div>
 
               {/* App Interface - Compact */}
-              <div className="p-4 bg-gray-50 min-h-64">
+              <div className="p-4 bg-[var(--bg-secondary)] min-h-64">
                 <div className="space-y-3">
                   {/* Search/Input Bar */}
-                  <div className="bg-white rounded-lg p-3 border border-gray-200 shadow-sm">
-                    <div className="flex items-center space-x-2 text-gray-500">
+                  <div className="bg-[var(--bg-primary)] rounded-lg p-3 border border-[var(--border-primary)] shadow-sm">
+                    <div className="flex items-center space-x-2 text-[var(--text-tertiary)]">
                       <svg
                         className="w-4 h-4"
                         fill="none"
@@ -315,51 +348,51 @@ const LandingPage = () => {
                   {/* Sample Notes Grid - Compact */}
                   <div className="grid md:grid-cols-3 gap-3">
                     <motion.div
-                      className="bg-white rounded-lg p-3 border border-gray-200 shadow-sm"
+                      className="bg-[var(--bg-primary)] rounded-lg p-3 border border-[var(--border-primary)] shadow-sm"
                       whileHover={{
                         y: -1,
                         shadow: "0 4px 12px rgba(0,0,0,0.1)",
                       }}
                     >
-                      <div className="text-xs font-medium text-gray-900 mb-1">
+                      <div className="text-xs font-medium text-[var(--text-primary)] mb-1">
                         Project Planning
                       </div>
-                      <div className="text-xs text-gray-600 mb-2">
+                      <div className="text-xs text-[var(--text-secondary)] mb-2">
                         Define project scope and timeline...
                       </div>
-                      <div className="text-xs text-gray-400">2 hours ago</div>
+                      <div className="text-xs text-[var(--text-tertiary)]">2 hours ago</div>
                     </motion.div>
 
                     <motion.div
-                      className="bg-white rounded-lg p-3 border border-gray-200 shadow-sm"
+                      className="bg-[var(--bg-primary)] rounded-lg p-3 border border-[var(--border-primary)] shadow-sm"
                       whileHover={{
                         y: -1,
                         shadow: "0 4px 12px rgba(0,0,0,0.1)",
                       }}
                     >
-                      <div className="text-xs font-medium text-gray-900 mb-1">
+                      <div className="text-xs font-medium text-[var(--text-primary)] mb-1">
                         Meeting Notes
                       </div>
-                      <div className="text-xs text-gray-600 mb-2">
+                      <div className="text-xs text-[var(--text-secondary)] mb-2">
                         • Review design mockups...
                       </div>
-                      <div className="text-xs text-gray-400">Yesterday</div>
+                      <div className="text-xs text-[var(--text-tertiary)]">Yesterday</div>
                     </motion.div>
 
                     <motion.div
-                      className="bg-white rounded-lg p-3 border border-gray-200 shadow-sm"
+                      className="bg-[var(--bg-primary)] rounded-lg p-3 border border-[var(--border-primary)] shadow-sm"
                       whileHover={{
                         y: -1,
                         shadow: "0 4px 12px rgba(0,0,0,0.1)",
                       }}
                     >
-                      <div className="text-xs font-medium text-gray-900 mb-1">
+                      <div className="text-xs font-medium text-[var(--text-primary)] mb-1">
                         Ideas
                       </div>
-                      <div className="text-xs text-gray-600 mb-2">
+                      <div className="text-xs text-[var(--text-secondary)] mb-2">
                         New feature concepts...
                       </div>
-                      <div className="text-xs text-gray-400">3 days ago</div>
+                      <div className="text-xs text-[var(--text-tertiary)]">3 days ago</div>
                     </motion.div>
                   </div>
                 </div>
@@ -380,10 +413,10 @@ const LandingPage = () => {
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-3xl sm:text-4xl font-light text-gray-900 mb-4 tracking-tight">
+            <h2 className="text-3xl sm:text-4xl font-light text-[var(--text-primary)] mb-4 tracking-tight">
               Everything you need to capture ideas
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto font-light">
+            <p className="text-lg text-[var(--text-secondary)] max-w-2xl mx-auto font-light">
               Designed for productivity with features that help you organize,
               search, and sync your thoughts seamlessly.
             </p>
@@ -494,7 +527,7 @@ const LandingPage = () => {
               {
                 title: "Open Source",
                 description:
-                  "Fully open source under MIT license. Self-host on your infrastructure or contribute to the codebase on GitHub.",
+                  "Fully open source under CC BY-NC-SA 4.0 license. Self-host on your infrastructure or contribute to the codebase on GitHub.",
                 icon: (
                   <svg
                     className="w-5 h-5"
@@ -520,13 +553,13 @@ const LandingPage = () => {
                 transition={{ duration: 0.6, delay: index * 0.1 }}
                 viewport={{ once: true }}
               >
-                <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center mx-auto mb-4 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-300">
+                <div className="w-10 h-10 bg-[var(--bg-tertiary)] rounded-lg flex items-center justify-center mx-auto mb-4 text-[var(--accent-primary)] group-hover:bg-[var(--accent-primary)] group-hover:text-white transition-colors duration-300">
                   {feature.icon}
                 </div>
-                <h3 className="text-lg font-medium text-gray-900 mb-3">
+                <h3 className="text-lg font-medium text-[var(--text-primary)] mb-3">
                   {feature.title}
                 </h3>
-                <p className="text-gray-600 leading-relaxed text-sm">
+                <p className="text-[var(--text-secondary)] leading-relaxed text-sm">
                   {feature.description}
                 </p>
               </motion.div>
@@ -535,7 +568,7 @@ const LandingPage = () => {
         </div>
 
         {/* Technical Details */}
-        <div className="bg-gray-50 border-t border-gray-200">
+        <div className="bg-[var(--bg-secondary)] border-t border-[var(--border-primary)]">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
             <motion.div
               className="grid lg:grid-cols-2 gap-12 items-center"
@@ -545,10 +578,10 @@ const LandingPage = () => {
               viewport={{ once: true }}
             >
               <div>
-                <h2 className="text-3xl sm:text-4xl font-light text-gray-900 mb-6 tracking-tight">
+                <h2 className="text-3xl sm:text-4xl font-light text-[var(--text-primary)] mb-6 tracking-tight">
                   Built for developers and teams
                 </h2>
-                <p className="text-lg text-gray-600 mb-8 font-light">
+                <p className="text-lg text-[var(--text-secondary)] mb-8 font-light">
                   Deploy ThoughtBox in minutes with Docker, or integrate it into
                   your existing infrastructure. Built with modern technologies
                   for scalability and performance.
@@ -556,9 +589,9 @@ const LandingPage = () => {
 
                 <div className="space-y-4">
                   <div className="flex items-start space-x-3">
-                    <div className="w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
+                    <div className="w-6 h-6 bg-[var(--bg-tertiary)] rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
                       <svg
-                        className="w-3 h-3 text-blue-600"
+                        className="w-3 h-3 text-[var(--accent-primary)]"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -572,10 +605,10 @@ const LandingPage = () => {
                       </svg>
                     </div>
                     <div>
-                      <h4 className="font-medium text-gray-900 mb-1">
+                      <h4 className="font-medium text-[var(--text-primary)] mb-1">
                         Docker Deployment
                       </h4>
-                      <p className="text-gray-600 text-sm">
+                      <p className="text-[var(--text-secondary)] text-sm">
                         One-command deployment with docker-compose.
                         Production-ready with SSL and monitoring included.
                       </p>
@@ -583,9 +616,9 @@ const LandingPage = () => {
                   </div>
 
                   <div className="flex items-start space-x-3">
-                    <div className="w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
+                    <div className="w-6 h-6 bg-[var(--bg-tertiary)] rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
                       <svg
-                        className="w-3 h-3 text-blue-600"
+                        className="w-3 h-3 text-[var(--accent-primary)]"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -599,10 +632,10 @@ const LandingPage = () => {
                       </svg>
                     </div>
                     <div>
-                      <h4 className="font-medium text-gray-900 mb-1">
+                      <h4 className="font-medium text-[var(--text-primary)] mb-1">
                         Enterprise Security
                       </h4>
-                      <p className="text-gray-600 text-sm">
+                      <p className="text-[var(--text-secondary)] text-sm">
                         End-to-end encryption, SOC 2 compliance, and audit logs
                         for enterprise deployments.
                       </p>
@@ -610,9 +643,9 @@ const LandingPage = () => {
                   </div>
 
                   <div className="flex items-start space-x-3">
-                    <div className="w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
+                    <div className="w-6 h-6 bg-[var(--bg-tertiary)] rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
                       <svg
-                        className="w-3 h-3 text-blue-600"
+                        className="w-3 h-3 text-[var(--accent-primary)]"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -626,10 +659,10 @@ const LandingPage = () => {
                       </svg>
                     </div>
                     <div>
-                      <h4 className="font-medium text-gray-900 mb-1">
+                      <h4 className="font-medium text-[var(--text-primary)] mb-1">
                         API Integration
                       </h4>
-                      <p className="text-gray-600 text-sm">
+                      <p className="text-[var(--text-secondary)] text-sm">
                         RESTful API for custom integrations. Webhooks, SSO, and
                         third-party service connections.
                       </p>
@@ -687,10 +720,10 @@ const LandingPage = () => {
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-3xl sm:text-4xl font-light text-gray-900 mb-4 tracking-tight">
+            <h2 className="text-3xl sm:text-4xl font-light text-[var(--text-primary)] mb-4 tracking-tight">
               Simple, transparent pricing
             </h2>
-            <p className="text-lg text-gray-600 font-light">
+            <p className="text-lg text-[var(--text-secondary)] font-light">
               Start free, upgrade when you need more features
             </p>
           </motion.div>
@@ -745,8 +778,8 @@ const LandingPage = () => {
                 key={plan.name}
                 className={`relative rounded-xl p-6 ${
                   plan.popular
-                    ? "bg-blue-600 text-white"
-                    : "bg-white border border-gray-200"
+                    ? "bg-[var(--accent-primary)] text-white"
+                    : "bg-[var(--bg-primary)] border border-[var(--border-primary)]"
                 }`}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -756,7 +789,7 @@ const LandingPage = () => {
               >
                 {plan.popular && (
                   <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                    <span className="bg-blue-800 text-white px-3 py-1 rounded-full text-xs font-medium">
+                    <span className="bg-[var(--accent-secondary)] text-white px-3 py-1 rounded-full text-xs font-medium">
                       Most Popular
                     </span>
                   </div>
@@ -765,7 +798,7 @@ const LandingPage = () => {
                 <div className="text-center">
                   <h3
                     className={`text-lg font-medium mb-3 ${
-                      plan.popular ? "text-white" : "text-gray-900"
+                      plan.popular ? "text-white" : "text-[var(--text-primary)]"
                     }`}
                   >
                     {plan.name}
@@ -774,14 +807,14 @@ const LandingPage = () => {
                   <div className="mb-6">
                     <span
                       className={`text-3xl font-light ${
-                        plan.popular ? "text-white" : "text-gray-900"
+                        plan.popular ? "text-white" : "text-[var(--text-primary)]"
                       }`}
                     >
                       {plan.price}
                     </span>
                     <span
                       className={`text-sm ${
-                        plan.popular ? "text-blue-100" : "text-gray-600"
+                        plan.popular ? "text-blue-100" : "text-[var(--text-secondary)]"
                       }`}
                     >
                       /{plan.period}
@@ -796,7 +829,7 @@ const LandingPage = () => {
                       >
                         <svg
                           className={`w-4 h-4 mr-2 flex-shrink-0 ${
-                            plan.popular ? "text-blue-200" : "text-blue-500"
+                            plan.popular ? "text-blue-200" : "text-[var(--accent-primary)]"
                           }`}
                           fill="none"
                           stroke="currentColor"
@@ -811,7 +844,7 @@ const LandingPage = () => {
                         </svg>
                         <span
                           className={
-                            plan.popular ? "text-blue-100" : "text-gray-600"
+                            plan.popular ? "text-blue-100" : "text-[var(--text-secondary)]"
                           }
                         >
                           {feature}
@@ -824,8 +857,8 @@ const LandingPage = () => {
                     <motion.button
                       className={`w-full py-2 px-4 rounded-lg font-medium transition-colors text-sm ${
                         plan.popular
-                          ? "bg-white text-blue-600 hover:bg-gray-50"
-                          : "bg-blue-600 text-white hover:bg-blue-700"
+                          ? "bg-white text-[var(--accent-primary)] hover:bg-gray-50"
+                          : "bg-[var(--accent-primary)] text-white hover:bg-[var(--accent-secondary)]"
                       }`}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
@@ -840,7 +873,7 @@ const LandingPage = () => {
         </div>
 
         {/* Final CTA */}
-        <div className="bg-gray-900 text-white">
+        <div className="bg-[var(--bg-tertiary)] text-[var(--text-primary)]">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
             <motion.div
               className="text-center max-w-2xl mx-auto"
@@ -852,7 +885,7 @@ const LandingPage = () => {
               <h2 className="text-3xl sm:text-4xl font-light mb-6 tracking-tight">
                 Ready to organize your thoughts?
               </h2>
-              <p className="text-lg text-gray-300 mb-8 font-light">
+              <p className="text-lg text-[var(--text-secondary)] mb-8 font-light">
                 Join thousands of users who have made ThoughtBox their digital
                 brain. Start your free trial today—no credit card required.
               </p>
@@ -860,7 +893,7 @@ const LandingPage = () => {
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <SignUpButton mode="modal">
                   <motion.button
-                    className="bg-blue-600 text-white px-8 py-3 rounded-lg font-medium text-lg hover:bg-blue-700 transition-colors shadow-lg hover:shadow-xl"
+                    className="bg-[var(--accent-primary)] text-white px-8 py-3 rounded-lg font-medium text-lg hover:bg-[var(--accent-secondary)] transition-colors shadow-lg hover:shadow-xl"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
@@ -872,7 +905,7 @@ const LandingPage = () => {
                   href="https://docs.thoughtbox.dev"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="border border-gray-600 hover:border-gray-500 text-white px-8 py-3 rounded-lg font-medium text-lg transition-colors inline-flex items-center justify-center"
+                  className="border border-[var(--border-secondary)] hover:border-[var(--border-primary)] text-[var(--text-primary)] px-8 py-3 rounded-lg font-medium text-lg transition-colors inline-flex items-center justify-center"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
@@ -881,7 +914,7 @@ const LandingPage = () => {
               </div>
 
               <div className="mt-10 text-center">
-                <p className="text-gray-400 text-sm">
+                <p className="text-[var(--text-tertiary)] text-sm">
                   No setup fees • Cancel anytime • 30-day money-back guarantee
                 </p>
               </div>
@@ -890,13 +923,13 @@ const LandingPage = () => {
         </div>
 
         {/* Footer */}
-        <footer className="bg-white border-t border-gray-200">
+        <footer className="bg-[var(--bg-primary)] border-t border-[var(--border-primary)]">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
             <div className="grid md:grid-cols-4 gap-8">
               {/* Company */}
               <div>
                 <div className="flex items-center space-x-2 mb-4">
-                  <div className="w-7 h-7 bg-blue-600 rounded-lg flex items-center justify-center">
+                  <div className="w-7 h-7 bg-[var(--accent-primary)] rounded-lg flex items-center justify-center">
                     <svg
                       className="w-4 h-4 text-white"
                       fill="none"
@@ -911,9 +944,9 @@ const LandingPage = () => {
                       />
                     </svg>
                   </div>
-                  <span className="font-medium text-gray-900">ThoughtBox</span>
+                  <span className="font-medium text-[var(--text-primary)]">ThoughtBox</span>
                 </div>
-                <p className="text-gray-600 text-sm leading-relaxed font-light">
+                <p className="text-[var(--text-secondary)] text-sm leading-relaxed font-light">
                   Your digital workspace for capturing and organizing thoughts,
                   built with privacy and performance in mind.
                 </p>
@@ -921,12 +954,12 @@ const LandingPage = () => {
 
               {/* Product */}
               <div>
-                <h4 className="font-medium text-gray-900 mb-4">Product</h4>
+                <h4 className="font-medium text-[var(--text-primary)] mb-4">Product</h4>
                 <ul className="space-y-2">
                   <li>
                     <a
                       href="#features"
-                      className="text-gray-600 hover:text-blue-600 text-sm transition-colors font-light"
+                      className="text-[var(--text-secondary)] hover:text-[var(--accent-primary)] text-sm transition-colors font-light"
                     >
                       Features
                     </a>
@@ -934,7 +967,7 @@ const LandingPage = () => {
                   <li>
                     <a
                       href="#pricing"
-                      className="text-gray-600 hover:text-blue-600 text-sm transition-colors font-light"
+                      className="text-[var(--text-secondary)] hover:text-[var(--accent-primary)] text-sm transition-colors font-light"
                     >
                       Pricing
                     </a>
@@ -942,7 +975,7 @@ const LandingPage = () => {
                   <li>
                     <a
                       href="/changelog"
-                      className="text-gray-600 hover:text-blue-600 text-sm transition-colors font-light"
+                      className="text-[var(--text-secondary)] hover:text-[var(--accent-primary)] text-sm transition-colors font-light"
                     >
                       Changelog
                     </a>
@@ -950,7 +983,7 @@ const LandingPage = () => {
                   <li>
                     <a
                       href="/roadmap"
-                      className="text-gray-600 hover:text-blue-600 text-sm transition-colors font-light"
+                      className="text-[var(--text-secondary)] hover:text-[var(--accent-primary)] text-sm transition-colors font-light"
                     >
                       Roadmap
                     </a>
@@ -960,14 +993,14 @@ const LandingPage = () => {
 
               {/* Resources */}
               <div>
-                <h4 className="font-medium text-gray-900 mb-4">Resources</h4>
+                <h4 className="font-medium text-[var(--text-primary)] mb-4">Resources</h4>
                 <ul className="space-y-2">
                   <li>
                     <a
                       href="https://docs.thoughtbox.dev"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-gray-600 hover:text-blue-600 text-sm transition-colors font-light"
+                      className="text-[var(--text-secondary)] hover:text-[var(--accent-primary)] text-sm transition-colors font-light"
                     >
                       Documentation
                     </a>
@@ -977,7 +1010,7 @@ const LandingPage = () => {
                       href="https://github.com/thoughtbox/thoughtbox"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-gray-600 hover:text-blue-600 text-sm transition-colors font-light"
+                      className="text-[var(--text-secondary)] hover:text-[var(--accent-primary)] text-sm transition-colors font-light"
                     >
                       GitHub
                     </a>
@@ -985,7 +1018,7 @@ const LandingPage = () => {
                   <li>
                     <a
                       href="/api"
-                      className="text-gray-600 hover:text-blue-600 text-sm transition-colors font-light"
+                      className="text-[var(--text-secondary)] hover:text-[var(--accent-primary)] text-sm transition-colors font-light"
                     >
                       API Reference
                     </a>
@@ -993,7 +1026,7 @@ const LandingPage = () => {
                   <li>
                     <a
                       href="/blog"
-                      className="text-gray-600 hover:text-blue-600 text-sm transition-colors font-light"
+                      className="text-[var(--text-secondary)] hover:text-[var(--accent-primary)] text-sm transition-colors font-light"
                     >
                       Blog
                     </a>
@@ -1003,12 +1036,12 @@ const LandingPage = () => {
 
               {/* Support */}
               <div>
-                <h4 className="font-medium text-gray-900 mb-4">Support</h4>
+                <h4 className="font-medium text-[var(--text-primary)] mb-4">Support</h4>
                 <ul className="space-y-2">
                   <li>
                     <a
                       href="/help"
-                      className="text-gray-600 hover:text-blue-600 text-sm transition-colors font-light"
+                      className="text-[var(--text-secondary)] hover:text-[var(--accent-primary)] text-sm transition-colors font-light"
                     >
                       Help Center
                     </a>
@@ -1016,7 +1049,7 @@ const LandingPage = () => {
                   <li>
                     <a
                       href="/contact"
-                      className="text-gray-600 hover:text-blue-600 text-sm transition-colors font-light"
+                      className="text-[var(--text-secondary)] hover:text-[var(--accent-primary)] text-sm transition-colors font-light"
                     >
                       Contact Us
                     </a>
@@ -1024,7 +1057,7 @@ const LandingPage = () => {
                   <li>
                     <a
                       href="/status"
-                      className="text-gray-600 hover:text-blue-600 text-sm transition-colors font-light"
+                      className="text-[var(--text-secondary)] hover:text-[var(--accent-primary)] text-sm transition-colors font-light"
                     >
                       System Status
                     </a>
@@ -1032,7 +1065,7 @@ const LandingPage = () => {
                   <li>
                     <a
                       href="/security"
-                      className="text-gray-600 hover:text-blue-600 text-sm transition-colors font-light"
+                      className="text-[var(--text-secondary)] hover:text-[var(--accent-primary)] text-sm transition-colors font-light"
                     >
                       Security
                     </a>
@@ -1042,9 +1075,9 @@ const LandingPage = () => {
             </div>
 
             {/* Bottom Footer */}
-            <div className="border-t border-gray-200 mt-10 pt-8 flex flex-col md:flex-row items-center justify-between">
+            <div className="border-t border-[var(--border-primary)] mt-10 pt-8 flex flex-col md:flex-row items-center justify-between">
               <div className="flex items-center space-x-6 mb-4 md:mb-0">
-                <span className="text-gray-500 text-sm font-light">
+                <span className="text-[var(--text-tertiary)] text-sm font-light">
                   © 2025 ThoughtBox. All rights reserved.
                 </span>
               </div>
@@ -1052,13 +1085,13 @@ const LandingPage = () => {
               <div className="flex items-center space-x-6">
                 <a
                   href="/privacy"
-                  className="text-gray-500 hover:text-blue-600 text-sm transition-colors font-light"
+                  className="text-[var(--text-tertiary)] hover:text-[var(--accent-primary)] text-sm transition-colors font-light"
                 >
                   Privacy Policy
                 </a>
                 <a
                   href="/terms"
-                  className="text-gray-500 hover:text-blue-600 text-sm transition-colors font-light"
+                  className="text-[var(--text-tertiary)] hover:text-[var(--accent-primary)] text-sm transition-colors font-light"
                 >
                   Terms of Service
                 </a>
@@ -1066,7 +1099,7 @@ const LandingPage = () => {
                   href="https://twitter.com/thoughtboxapp"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-gray-500 hover:text-blue-600 transition-colors"
+                  className="text-[var(--text-tertiary)] hover:text-[var(--accent-primary)] transition-colors"
                 >
                   <svg
                     className="w-4 h-4"
@@ -1080,7 +1113,7 @@ const LandingPage = () => {
                   href="https://github.com/thoughtbox/thoughtbox"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-gray-500 hover:text-blue-600 transition-colors"
+                  className="text-[var(--text-tertiary)] hover:text-[var(--accent-primary)] transition-colors"
                 >
                   <svg
                     className="w-4 h-4"

@@ -1,6 +1,8 @@
 # ThoughtBox 🧠✨
 
 > A modern, secure, and beautiful note-taking application built with React, PostgreSQL, and Clerk authentication.
+>
+> ![alt text](image.png)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![React](https://img.shields.io/badge/React-19.1.0-blue.svg)](https://reactjs.org/)
