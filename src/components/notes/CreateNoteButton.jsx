@@ -166,74 +166,15 @@ const CreateNoteButton = ({ className = "" }) => {
       >
         <motion.div
           onClick={handleOpenModal}
-          className="relative overflow-hidden cursor-text p-4 rounded-xl border border-[var(--border-primary)] shadow-lg hover:shadow-xl transition-all duration-300"
-          style={{
-            background: 'var(--bg-secondary)',
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)',
-            boxShadow: 'var(--shadow-lg)',
-          }}
-          whileHover={{ 
-            scale: 1.02,
-            boxShadow: 'var(--shadow-xl)',
-          }}
-          whileTap={{ scale: 0.98 }}
+          className="cursor-text p-4 rounded-lg border border-[var(--border-primary)] bg-[var(--bg-secondary)] hover:bg-[var(--bg-tertiary)] transition-all duration-200"
+          whileHover={{ scale: 1.01 }}
+          whileTap={{ scale: 0.99 }}
         >
-          {/* Animated gradient overlay */}
-          <motion.div
-            className="absolute inset-0 opacity-0 hover:opacity-100 transition-opacity duration-300"
-            style={{
-              background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(147, 51, 234, 0.1) 100%)',
-            }}
-          />
-          
-          <div className="relative flex items-center space-x-3">
-            <motion.div
-              whileHover={{ rotate: 15, scale: 1.1 }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
-            >
-              <PencilIcon className="w-5 h-5 text-gray-500" />
-            </motion.div>
-            
-            <motion.span 
-              className="text-[var(--text-secondary)] text-sm"
-              initial={{ opacity: 0.7 }}
-              whileHover={{ opacity: 1 }}
-            >
+          <div className="flex items-center space-x-3">
+            <PencilIcon className="w-5 h-5 text-[var(--text-tertiary)]" />
+            <span className="text-[var(--text-secondary)] text-sm">
               Type to create a new note...
-            </motion.span>
-            
-            <div className="flex items-center space-x-2">
-              <button
-                onClick={() => handleTypeChange("text")}
-                className="px-3 py-1.5 bg-[var(--accent-primary)] text-white text-sm rounded-lg hover:bg-opacity-90 transition-opacity flex items-center space-x-2"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                <span>Text</span>
-              </button>
-              
-              <button
-                onClick={() => handleTypeChange("todo")}
-                className="px-3 py-1.5 bg-[var(--success)] text-white text-sm rounded-lg hover:bg-opacity-90 transition-opacity flex items-center space-x-2"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                </svg>
-                <span>Todo</span>
-              </button>
-              
-              <button
-                onClick={() => handleTypeChange("timetable")}
-                className="px-3 py-1.5 bg-[var(--warning)] text-white text-sm rounded-lg hover:bg-opacity-90 transition-opacity flex items-center space-x-2"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                <span>Schedule</span>
-              </button>
-            </div>
+            </span>
           </div>
         </motion.div>
       </motion.div>
@@ -246,12 +187,7 @@ const CreateNoteButton = ({ className = "" }) => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4"
-            style={{
-              backgroundColor: 'rgba(0, 0, 0, 0.4)',
-              backdropFilter: 'blur(8px)',
-              WebkitBackdropFilter: 'blur(8px)',
-            }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/20 backdrop-blur-sm"
             onClick={(e) => {
               if (e.target === e.currentTarget) {
                 handleCloseModal();
@@ -260,292 +196,176 @@ const CreateNoteButton = ({ className = "" }) => {
           >
             <motion.div
               ref={modalRef}
-              initial={{ opacity: 0, scale: 0.9, y: -20 }}
+              initial={{ opacity: 0, scale: 0.95, y: -20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: -20 }}
-              transition={{ 
-                type: "spring", 
-                stiffness: 300, 
-                damping: 30,
-                duration: 0.4 
-              }}
-              className="relative overflow-hidden p-6 rounded-2xl border border-white/30 w-full max-w-2xl max-h-[80vh] overflow-y-auto"
-              style={{
-                background: 'rgba(255, 255, 255, 0.9)',
-                backdropFilter: 'blur(25px)',
-                WebkitBackdropFilter: 'blur(25px)',
-                boxShadow: '0 20px 50px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.2)',
-              }}
+              exit={{ opacity: 0, scale: 0.95, y: -20 }}
+              transition={{ duration: 0.2 }}
+              className="relative p-6 rounded-lg border border-[var(--border-primary)] bg-[var(--bg-secondary)] w-full max-w-2xl max-h-[80vh] overflow-y-auto shadow-xl"
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Animated background gradient */}
-              <motion.div
-                className="absolute inset-0 opacity-30"
-                style={{
-                  background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(147, 51, 234, 0.1) 50%, rgba(236, 72, 153, 0.1) 100%)',
-                }}
-                animate={{
-                  backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
-                }}
-                transition={{
-                  duration: 8,
-                  repeat: Infinity,
-                  ease: "linear"
-                }}
-              />
 
               <div className="relative">
-              <motion.input
+              <input
                 ref={inputRef}
                 type="text"
                 placeholder="Title"
                 value={noteTitle}
                 onChange={(e) => setNoteTitle(e.target.value)}
-                className="w-full text-lg font-semibold placeholder-gray-500 border-none outline-none mb-4 bg-transparent"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.1, duration: 0.3 }}
-                whileFocus={{ 
-                  scale: 1.02,
-                  transition: { type: "spring", stiffness: 300, damping: 30 }
-                }}
+                className="w-full text-lg font-medium placeholder-[var(--text-tertiary)] text-[var(--text-primary)] border-none outline-none mb-4 bg-transparent"
               />
 
               {selectedType === "text" && (
-                <motion.textarea
+                <textarea
                   placeholder="Take a note..."
                   value={noteContent}
                   onChange={(e) => setNoteContent(e.target.value)}
-                  className="w-full placeholder-gray-500 border-none outline-none resize-none min-h-[120px] bg-transparent leading-relaxed"
+                  className="w-full placeholder-[var(--text-tertiary)] text-[var(--text-primary)] border-none outline-none resize-none min-h-[120px] bg-transparent leading-relaxed"
                   rows={4}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2, duration: 0.3 }}
-                  whileFocus={{ 
-                    scale: 1.01,
-                    transition: { type: "spring", stiffness: 300, damping: 30 }
-                  }}
                 />
               )}
 
               {selectedType === "todo" && (
-                <motion.div 
-                  className="space-y-3"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2, duration: 0.3 }}
-                >
+                <div className="space-y-3">
                   <AnimatePresence>
                     {todoItems.map((item, index) => (
-                      <motion.div 
-                        key={item.id} 
-                        className="flex items-center space-x-3"
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -20 }}
-                        transition={{ delay: index * 0.1 }}
-                      >
-                        <motion.input
+                      <div key={item.id} className="flex items-center space-x-3">
+                        <input
                           type="checkbox"
                           checked={item.completed}
                           onChange={() => updateTodoItem(item.id, item.text)}
-                          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                          whileTap={{ scale: 0.9 }}
+                          className="rounded border-[var(--border-primary)] text-[var(--text-primary)] focus:ring-[var(--text-primary)]"
                         />
-                        <motion.input
+                        <input
                           type="text"
                           placeholder="List item"
                           value={item.text}
                           onChange={(e) => updateTodoItem(item.id, e.target.value)}
-                          className="flex-1 border-none outline-none bg-transparent"
-                          whileFocus={{ 
-                            scale: 1.01,
-                            transition: { type: "spring", stiffness: 300, damping: 30 }
-                          }}
+                          className="flex-1 border-none outline-none bg-transparent text-[var(--text-primary)] placeholder-[var(--text-tertiary)]"
                         />
                         {todoItems.length > 1 && (
-                          <motion.button
+                          <button
                             onClick={() => removeTodoItem(item.id)}
-                            className="p-1 hover:bg-white/50 rounded-full transition-colors"
-                            whileHover={{ scale: 1.1, rotate: 90 }}
-                            whileTap={{ scale: 0.9 }}
+                            className="p-1 hover:bg-[var(--bg-tertiary)] rounded-lg transition-colors"
                           >
-                            <XMarkIcon className="w-4 h-4 text-gray-400" />
-                          </motion.button>
+                            <XMarkIcon className="w-4 h-4 text-[var(--text-tertiary)]" />
+                          </button>
                         )}
-                      </motion.div>
+                      </div>
                     ))}
                   </AnimatePresence>
-                  <motion.button
+                  <button
                     onClick={addTodoItem}
-                    className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 p-2 hover:bg-white/50 rounded-lg transition-all duration-200"
-                    whileHover={{ scale: 1.02, x: 5 }}
-                    whileTap={{ scale: 0.98 }}
+                    className="flex items-center space-x-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] p-2 hover:bg-[var(--bg-tertiary)] rounded-lg transition-colors"
                   >
-                    <motion.div
-                      whileHover={{ rotate: 90 }}
-                      transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                    >
-                      <PlusIcon className="w-4 h-4" />
-                    </motion.div>
+                    <PlusIcon className="w-4 h-4" />
                     <span className="text-sm font-medium">Add item</span>
-                  </motion.button>
-                </motion.div>
+                  </button>
+                </div>
               )}
 
               {selectedType === "timetable" && (
-                <motion.div 
-                  className="space-y-3"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2, duration: 0.3 }}
-                >
+                <div className="space-y-3">
                   <AnimatePresence>
                     {timetableEntries.map((entry, index) => (
-                      <motion.div 
-                        key={entry.id} 
-                        className="flex items-center space-x-3"
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -20 }}
-                        transition={{ delay: index * 0.1 }}
-                      >
-                        <motion.input
+                      <div key={entry.id} className="flex items-center space-x-3">
+                        <input
                           type="time"
                           value={entry.time}
                           onChange={(e) =>
                             updateTimetableEntry(entry.id, "time", e.target.value)
                           }
-                          className="border border-white/30 bg-white/50 backdrop-blur-sm rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                          whileFocus={{ scale: 1.05 }}
+                          className="border border-[var(--border-primary)] bg-[var(--bg-secondary)] rounded-lg px-3 py-2 text-sm text-[var(--text-primary)] focus:ring-2 focus:ring-[var(--text-primary)] focus:border-transparent transition-all"
                         />
-                        <motion.input
+                        <input
                           type="text"
                           placeholder="Activity"
                           value={entry.description}
                           onChange={(e) =>
                             updateTimetableEntry(entry.id, "description", e.target.value)
                           }
-                          className="flex-1 border-none outline-none bg-transparent"
-                          whileFocus={{ 
-                            scale: 1.01,
-                            transition: { type: "spring", stiffness: 300, damping: 30 }
-                          }}
+                          className="flex-1 border-none outline-none bg-transparent text-[var(--text-primary)] placeholder-[var(--text-tertiary)]"
                         />
                         {timetableEntries.length > 1 && (
-                          <motion.button
+                          <button
                             onClick={() => removeTimetableEntry(entry.id)}
-                            className="p-1 hover:bg-white/50 rounded-full transition-colors"
-                            whileHover={{ scale: 1.1, rotate: 90 }}
-                            whileTap={{ scale: 0.9 }}
+                            className="p-1 hover:bg-[var(--bg-tertiary)] rounded-lg transition-colors"
                           >
-                            <XMarkIcon className="w-4 h-4 text-gray-400" />
-                          </motion.button>
+                            <XMarkIcon className="w-4 h-4 text-[var(--text-tertiary)]" />
+                          </button>
                         )}
-                      </motion.div>
+                      </div>
                     ))}
                   </AnimatePresence>
-                  <motion.button
+                  <button
                     onClick={addTimetableEntry}
-                    className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 p-2 hover:bg-white/50 rounded-lg transition-all duration-200"
-                    whileHover={{ scale: 1.02, x: 5 }}
-                    whileTap={{ scale: 0.98 }}
+                    className="flex items-center space-x-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] p-2 hover:bg-[var(--bg-tertiary)] rounded-lg transition-colors"
                   >
-                    <motion.div
-                      whileHover={{ rotate: 90 }}
-                      transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                    >
-                      <PlusIcon className="w-4 h-4" />
-                    </motion.div>
+                    <PlusIcon className="w-4 h-4" />
                     <span className="text-sm font-medium">Add entry</span>
-                  </motion.button>
-                </motion.div>
+                  </button>
+                </div>
               )}
 
-              <motion.div 
-                className="flex items-center justify-between mt-6 pt-4 border-t border-white/30"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3, duration: 0.3 }}
-              >
+              <div className="flex items-center justify-between mt-6 pt-4 border-t border-[var(--border-primary)]">
                 <div className="flex space-x-1">
-                  <motion.button
+                  <button
                     onClick={() => handleTypeChange("text")}
-                    className={`p-3 rounded-xl transition-all duration-200 ${
+                    className={`p-3 rounded-lg transition-colors ${
                       selectedType === "text"
-                        ? "bg-blue-500/20 text-blue-600 shadow-lg"
-                        : "hover:bg-white/50 text-gray-600"
+                        ? "bg-[var(--text-primary)] text-[var(--bg-primary)]"
+                        : "hover:bg-[var(--bg-tertiary)] text-[var(--text-tertiary)]"
                     }`}
                     title="Text note"
-                    whileHover={{ scale: 1.05, y: -2 }}
-                    whileTap={{ scale: 0.95 }}
                   >
                     <DocumentTextIcon className="w-5 h-5" />
-                  </motion.button>
-                  <motion.button
+                  </button>
+                  <button
                     onClick={() => handleTypeChange("todo")}
-                    className={`p-3 rounded-xl transition-all duration-200 ${
+                    className={`p-3 rounded-lg transition-colors ${
                       selectedType === "todo"
-                        ? "bg-green-500/20 text-green-600 shadow-lg"
-                        : "hover:bg-white/50 text-gray-600"
+                        ? "bg-[var(--text-primary)] text-[var(--bg-primary)]"
+                        : "hover:bg-[var(--bg-tertiary)] text-[var(--text-tertiary)]"
                     }`}
                     title="Todo list"
-                    whileHover={{ scale: 1.05, y: -2 }}
-                    whileTap={{ scale: 0.95 }}
                   >
                     <ListBulletIcon className="w-5 h-5" />
-                  </motion.button>
-                  <motion.button
+                  </button>
+                  <button
                     onClick={() => handleTypeChange("timetable")}
-                    className={`p-3 rounded-xl transition-all duration-200 ${
+                    className={`p-3 rounded-lg transition-colors ${
                       selectedType === "timetable"
-                        ? "bg-purple-500/20 text-purple-600 shadow-lg"
-                        : "hover:bg-white/50 text-gray-600"
+                        ? "bg-[var(--text-primary)] text-[var(--bg-primary)]"
+                        : "hover:bg-[var(--bg-tertiary)] text-[var(--text-tertiary)]"
                     }`}
                     title="Timetable"
-                    whileHover={{ scale: 1.05, y: -2 }}
-                    whileTap={{ scale: 0.95 }}
                   >
                     <ClockIcon className="w-5 h-5" />
-                  </motion.button>
+                  </button>
                 </div>
 
                 <div className="flex space-x-3">
-                  <motion.button
+                  <button
                     onClick={handleSave}
-                    className="px-6 py-2.5 text-sm font-semibold text-white rounded-xl transition-all duration-200"
-                    style={{
-                      background: 'linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%)',
-                      boxShadow: '0 4px 15px rgba(59, 130, 246, 0.4)',
-                    }}
-                    whileHover={{ 
-                      scale: 1.05, 
-                      boxShadow: '0 6px 20px rgba(59, 130, 246, 0.5)',
-                    }}
-                    whileTap={{ scale: 0.95 }}
+                    className="px-6 py-2.5 text-sm font-medium text-[var(--bg-primary)] bg-[var(--text-primary)] hover:opacity-80 rounded-lg transition-opacity"
                   >
                     Save
-                  </motion.button>
-                  <motion.button
+                  </button>
+                  <button
                     onClick={handleCloseModal}
-                    className="px-6 py-2.5 text-sm font-semibold text-gray-700 bg-white/50 hover:bg-white/70 rounded-xl transition-all duration-200 border border-white/30"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
+                    className="px-6 py-2.5 text-sm font-medium text-[var(--text-primary)] border border-[var(--border-primary)] hover:bg-[var(--bg-tertiary)] rounded-lg transition-colors"
                   >
                     Cancel
-                  </motion.button>
+                  </button>
                 </div>
-              </motion.div>
+              </div>
               
               {/* Close button */}
-              <motion.button
+              <button
                 onClick={handleCloseModal}
-                className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 hover:bg-white/50 rounded-full transition-colors z-10"
-                whileHover={{ scale: 1.1, rotate: 90 }}
-                whileTap={{ scale: 0.9 }}
+                className="absolute top-4 right-4 p-2 text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)] rounded-lg transition-colors"
               >
                 <XMarkIcon className="w-5 h-5" />
-              </motion.button>
+              </button>
               </div>
             </motion.div>
           </motion.div>

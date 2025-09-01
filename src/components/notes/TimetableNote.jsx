@@ -1,316 +1,211 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { useNotes } from '../../contexts/NotesContext';
-import { createTimetableEntry } from '../../types/noteUtils';
+import { useState, useEffect, useRef } from 'react';
 
 const TimetableNote = ({ 
   note, 
+  onChange, 
   onSave, 
   onCancel, 
-  autoFocus = false,
-  className = ""
+  autoSave = true, 
+  className = "" 
 }) => {
-  const { updateNote } = useNotes();
-  
-  // Local state for editing
   const [title, setTitle] = useState(note?.title || '');
   const [entries, setEntries] = useState(note?.content?.entries || []);
   const [newEntryTime, setNewEntryTime] = useState('');
   const [newEntryDescription, setNewEntryDescription] = useState('');
-  const [newEntryDate, setNewEntryDate] = useState(getTodayDate());
+  const [newEntryDate, setNewEntryDate] = useState(new Date().toISOString().split('T')[0]);
   const [isSaving, setIsSaving] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
   const [timeConflictError, setTimeConflictError] = useState('');
-  
-  // Refs for auto-focus and debouncing
-  const titleRef = useRef(null);
+
+  const titleInputRef = useRef(null);
   const timeInputRef = useRef(null);
-  const saveTimeoutRef = useRef(null);
-  const initialDataRef = useRef({ 
-    title: note?.title || '', 
-    entries: note?.content?.entries || [] 
-  });
 
-  // Auto-focus on mount if requested
-  useEffect(() => {
-    if (autoFocus && titleRef.current) {
-      titleRef.current.focus();
-    }
-  }, [autoFocus]);
-
-  // Track changes
-  useEffect(() => {
-    const hasContentChanges = JSON.stringify(entries) !== JSON.stringify(initialDataRef.current.entries);
-    const hasTitleChanges = title !== initialDataRef.current.title;
-    setHasChanges(hasContentChanges || hasTitleChanges);
-  }, [title, entries]);
-
-  // Debounced auto-save function
-  const debouncedSave = useCallback(async () => {
-    if (!note || !hasChanges) return;
-
-    try {
-      setIsSaving(true);
-      
-      const updatedNote = await updateNote(note.id, {
-        title: title.trim(),
-        content: { entries: sortEntriesChronologically(entries) }
-      });
-
-      // Update initial data reference
-      initialDataRef.current = { 
-        title: title.trim(), 
-        entries: [...entries] 
-      };
-      
-      setHasChanges(false);
-      onSave?.(updatedNote);
-    } catch (error) {
-      console.error('Failed to save note:', error);
-      // Note: Error handling is managed by NotesContext
-    } finally {
-      setIsSaving(false);
-    }
-  }, [note, title, entries, hasChanges, updateNote, onSave]);
-
-  // Auto-save with debouncing - reduced delay for instant sync
-  useEffect(() => {
-    if (!hasChanges || !note) return;
-
-    // Clear existing timeout
-    if (saveTimeoutRef.current) {
-      clearTimeout(saveTimeoutRef.current);
-    }
-
-    // Set new timeout for auto-save (500ms delay for instant feel)
-    saveTimeoutRef.current = setTimeout(() => {
-      debouncedSave();
-    }, 500);
-
-    // Cleanup timeout on unmount or dependency change
-    return () => {
-      if (saveTimeoutRef.current) {
-        clearTimeout(saveTimeoutRef.current);
-      }
-    };
-  }, [hasChanges, debouncedSave, note]);
-
-  // Auto-save on blur/focus loss for instant sync
-  const handleBlur = useCallback(() => {
-    if (hasChanges && note) {
-      // Clear timeout and save immediately
-      if (saveTimeoutRef.current) {
-        clearTimeout(saveTimeoutRef.current);
-      }
-      debouncedSave();
-    }
-  }, [hasChanges, note, debouncedSave]);
-
-  // Manual save function
-  const handleSave = useCallback(async () => {
-    if (saveTimeoutRef.current) {
-      clearTimeout(saveTimeoutRef.current);
-    }
-    await debouncedSave();
-  }, [debouncedSave]);
-
-  // Handle title change
-  const handleTitleChange = (e) => {
-    setTitle(e.target.value);
-  };
-
-  // Handle new entry field changes
-  const handleNewEntryTimeChange = (e) => {
-    setNewEntryTime(e.target.value);
-    setTimeConflictError('');
-  };
-
-  const handleNewEntryDescriptionChange = (e) => {
-    setNewEntryDescription(e.target.value);
-  };
-
-  const handleNewEntryDateChange = (e) => {
-    setNewEntryDate(e.target.value);
-    setTimeConflictError('');
-  };
-
-  // Validate time slot for conflicts
-  const validateTimeSlot = (time, date, excludeEntryId = null) => {
-    const conflictingEntry = entries.find(entry => 
-      entry.id !== excludeEntryId &&
-      entry.time === time && 
-      entry.date === date
-    );
-    
-    return conflictingEntry ? `Time slot ${time} on ${date} is already occupied` : '';
-  };
-
-  // Add new timetable entry
-  const handleAddEntry = () => {
-    const time = newEntryTime.trim();
-    const description = newEntryDescription.trim();
-    const date = newEntryDate;
-    
-    if (!time || !description || !date) return;
-
-    // Validate time format
-    if (!/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/.test(time)) {
-      setTimeConflictError('Please enter time in HH:MM format (e.g., 09:30)');
-      return;
-    }
-
-    // Check for time conflicts
-    const conflictError = validateTimeSlot(time, date);
-    if (conflictError) {
-      setTimeConflictError(conflictError);
-      return;
-    }
-
-    const newEntry = createTimetableEntry(time, description, date);
-    const newEntries = [...entries, newEntry];
-    
-    setEntries(sortEntriesChronologically(newEntries));
-    setNewEntryTime('');
-    setNewEntryDescription('');
-    setTimeConflictError('');
-    
-    // Focus back to time input for quick adding
-    if (timeInputRef.current) {
-      timeInputRef.current.focus();
-    }
-  };
-
-  // Handle Enter key in new entry inputs
-  const handleNewEntryKeyDown = (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      handleAddEntry();
-    }
-  };
-
-  // Toggle timetable entry completion
-  const handleToggleEntry = (entryId) => {
-    setEntries(prevEntries => 
-      prevEntries.map(entry => 
-        entry.id === entryId 
-          ? { ...entry, completed: !entry.completed }
-          : entry
-      )
-    );
-  };
-
-  // Update timetable entry
-  const handleUpdateEntry = (entryId, updates) => {
-    // If updating time or date, validate for conflicts
-    if (updates.time !== undefined || updates.date !== undefined) {
-      const entry = entries.find(e => e.id === entryId);
-      const newTime = updates.time !== undefined ? updates.time : entry.time;
-      const newDate = updates.date !== undefined ? updates.date : entry.date;
-      
-      const conflictError = validateTimeSlot(newTime, newDate, entryId);
-      if (conflictError) {
-        setTimeConflictError(conflictError);
-        return false;
-      }
-    }
-
-    setEntries(prevEntries => {
-      const updatedEntries = prevEntries.map(entry => 
-        entry.id === entryId 
-          ? { ...entry, ...updates }
-          : entry
-      );
-      return sortEntriesChronologically(updatedEntries);
-    });
-    
-    setTimeConflictError('');
-    return true;
-  };
-
-  // Remove timetable entry
-  const handleRemoveEntry = (entryId) => {
-    setEntries(prevEntries => prevEntries.filter(entry => entry.id !== entryId));
-  };
-
-  // Handle keyboard shortcuts
-  const handleKeyDown = (e) => {
-    // Ctrl/Cmd + S to save
-    if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-      e.preventDefault();
-      handleSave();
-    }
-    
-    // Escape to cancel (if onCancel is provided)
-    if (e.key === 'Escape' && onCancel) {
-      e.preventDefault();
-      onCancel();
-    }
-  };
-
-  // Listen for force save events (page visibility change, etc.)
-  useEffect(() => {
-    const handleForceSave = () => {
-      if (hasChanges && note) {
-        if (saveTimeoutRef.current) {
-          clearTimeout(saveTimeoutRef.current);
-        }
-        debouncedSave();
-      }
-    };
-
-    window.addEventListener('force-save-notes', handleForceSave);
-    
-    return () => {
-      window.removeEventListener('force-save-notes', handleForceSave);
-    };
-  }, [hasChanges, note, debouncedSave]);
-
-  // Cleanup timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (saveTimeoutRef.current) {
-        clearTimeout(saveTimeoutRef.current);
-      }
-    };
-  }, []);
-
-  // Calculate completion stats
+  // Calculate progress
   const completedCount = entries.filter(entry => entry.completed).length;
   const totalCount = entries.length;
   const completionPercentage = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
 
-  // Group entries by date for better organization
-  const entriesByDate = groupEntriesByDate(entries);
+  // Auto-save functionality
+  useEffect(() => {
+    if (autoSave && hasChanges && !isSaving) {
+      const timer = setTimeout(() => {
+        handleSave();
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [title, entries, hasChanges, autoSave, isSaving]);
+
+  // Track changes
+  useEffect(() => {
+    const originalTitle = note?.title || '';
+    const originalEntries = note?.content?.entries || [];
+    
+    const titleChanged = title !== originalTitle;
+    const entriesChanged = JSON.stringify(entries) !== JSON.stringify(originalEntries);
+    
+    setHasChanges(titleChanged || entriesChanged);
+  }, [title, entries, note]);
+
+  // Handle keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.ctrlKey || e.metaKey) {
+        if (e.key === 's') {
+          e.preventDefault();
+          handleSave();
+        }
+      }
+      if (e.key === 'Escape' && onCancel) {
+        onCancel();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  const handleSave = async () => {
+    if (isSaving) return;
+    
+    setIsSaving(true);
+    try {
+      const updatedNote = {
+        ...note,
+        title: title.trim(),
+        content: { entries: entries.filter(entry => entry.description.trim()) },
+        type: 'timetable'
+      };
+      
+      if (onChange) {
+        onChange(updatedNote);
+      }
+      
+      if (onSave) {
+        await onSave(updatedNote);
+      }
+      
+      setHasChanges(false);
+    } catch (error) {
+      console.error('Failed to save timetable note:', error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleTitleChange = (e) => {
+    setTitle(e.target.value);
+  };
+
+  const handleAddEntry = () => {
+    if (!newEntryTime.trim() || !newEntryDescription.trim() || !newEntryDate) {
+      return;
+    }
+
+    // Check for time conflicts
+    const conflictEntry = entries.find(entry => 
+      entry.date === newEntryDate && entry.time === newEntryTime
+    );
+
+    if (conflictEntry) {
+      setTimeConflictError(`Time slot ${newEntryTime} on ${newEntryDate} is already taken`);
+      return;
+    }
+
+    const newEntry = {
+      id: Date.now(),
+      time: newEntryTime,
+      description: newEntryDescription,
+      date: newEntryDate,
+      completed: false
+    };
+
+    setEntries(prev => [...prev, newEntry].sort((a, b) => {
+      if (a.date !== b.date) return a.date.localeCompare(b.date);
+      return a.time.localeCompare(b.time);
+    }));
+
+    setNewEntryTime('');
+    setNewEntryDescription('');
+    setTimeConflictError('');
+    
+    // Focus time input for next entry
+    setTimeout(() => timeInputRef.current?.focus(), 100);
+  };
+
+  const handleEntryToggle = (id) => {
+    setEntries(prev => prev.map(entry => 
+      entry.id === id ? { ...entry, completed: !entry.completed } : entry
+    ));
+  };
+
+  const handleEntryRemove = (id) => {
+    setEntries(prev => prev.filter(entry => entry.id !== id));
+  };
+
+  const handleEntryUpdate = (id, field, value) => {
+    setEntries(prev => prev.map(entry => 
+      entry.id === id ? { ...entry, [field]: value } : entry
+    ));
+  };
+
+  const formatTime = (timeString) => {
+    if (!timeString) return '';
+    try {
+      const [hours, minutes] = timeString.split(':');
+      const date = new Date();
+      date.setHours(parseInt(hours), parseInt(minutes));
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    } catch {
+      return timeString;
+    }
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    try {
+      return new Date(dateString).toLocaleDateString();
+    } catch {
+      return dateString;
+    }
+  };
+
+  // Group entries by date
+  const entriesByDate = entries.reduce((groups, entry) => {
+    const date = entry.date;
+    if (!groups[date]) {
+      groups[date] = [];
+    }
+    groups[date].push(entry);
+    return groups;
+  }, {});
 
   return (
-    <div className={`timetable-note-editor ${className}`} onKeyDown={handleKeyDown}>
-      {/* Title input */}
-      <div className="mb-4">
-        <input
-          ref={titleRef}
-          type="text"
-          value={title}
-          onChange={handleTitleChange}
-          onBlur={handleBlur}
-          placeholder="Timetable title..."
-          className="w-full text-xl font-semibold text-gray-900 placeholder-gray-400 border-none outline-none bg-transparent resize-none"
-          data-testid="timetable-note-title"
-        />
-      </div>
+    <div className={`timetable-note ${className}`}>
+      {/* Title Input */}
+      <textarea
+        ref={titleInputRef}
+        value={title}
+        onChange={handleTitleChange}
+        placeholder="Timetable title..."
+        className="w-full text-xl font-semibold text-[var(--text-primary)] placeholder-[var(--text-tertiary)] border-none outline-none bg-transparent resize-none"
+        rows={1}
+        data-testid="timetable-note-title"
+      />
 
       {/* Progress indicator */}
       {totalCount > 0 && (
-        <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+        <div className="mb-4 p-3 bg-[var(--bg-tertiary)] rounded-lg">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-gray-700">
+            <span className="text-sm font-medium text-[var(--text-secondary)]">
               Progress: {completedCount} of {totalCount} completed
             </span>
-            <span className="text-sm font-medium text-gray-700">
+            <span className="text-sm font-medium text-[var(--text-secondary)]">
               {completionPercentage}%
             </span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
+          <div className="w-full bg-[var(--border-primary)] rounded-full h-2">
             <div 
-              className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+              className="bg-[var(--accent-primary)] h-2 rounded-full transition-all duration-300"
               style={{ width: `${completionPercentage}%` }}
             ></div>
           </div>
@@ -318,102 +213,100 @@ const TimetableNote = ({
       )}
 
       {/* Add new entry form */}
-      <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-        <h3 className="text-sm font-medium text-gray-700 mb-3">Add New Entry</h3>
+      <div className="mb-6 p-4 bg-[var(--bg-tertiary)] rounded-lg">
+        <h3 className="text-sm font-medium text-[var(--text-secondary)] mb-3">Add New Entry</h3>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Date</label>
+            <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">Date</label>
             <input
               type="date"
               value={newEntryDate}
-              onChange={handleNewEntryDateChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-              data-testid="timetable-new-entry-date"
+              onChange={(e) => setNewEntryDate(e.target.value)}
+              className="w-full px-3 py-2 border border-[var(--border-primary)] bg-[var(--bg-secondary)] rounded-md text-sm text-[var(--text-primary)] focus:ring-2 focus:ring-[var(--accent-primary)] focus:border-transparent"
             />
           </div>
           
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Time</label>
+            <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">Time</label>
             <input
               ref={timeInputRef}
               type="time"
               value={newEntryTime}
-              onChange={handleNewEntryTimeChange}
-              onKeyDown={handleNewEntryKeyDown}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-              data-testid="timetable-new-entry-time"
+              onChange={(e) => setNewEntryTime(e.target.value)}
+              className="w-full px-3 py-2 border border-[var(--border-primary)] bg-[var(--bg-secondary)] rounded-md text-sm text-[var(--text-primary)] focus:ring-2 focus:ring-[var(--accent-primary)] focus:border-transparent"
             />
           </div>
           
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Description</label>
+            <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">Description</label>
             <input
               type="text"
               value={newEntryDescription}
-              onChange={handleNewEntryDescriptionChange}
-              onKeyDown={handleNewEntryKeyDown}
-              placeholder="Enter activity description..."
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-              data-testid="timetable-new-entry-description"
+              onChange={(e) => setNewEntryDescription(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleAddEntry()}
+              placeholder="Activity description"
+              className="w-full px-3 py-2 border border-[var(--border-primary)] bg-[var(--bg-secondary)] rounded-md text-sm text-[var(--text-primary)] placeholder-[var(--text-tertiary)] focus:ring-2 focus:ring-[var(--accent-primary)] focus:border-transparent"
             />
           </div>
         </div>
         
         {timeConflictError && (
-          <div className="mb-3 text-sm text-red-600" data-testid="timetable-conflict-error">
+          <div className="mb-3 text-sm text-[var(--error)]" data-testid="timetable-conflict-error">
             {timeConflictError}
           </div>
         )}
-        
+
         <button
           onClick={handleAddEntry}
           disabled={!newEntryTime.trim() || !newEntryDescription.trim() || !newEntryDate}
-          className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+          className="px-4 py-2 bg-[var(--accent-primary)] text-[var(--bg-primary)] rounded-md hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
           data-testid="timetable-add-entry-button"
         >
           Add Entry
         </button>
       </div>
 
-      {/* Timetable entries grouped by date */}
-      <div className="space-y-4 mb-4">
-        {Object.entries(entriesByDate).map(([date, dateEntries]) => (
-          <TimetableDateGroup
-            key={date}
-            date={date}
-            entries={dateEntries}
-            onToggleEntry={handleToggleEntry}
-            onUpdateEntry={handleUpdateEntry}
-            onRemoveEntry={handleRemoveEntry}
-          />
-        ))}
+      {/* Entries grouped by date */}
+      <div className="space-y-4">
+        {Object.entries(entriesByDate)
+          .sort(([a], [b]) => a.localeCompare(b))
+          .map(([date, dateEntries]) => (
+            <DateGroup 
+              key={date} 
+              date={date} 
+              entries={dateEntries}
+              onEntryToggle={handleEntryToggle}
+              onEntryRemove={handleEntryRemove}
+              onEntryUpdate={handleEntryUpdate}
+            />
+          ))}
       </div>
 
       {/* Status indicator */}
-      <div className="flex items-center justify-between mt-4 text-sm text-gray-500">
+      <div className="flex items-center justify-between mt-4 text-sm text-[var(--text-secondary)]">
         <div className="flex items-center space-x-2">
           {isSaving && (
             <span className="flex items-center space-x-1">
-              <div className="w-3 h-3 border border-gray-300 border-t-blue-500 rounded-full animate-spin"></div>
+              <div className="w-3 h-3 border border-[var(--border-primary)] border-t-[var(--accent-primary)] rounded-full animate-spin"></div>
               <span>Saving...</span>
             </span>
           )}
           {hasChanges && !isSaving && (
-            <span className="text-yellow-600">Unsaved changes</span>
+            <span className="text-[var(--warning)]">Unsaved changes</span>
           )}
           {!hasChanges && !isSaving && note && (
-            <span className="text-green-600">Saved</span>
+            <span className="text-[var(--success)]">Saved</span>
           )}
         </div>
         
-        <div className="text-xs text-gray-400">
+        <div className="text-xs text-[var(--text-tertiary)]">
           {totalCount} {totalCount === 1 ? 'entry' : 'entries'}
         </div>
       </div>
 
       {/* Keyboard shortcuts hint */}
-      <div className="mt-2 text-xs text-gray-400">
+      <div className="mt-2 text-xs text-[var(--text-tertiary)]">
         <span>Ctrl+S to save</span>
         <span className="ml-4">Enter to add entry</span>
         {onCancel && <span className="ml-4">Esc to cancel</span>}
@@ -422,189 +315,101 @@ const TimetableNote = ({
   );
 };
 
-// Helper function to get today's date in YYYY-MM-DD format
-function getTodayDate() {
-  return new Date().toISOString().split('T')[0];
-}
-
-// Helper function to sort entries chronologically
-function sortEntriesChronologically(entries) {
-  return [...entries].sort((a, b) => {
-    // First sort by date, then by time
-    if (a.date !== b.date) {
-      return a.date.localeCompare(b.date);
-    }
-    return a.time.localeCompare(b.time);
-  });
-}
-
-// Helper function to group entries by date
-function groupEntriesByDate(entries) {
-  const grouped = {};
-  
-  entries.forEach(entry => {
-    if (!grouped[entry.date]) {
-      grouped[entry.date] = [];
-    }
-    grouped[entry.date].push(entry);
-  });
-  
-  // Sort dates
-  const sortedDates = Object.keys(grouped).sort();
-  const sortedGrouped = {};
-  
-  sortedDates.forEach(date => {
-    sortedGrouped[date] = grouped[date];
-  });
-  
-  return sortedGrouped;
-}
-
-// Component for displaying entries grouped by date
-const TimetableDateGroup = ({ date, entries, onToggleEntry, onUpdateEntry, onRemoveEntry }) => {
-  const formatDate = (dateStr) => {
-    const date = new Date(dateStr + 'T00:00:00');
-    const today = new Date();
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    
-    if (dateStr === today.toISOString().split('T')[0]) {
-      return 'Today';
-    } else if (dateStr === tomorrow.toISOString().split('T')[0]) {
-      return 'Tomorrow';
-    } else {
-      return date.toLocaleDateString('en-US', { 
-        weekday: 'long', 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric' 
+// Date Group Component
+const DateGroup = ({ date, entries, onEntryToggle, onEntryRemove, onEntryUpdate }) => {
+  const formatDate = (dateString) => {
+    try {
+      return new Date(dateString).toLocaleDateString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
       });
+    } catch {
+      return dateString;
     }
   };
 
   return (
-    <div className="border border-gray-200 rounded-lg p-4">
-      <h4 className="text-sm font-medium text-gray-800 mb-3 border-b border-gray-100 pb-2">
+    <div className="border border-[var(--border-primary)] rounded-lg p-4">
+      <h4 className="text-sm font-medium text-[var(--text-primary)] mb-3 border-b border-[var(--border-primary)] pb-2">
         {formatDate(date)}
       </h4>
       
       <div className="space-y-2">
-        {entries.map((entry) => (
-          <TimetableEntry
-            key={entry.id}
-            entry={entry}
-            onToggle={() => onToggleEntry(entry.id)}
-            onUpdate={(updates) => onUpdateEntry(entry.id, updates)}
-            onRemove={() => onRemoveEntry(entry.id)}
-          />
-        ))}
+        {entries
+          .sort((a, b) => a.time.localeCompare(b.time))
+          .map(entry => (
+            <TimetableEntry
+              key={entry.id}
+              entry={entry}
+              onToggle={() => onEntryToggle(entry.id)}
+              onRemove={() => onEntryRemove(entry.id)}
+              onUpdate={(field, value) => onEntryUpdate(entry.id, field, value)}
+            />
+          ))}
       </div>
     </div>
   );
 };
-// Individual timetable entry component
-const TimetableEntry = ({ entry, onToggle, onUpdate, onRemove }) => {
+
+// Timetable Entry Component
+const TimetableEntry = ({ entry, onToggle, onRemove, onUpdate }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editTime, setEditTime] = useState(entry.time);
   const [editDescription, setEditDescription] = useState(entry.description);
-  const [editDate, setEditDate] = useState(entry.date);
-  const editTimeRef = useRef(null);
 
-  // Focus input when entering edit mode
-  useEffect(() => {
-    if (isEditing && editTimeRef.current) {
-      editTimeRef.current.focus();
-    }
-  }, [isEditing]);
+  const now = new Date();
+  const entryDateTime = new Date(`${entry.date}T${entry.time}`);
+  const overdue = entryDateTime < now && !entry.completed;
 
   const handleStartEdit = () => {
+    setIsEditing(true);
     setEditTime(entry.time);
     setEditDescription(entry.description);
-    setEditDate(entry.date);
-    setIsEditing(true);
   };
 
   const handleSaveEdit = () => {
-    const trimmedDescription = editDescription.trim();
-    
-    if (!editTime || !trimmedDescription || !editDate) {
-      handleCancelEdit();
-      return;
-    }
-
-    // Validate time format
-    if (!/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/.test(editTime)) {
-      handleCancelEdit();
-      return;
-    }
-
-    const updates = {};
-    if (editTime !== entry.time) updates.time = editTime;
-    if (trimmedDescription !== entry.description) updates.description = trimmedDescription;
-    if (editDate !== entry.date) updates.date = editDate;
-
-    if (Object.keys(updates).length > 0) {
-      const success = onUpdate(updates);
-      if (!success) {
-        // Conflict detected, revert changes
-        handleCancelEdit();
-        return;
-      }
-    }
-    
+    onUpdate('time', editTime);
+    onUpdate('description', editDescription);
     setIsEditing(false);
   };
 
   const handleCancelEdit = () => {
     setEditTime(entry.time);
     setEditDescription(entry.description);
-    setEditDate(entry.date);
     setIsEditing(false);
   };
 
-  const handleEditKeyDown = (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      handleSaveEdit();
-    } else if (e.key === 'Escape') {
-      e.preventDefault();
-      handleCancelEdit();
+  const formatTime = (timeString) => {
+    if (!timeString) return '';
+    try {
+      const [hours, minutes] = timeString.split(':');
+      const date = new Date();
+      date.setHours(parseInt(hours), parseInt(minutes));
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    } catch {
+      return timeString;
     }
   };
-
-  const formatTime = (time) => {
-    const [hours, minutes] = time.split(':');
-    const hour = parseInt(hours, 10);
-    const ampm = hour >= 12 ? 'PM' : 'AM';
-    const displayHour = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
-    return `${displayHour}:${minutes} ${ampm}`;
-  };
-
-  const isOverdue = () => {
-    const now = new Date();
-    const entryDateTime = new Date(`${entry.date}T${entry.time}:00`);
-    return entryDateTime < now && !entry.completed;
-  };
-
-  const overdue = isOverdue();
 
   return (
     <div className={`flex items-center space-x-3 p-3 rounded-lg border transition-colors ${
       entry.completed 
-        ? 'bg-green-50 border-green-200' 
+        ? 'bg-[var(--bg-tertiary)] border-[var(--success)]' 
         : overdue
-        ? 'bg-red-50 border-red-200'
-        : 'bg-white border-gray-200'
+        ? 'bg-[var(--bg-tertiary)] border-[var(--error)]'
+        : 'bg-[var(--bg-secondary)] border-[var(--border-primary)]'
     }`}>
       {/* Checkbox */}
       <button
         onClick={onToggle}
         className={`flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
           entry.completed 
-            ? 'bg-green-500 border-green-500 text-white' 
+            ? 'bg-[var(--success)] border-[var(--success)] text-[var(--bg-primary)]' 
             : overdue
-            ? 'border-red-400 hover:border-red-500'
-            : 'border-gray-300 hover:border-gray-400'
+            ? 'border-[var(--error)] hover:border-[var(--error)]'
+            : 'border-[var(--border-primary)] hover:border-[var(--border-secondary)]'
         }`}
         data-testid={`timetable-entry-checkbox-${entry.id}`}
       >
@@ -615,64 +420,65 @@ const TimetableEntry = ({ entry, onToggle, onUpdate, onRemove }) => {
         )}
       </button>
 
-      {/* Time and content */}
-      <div className="flex-1">
+      {/* Content */}
+      <div className="flex-1 min-w-0">
         {isEditing ? (
-          <div className="space-y-2">
-            <div className="grid grid-cols-2 gap-2">
-              <input
-                ref={editTimeRef}
-                type="time"
-                value={editTime}
-                onChange={(e) => setEditTime(e.target.value)}
-                onKeyDown={handleEditKeyDown}
-                className="px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                data-testid={`timetable-entry-edit-time-${entry.id}`}
-              />
-              <input
-                type="date"
-                value={editDate}
-                onChange={(e) => setEditDate(e.target.value)}
-                onKeyDown={handleEditKeyDown}
-                className="px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                data-testid={`timetable-entry-edit-date-${entry.id}`}
-              />
-            </div>
+          <div className="flex items-center space-x-2">
+            <input
+              type="time"
+              value={editTime}
+              onChange={(e) => setEditTime(e.target.value)}
+              className="px-2 py-1 border border-[var(--border-primary)] bg-[var(--bg-secondary)] rounded text-sm text-[var(--text-primary)]"
+            />
             <input
               type="text"
               value={editDescription}
               onChange={(e) => setEditDescription(e.target.value)}
-              onKeyDown={handleEditKeyDown}
-              onBlur={handleSaveEdit}
-              className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-              data-testid={`timetable-entry-edit-description-${entry.id}`}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleSaveEdit();
+                if (e.key === 'Escape') handleCancelEdit();
+              }}
+              className="flex-1 px-2 py-1 border border-[var(--border-primary)] bg-[var(--bg-secondary)] rounded text-sm text-[var(--text-primary)]"
+              autoFocus
             />
+            <button
+              onClick={handleSaveEdit}
+              className="px-2 py-1 bg-[var(--accent-primary)] text-[var(--bg-primary)] rounded text-xs hover:opacity-80"
+            >
+              Save
+            </button>
+            <button
+              onClick={handleCancelEdit}
+              className="px-2 py-1 bg-[var(--bg-tertiary)] text-[var(--text-primary)] rounded text-xs hover:bg-[var(--border-primary)]"
+            >
+              Cancel
+            </button>
           </div>
         ) : (
-          <div onClick={handleStartEdit} className="cursor-pointer hover:bg-gray-100 px-2 py-1 rounded">
+          <div onClick={handleStartEdit} className="cursor-pointer hover:bg-[var(--bg-tertiary)] px-2 py-1 rounded">
             <div className="flex items-center space-x-3">
               <span className={`text-sm font-medium ${
                 entry.completed 
-                  ? 'line-through text-gray-500' 
+                  ? 'line-through text-[var(--text-tertiary)]' 
                   : overdue
-                  ? 'text-red-600'
-                  : 'text-blue-600'
+                  ? 'text-[var(--error)]'
+                  : 'text-[var(--accent-primary)]'
               }`} data-testid={`timetable-entry-time-${entry.id}`}>
                 {formatTime(entry.time)}
               </span>
               
               <span className={`text-sm ${
                 entry.completed 
-                  ? 'line-through text-gray-500' 
+                  ? 'line-through text-[var(--text-tertiary)]' 
                   : overdue
-                  ? 'text-red-800'
-                  : 'text-gray-900'
+                  ? 'text-[var(--error)]'
+                  : 'text-[var(--text-primary)]'
               }`} data-testid={`timetable-entry-description-${entry.id}`}>
                 {entry.description}
               </span>
               
               {overdue && (
-                <span className="text-xs text-red-500 font-medium">
+                <span className="text-xs text-[var(--error)] font-medium">
                   Overdue
                 </span>
               )}
@@ -684,7 +490,7 @@ const TimetableEntry = ({ entry, onToggle, onUpdate, onRemove }) => {
       {/* Remove button */}
       <button
         onClick={onRemove}
-        className="flex-shrink-0 w-6 h-6 text-gray-400 hover:text-red-500 transition-colors"
+        className="flex-shrink-0 w-6 h-6 text-[var(--text-tertiary)] hover:text-[var(--error)] transition-colors"
         data-testid={`timetable-entry-remove-${entry.id}`}
       >
         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">

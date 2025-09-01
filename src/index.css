@@ -5,25 +5,25 @@
 
 /* CSS Variables for theming */
 :root {
-  /* Light theme - Low contrast for eye comfort */
-  --bg-primary: #fafafa;
+  /* Light theme - Minimal black and white */
+  --bg-primary: #ffffff;
   --bg-secondary: #ffffff;
-  --bg-tertiary: #f5f5f5;
-  --text-primary: #374151;
+  --bg-tertiary: #f8f9fa;
+  --text-primary: #000000;
   --text-secondary: #6b7280;
   --text-tertiary: #9ca3af;
   --border-primary: #e5e7eb;
   --border-secondary: #d1d5db;
-  --accent-primary: #3b82f6;
-  --accent-secondary: #60a5fa;
-  --success: #10b981;
-  --warning: #f59e0b;
-  --error: #ef4444;
+  --accent-primary: #000000;
+  --accent-secondary: #374151;
+  --success: #000000;
+  --warning: #000000;
+  --error: #000000;
   
   /* Toast variables */
   --toast-bg: rgba(255, 255, 255, 0.95);
-  --toast-border: rgba(255, 255, 255, 0.2);
-  --toast-text: #374151;
+  --toast-border: rgba(0, 0, 0, 0.1);
+  --toast-text: #000000;
   
   /* Shadow variables */
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
@@ -32,32 +32,32 @@
   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
-.dark {
-  /* Dark theme - Low contrast for eye comfort */
-  --bg-primary: #0f0f0f;
-  --bg-secondary: #1a1a1a;
-  --bg-tertiary: #262626;
-  --text-primary: #e5e7eb;
-  --text-secondary: #d1d5db;
-  --text-tertiary: #9ca3af;
-  --border-primary: #374151;
-  --border-secondary: #4b5563;
-  --accent-primary: #60a5fa;
-  --accent-secondary: #93c5fd;
-  --success: #34d399;
-  --warning: #fbbf24;
-  --error: #f87171;
+html.dark {
+  /* Dark theme - Minimal black and white */
+  --bg-primary: #000000;
+  --bg-secondary: #111111;
+  --bg-tertiary: #1a1a1a;
+  --text-primary: #ffffff;
+  --text-secondary: #a1a1aa;
+  --text-tertiary: #71717a;
+  --border-primary: #27272a;
+  --border-secondary: #3f3f46;
+  --accent-primary: #ffffff;
+  --accent-secondary: #d4d4d8;
+  --success: #ffffff;
+  --warning: #ffffff;
+  --error: #ffffff;
   
   /* Toast variables */
-  --toast-bg: rgba(26, 26, 26, 0.95);
-  --toast-border: rgba(55, 65, 81, 0.3);
-  --toast-text: #e5e7eb;
+  --toast-bg: rgba(17, 17, 17, 0.95);
+  --toast-border: rgba(255, 255, 255, 0.1);
+  --toast-text: #ffffff;
   
   /* Shadow variables */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.8);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.8), 0 2px 4px -1px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.8), 0 4px 6px -2px rgba(0, 0, 0, 0.6);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.8), 0 10px 10px -5px rgba(0, 0, 0, 0.6);
 }
 
 body {
@@ -65,9 +65,30 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
+  background-color: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
   transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Force theme variables to override Tailwind defaults */
+html.dark * {
+  color: inherit;
+}
+
+html.dark .text-gray-900,
+html.dark .text-gray-800,
+html.dark .text-gray-700,
+html.dark .text-gray-600,
+html.dark .text-gray-500,
+html.dark .text-gray-400,
+html.dark .text-gray-300 {
+  color: var(--text-primary) !important;
+}
+
+html.dark .bg-white,
+html.dark .bg-gray-50,
+html.dark .bg-gray-100 {
+  background-color: var(--bg-secondary) !important;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -147,4 +168,60 @@ html {
 /* Smooth transitions for theme switching */
 * {
   transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+/* Ensure theme variables work in dark mode */
+html.dark {
+  color-scheme: dark;
+}
+
+html.dark .note-card,
+html.dark .note-card * {
+  color: var(--text-primary);
+}
+
+html.dark .note-card h3,
+html.dark .note-card p,
+html.dark .note-card span,
+html.dark .note-card div {
+  color: inherit;
+}
+
+/* Override any hardcoded text colors in dark mode */
+html.dark [class*="text-gray"] {
+  color: var(--text-secondary) !important;
+}
+
+html.dark [class*="text-black"] {
+  color: var(--text-primary) !important;
+}
+
+/* Force note text to be visible in dark mode */
+html.dark .note-card * {
+  color: var(--text-primary) !important;
+}
+
+html.dark .text-\[var\(--text-primary\)\] {
+  color: var(--text-primary) !important;
+}
+
+html.dark .text-\[var\(--text-secondary\)\] {
+  color: var(--text-secondary) !important;
+}
+
+html.dark .text-\[var\(--text-tertiary\)\] {
+  color: var(--text-tertiary) !important;
+}
+
+/* Ensure backgrounds are correct */
+html.dark .bg-\[var\(--bg-primary\)\] {
+  background-color: var(--bg-primary) !important;
+}
+
+html.dark .bg-\[var\(--bg-secondary\)\] {
+  background-color: var(--bg-secondary) !important;
+}
+
+html.dark .bg-\[var\(--bg-tertiary\)\] {
+  background-color: var(--bg-tertiary) !important;
 }

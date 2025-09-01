@@ -149,9 +149,9 @@ const SearchBar = ({
     <div className={`relative ${className}`}>
       <motion.div 
         className={`
-          relative flex items-center rounded-xl transition-all duration-300 border
+          relative flex items-center rounded-lg transition-all duration-300 border
           ${isFocused 
-            ? 'border-[var(--accent-primary)]/40 shadow-lg ring-1 ring-[var(--accent-primary)]/50' 
+            ? 'border-[var(--text-primary)] shadow-lg' 
             : 'border-[var(--border-primary)] hover:border-[var(--border-secondary)]'
           }
         `}
@@ -180,7 +180,7 @@ const SearchBar = ({
         >
           <svg 
             className={`w-5 h-5 transition-colors ${
-              isFocused ? 'text-blue-500' : 'text-gray-400'
+              isFocused ? 'text-[var(--text-primary)]' : 'text-[var(--text-tertiary)]'
             }`}
             fill="none" 
             stroke="currentColor" 
@@ -205,7 +205,7 @@ const SearchBar = ({
           onFocus={handleFocus}
           onBlur={handleBlur}
           placeholder={placeholder}
-          className="w-full pl-10 pr-10 py-3 bg-transparent border-0 focus:outline-none focus:ring-0 text-gray-900 placeholder-gray-500"
+          className="w-full pl-10 pr-10 py-3 bg-transparent border-0 focus:outline-none focus:ring-0 text-[var(--text-primary)] placeholder-[var(--text-tertiary)]"
           autoComplete="off"
         />
 
@@ -217,7 +217,7 @@ const SearchBar = ({
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.8 }}
               onClick={handleClear}
-              className="absolute right-3 p-1 text-gray-400 hover:text-gray-600 transition-colors rounded-full hover:bg-white/50"
+              className="absolute right-3 p-1 text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors rounded-full hover:bg-[var(--bg-tertiary)]"
               type="button"
               whileHover={{ scale: 1.1, rotate: 90 }}
               whileTap={{ scale: 0.9 }}
@@ -231,8 +231,8 @@ const SearchBar = ({
 
         {/* Keyboard Shortcut Hint */}
         {!isFocused && !query && (
-          <div className="absolute right-3 flex items-center space-x-1 text-xs text-gray-400">
-            <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-200 rounded text-xs font-mono">
+          <div className="absolute right-3 flex items-center space-x-1 text-xs text-[var(--text-tertiary)]">
+            <kbd className="px-1.5 py-0.5 bg-[var(--bg-tertiary)] border border-[var(--border-primary)] rounded text-xs font-mono">
               ⌘K
             </kbd>
           </div>
@@ -241,7 +241,7 @@ const SearchBar = ({
 
       {/* Search Results Count */}
       {showResultsCount && query && (
-        <div className="absolute top-full left-0 right-0 mt-1 text-xs text-gray-500 px-3">
+        <div className="absolute top-full left-0 right-0 mt-1 text-xs text-[var(--text-secondary)] px-3">
           {isSearching ? (
             <span className="flex items-center space-x-1">
               <svg className="w-3 h-3 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -268,13 +268,7 @@ const SearchBar = ({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10, scale: 0.95 }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="absolute top-full left-0 right-0 mt-2 rounded-xl border border-white/30 z-50 max-h-48 overflow-y-auto"
-            style={{
-              background: 'rgba(255, 255, 255, 0.9)',
-              backdropFilter: 'blur(25px)',
-              WebkitBackdropFilter: 'blur(25px)',
-              boxShadow: '0 12px 40px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.6)',
-            }}
+            className="absolute top-full left-0 right-0 mt-2 rounded-lg border border-[var(--border-primary)] bg-[var(--bg-secondary)] z-50 max-h-48 overflow-y-auto shadow-lg"
           >
             {suggestions.map((suggestion, index) => (
               <motion.button
@@ -283,10 +277,10 @@ const SearchBar = ({
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.05 }}
                 onClick={() => handleSuggestionClick(suggestion)}
-                className={`w-full text-left px-4 py-2 text-sm hover:bg-white/50 transition-colors ${
-                  index === selectedSuggestionIndex ? 'bg-blue-500/20 text-blue-700' : 'text-gray-700'
-                } ${index === 0 ? 'rounded-t-xl' : ''} ${
-                  index === suggestions.length - 1 ? 'rounded-b-xl' : ''
+                className={`w-full text-left px-4 py-2 text-sm hover:bg-[var(--bg-tertiary)] transition-colors ${
+                  index === selectedSuggestionIndex ? 'bg-[var(--text-primary)] text-[var(--bg-primary)]' : 'text-[var(--text-primary)]'
+                } ${index === 0 ? 'rounded-t-lg' : ''} ${
+                  index === suggestions.length - 1 ? 'rounded-b-lg' : ''
                 }`}
                 whileHover={{ scale: 1.02, x: 5 }}
                 whileTap={{ scale: 0.98 }}

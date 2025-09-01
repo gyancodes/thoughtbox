@@ -228,23 +228,23 @@ const TodoNote = ({
           onChange={handleTitleChange}
           onBlur={handleBlur}
           placeholder="Todo list title..."
-          className="w-full text-xl font-semibold text-gray-900 placeholder-gray-400 border-none outline-none bg-transparent resize-none"
+          className="w-full text-xl font-semibold text-[var(--text-primary)] placeholder-[var(--text-tertiary)] border-none outline-none bg-transparent resize-none"
           data-testid="todo-note-title"
         />
       </div>
 
       {/* Progress indicator */}
       {totalCount > 0 && (
-        <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+        <div className="mb-4 p-3 bg-[var(--bg-tertiary)] rounded-lg">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-gray-700">
+            <span className="text-sm font-medium text-[var(--text-secondary)]">
               Progress: {completedCount} of {totalCount} completed
             </span>
-            <span className="text-sm font-medium text-gray-700">
+            <span className="text-sm font-medium text-[var(--text-secondary)]">
               {completionPercentage}%
             </span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
+          <div className="w-full bg-[var(--border-primary)] rounded-full h-2">
             <div 
               className="bg-green-500 h-2 rounded-full transition-all duration-300"
               style={{ width: `${completionPercentage}%` }}
@@ -289,29 +289,29 @@ const TodoNote = ({
       </div>
 
       {/* Status indicator */}
-      <div className="flex items-center justify-between mt-4 text-sm text-gray-500">
+      <div className="flex items-center justify-between mt-4 text-sm text-[var(--text-secondary)]">
         <div className="flex items-center space-x-2">
           {isSaving && (
             <span className="flex items-center space-x-1">
-              <div className="w-3 h-3 border border-gray-300 border-t-blue-500 rounded-full animate-spin"></div>
+              <div className="w-3 h-3 border border-[var(--border-primary)] border-t-[var(--accent-primary)] rounded-full animate-spin"></div>
               <span>Saving...</span>
             </span>
           )}
           {hasChanges && !isSaving && (
-            <span className="text-yellow-600">Unsaved changes</span>
+            <span className="text-[var(--warning)]">Unsaved changes</span>
           )}
           {!hasChanges && !isSaving && note && (
-            <span className="text-green-600">Saved</span>
+            <span className="text-[var(--success)]">Saved</span>
           )}
         </div>
         
-        <div className="text-xs text-gray-400">
+        <div className="text-xs text-[var(--text-tertiary)]">
           {totalCount} {totalCount === 1 ? 'item' : 'items'}
         </div>
       </div>
 
       {/* Keyboard shortcuts hint */}
-      <div className="mt-2 text-xs text-gray-400">
+      <div className="mt-2 text-xs text-[var(--text-tertiary)]">
         <span>Ctrl+S to save</span>
         <span className="ml-4">Enter to add item</span>
         {onCancel && <span className="ml-4">Esc to cancel</span>}
@@ -364,7 +364,7 @@ const TodoItem = ({ item, onToggle, onUpdateText, onRemove }) => {
 
   return (
     <div className={`flex items-center space-x-3 p-2 rounded-lg border ${
-      item.completed ? 'bg-green-50 border-green-200' : 'bg-white border-gray-200'
+      item.completed ? 'bg-[var(--bg-tertiary)] border-[var(--success)]' : 'bg-[var(--bg-secondary)] border-[var(--border-primary)]'
     }`}>
       {/* Checkbox */}
       <button
@@ -399,10 +399,10 @@ const TodoItem = ({ item, onToggle, onUpdateText, onRemove }) => {
         ) : (
           <span
             onClick={handleStartEdit}
-            className={`cursor-pointer hover:bg-gray-100 px-2 py-1 rounded ${
+            className={`cursor-pointer hover:bg-[var(--bg-tertiary)] px-2 py-1 rounded ${
               item.completed 
-                ? 'line-through text-gray-500' 
-                : 'text-gray-900'
+                ? 'line-through text-[var(--text-tertiary)]' 
+                : 'text-[var(--text-primary)]'
             }`}
             data-testid={`todo-item-text-${item.id}`}
           >
@@ -414,7 +414,7 @@ const TodoItem = ({ item, onToggle, onUpdateText, onRemove }) => {
       {/* Remove button */}
       <button
         onClick={onRemove}
-        className="flex-shrink-0 w-6 h-6 text-gray-400 hover:text-red-500 transition-colors"
+        className="flex-shrink-0 w-6 h-6 text-[var(--text-tertiary)] hover:text-[var(--error)] transition-colors"
         data-testid={`todo-item-remove-${item.id}`}
       >
         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">

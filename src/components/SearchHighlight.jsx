@@ -25,7 +25,8 @@ const SearchHighlight = ({
             </mark>
           );
         }
-        return <span key={index}>{part}</span>;
+        // Ensure we're rendering a string, not an object
+        return <span key={index}>{typeof part === 'string' ? part : String(part)}</span>;
       })}
     </span>
   );

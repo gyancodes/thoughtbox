@@ -185,19 +185,16 @@ const NoteCard = ({ note, onClick, onEdit, onDelete, onConflictResolve, searchQu
         damping: 30,
         duration: 0.2 
       }}
-      className="note-card rounded-xl border border-[var(--border-primary)] p-4 cursor-pointer relative group bg-[var(--bg-secondary)]/80 backdrop-blur-sm"
-      style={{ 
-        backgroundColor: note.color || 'var(--bg-secondary)',
-      }}
+      className="note-card rounded-lg border border-[var(--border-primary)] p-4 cursor-pointer relative group bg-[var(--bg-secondary)] hover:bg-[var(--bg-tertiary)] transition-colors"
       onClick={handleCardClick}
     >
       {/* Note Header */}
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1 min-w-0">
-          <h3 className="text-lg font-medium text-[var(--text-primary)] truncate mb-1">
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white truncate mb-1">
             {note.title || 'Untitled'}
           </h3>
-          <div className="flex items-center space-x-2 text-sm text-[var(--text-secondary)]">
+          <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-300">
             <span className="capitalize">{note.type}</span>
             {note.updatedAt && (
               <>
@@ -210,25 +207,21 @@ const NoteCard = ({ note, onClick, onEdit, onDelete, onConflictResolve, searchQu
         
         {/* Note Type Icon */}
         <div className="flex-shrink-0 ml-3">
-          {note.type === 'todo' ? (
-            <div className="w-8 h-8 bg-[var(--success)] bg-opacity-10 rounded-lg flex items-center justify-center">
-              <svg className="w-4 h-4 text-[var(--success)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="w-6 h-6 flex items-center justify-center">
+            {note.type === 'todo' ? (
+              <svg className="w-4 h-4 text-[var(--text-tertiary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
               </svg>
-            </div>
-          ) : note.type === 'timetable' ? (
-            <div className="w-8 h-8 bg-[var(--warning)] bg-opacity-10 rounded-lg flex items-center justify-center">
-              <svg className="w-4 h-4 text-[var(--warning)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            ) : note.type === 'timetable' ? (
+              <svg className="w-4 h-4 text-[var(--text-tertiary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
-            </div>
-          ) : (
-            <div className="w-8 h-8 bg-[var(--accent-primary)] bg-opacity-10 rounded-lg flex items-center justify-center">
-              <svg className="w-4 h-4 text-[var(--accent-primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            ) : (
+              <svg className="w-4 h-4 text-[var(--text-tertiary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
 
@@ -236,52 +229,52 @@ const NoteCard = ({ note, onClick, onEdit, onDelete, onConflictResolve, searchQu
       <div className="mb-4">
         {note.type === 'todo' ? (
           <div className="space-y-2">
-            {note.todos && note.todos.slice(0, 3).map((todo, index) => (
+            {note.content?.items && note.content.items.slice(0, 3).map((todo, index) => (
               <div key={index} className="flex items-center space-x-2">
-                <div className={`w-3 h-3 rounded-full border-2 ${
+                <div className={`w-3 h-3 rounded-full border ${
                   todo.completed 
-                    ? 'bg-[var(--success)] border-[var(--success)]' 
+                    ? 'bg-[var(--text-primary)] border-[var(--text-primary)]' 
                     : 'border-[var(--border-secondary)]'
                 }`}></div>
                 <span className={`text-sm ${
                   todo.completed 
-                    ? 'text-[var(--text-tertiary)] line-through' 
-                    : 'text-[var(--text-secondary)]'
+                    ? 'text-gray-500 dark:text-gray-400 line-through' 
+                    : 'text-gray-700 dark:text-gray-300'
                 }`}>
                   {todo.text}
                 </span>
               </div>
             ))}
-            {note.todos && note.todos.length > 3 && (
-              <p className="text-xs text-[var(--text-tertiary)]">
-                +{note.todos.length - 3} more items
+            {note.content?.items && note.content.items.length > 3 && (
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                +{note.content.items.length - 3} more items
               </p>
             )}
           </div>
         ) : note.type === 'timetable' ? (
           <div className="space-y-2">
-            {note.schedule && note.schedule.slice(0, 3).map((item, index) => (
+            {note.content?.entries && note.content.entries.slice(0, 3).map((item, index) => (
               <div key={index} className="flex items-center space-x-2 text-sm">
-                <span className="text-[var(--accent-primary)] font-medium">
+                <span className="text-gray-900 dark:text-white font-medium">
                   {item.time}
                 </span>
-                <span className="text-[var(--text-secondary)]">
-                  {item.activity}
+                <span className="text-gray-700 dark:text-gray-300">
+                  {item.description}
                 </span>
               </div>
             ))}
-            {note.schedule && note.schedule.length > 3 && (
-              <p className="text-xs text-[var(--text-tertiary)]">
-                +{note.schedule.length - 3} more activities
+            {note.content?.entries && note.content.entries.length > 3 && (
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                +{note.content.entries.length - 3} more activities
               </p>
             )}
           </div>
         ) : (
-          <p className="text-[var(--text-secondary)] text-sm leading-relaxed">
-            {note.content ? (
-              note.content.length > 120 
-                ? `${note.content.substring(0, 120)}...` 
-                : note.content
+          <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
+            {note.content?.text ? (
+              note.content.text.length > 120 
+                ? `${note.content.text.substring(0, 120)}...` 
+                : note.content.text
             ) : (
               'No content'
             )}
