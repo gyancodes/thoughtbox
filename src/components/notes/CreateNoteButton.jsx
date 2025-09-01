@@ -187,7 +187,7 @@ const CreateNoteButton = ({ className = "" }) => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/20 backdrop-blur-sm"
+            className="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4"
             onClick={(e) => {
               if (e.target === e.currentTarget) {
                 handleCloseModal();
@@ -200,18 +200,25 @@ const CreateNoteButton = ({ className = "" }) => {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: -20 }}
               transition={{ duration: 0.2 }}
-              className="relative p-6 rounded-lg border border-[var(--border-primary)] bg-[var(--bg-secondary)] w-full max-w-2xl max-h-[80vh] overflow-y-auto shadow-xl"
+              className="create-note-modal relative rounded-lg border border-[var(--border-primary)] bg-[var(--bg-secondary)] w-full max-w-2xl max-h-[80vh] overflow-y-auto shadow-xl"
               onClick={(e) => e.stopPropagation()}
             >
+              {/* Close button - positioned outside content area */}
+              <button
+                onClick={handleCloseModal}
+                className="absolute top-4 right-4 z-10 p-2 text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)] rounded-lg transition-colors"
+              >
+                <XMarkIcon className="w-5 h-5" />
+              </button>
 
-              <div className="relative">
+              <div className="p-6 pr-16">
               <input
                 ref={inputRef}
                 type="text"
                 placeholder="Title"
                 value={noteTitle}
                 onChange={(e) => setNoteTitle(e.target.value)}
-                className="w-full text-lg font-medium placeholder-[var(--text-tertiary)] text-[var(--text-primary)] border-none outline-none mb-4 bg-transparent"
+                className="w-full text-lg font-medium placeholder-[var(--text-tertiary)] text-[var(--text-primary)] border border-[var(--border-primary)] outline-none mb-4 bg-[var(--bg-tertiary)] p-3 rounded-lg focus:border-[var(--accent-primary)] focus:ring-2 focus:ring-[var(--accent-primary)] focus:ring-opacity-20"
               />
 
               {selectedType === "text" && (
@@ -219,7 +226,7 @@ const CreateNoteButton = ({ className = "" }) => {
                   placeholder="Take a note..."
                   value={noteContent}
                   onChange={(e) => setNoteContent(e.target.value)}
-                  className="w-full placeholder-[var(--text-tertiary)] text-[var(--text-primary)] border-none outline-none resize-none min-h-[120px] bg-transparent leading-relaxed"
+                  className="w-full placeholder-[var(--text-tertiary)] text-[var(--text-primary)] border border-[var(--border-primary)] outline-none resize-none min-h-[120px] bg-[var(--bg-tertiary)] leading-relaxed p-3 rounded-lg focus:border-[var(--accent-primary)] focus:ring-2 focus:ring-[var(--accent-primary)] focus:ring-opacity-20"
                   rows={4}
                 />
               )}
@@ -240,7 +247,7 @@ const CreateNoteButton = ({ className = "" }) => {
                           placeholder="List item"
                           value={item.text}
                           onChange={(e) => updateTodoItem(item.id, e.target.value)}
-                          className="flex-1 border-none outline-none bg-transparent text-[var(--text-primary)] placeholder-[var(--text-tertiary)]"
+                          className="flex-1 border border-[var(--border-primary)] outline-none bg-[var(--bg-tertiary)] text-[var(--text-primary)] placeholder-[var(--text-tertiary)] p-2 rounded focus:border-[var(--accent-primary)] focus:ring-1 focus:ring-[var(--accent-primary)] focus:ring-opacity-20"
                         />
                         {todoItems.length > 1 && (
                           <button
@@ -274,7 +281,7 @@ const CreateNoteButton = ({ className = "" }) => {
                           onChange={(e) =>
                             updateTimetableEntry(entry.id, "time", e.target.value)
                           }
-                          className="border border-[var(--border-primary)] bg-[var(--bg-secondary)] rounded-lg px-3 py-2 text-sm text-[var(--text-primary)] focus:ring-2 focus:ring-[var(--text-primary)] focus:border-transparent transition-all"
+                          className="border border-[var(--border-primary)] bg-[var(--bg-tertiary)] rounded-lg px-3 py-2 text-sm text-[var(--text-primary)] focus:ring-2 focus:ring-[var(--accent-primary)] focus:border-[var(--accent-primary)] transition-all"
                         />
                         <input
                           type="text"
@@ -283,7 +290,7 @@ const CreateNoteButton = ({ className = "" }) => {
                           onChange={(e) =>
                             updateTimetableEntry(entry.id, "description", e.target.value)
                           }
-                          className="flex-1 border-none outline-none bg-transparent text-[var(--text-primary)] placeholder-[var(--text-tertiary)]"
+                          className="flex-1 border border-[var(--border-primary)] outline-none bg-[var(--bg-tertiary)] text-[var(--text-primary)] placeholder-[var(--text-tertiary)] p-2 rounded focus:border-[var(--accent-primary)] focus:ring-1 focus:ring-[var(--accent-primary)] focus:ring-opacity-20"
                         />
                         {timetableEntries.length > 1 && (
                           <button
@@ -312,7 +319,7 @@ const CreateNoteButton = ({ className = "" }) => {
                     onClick={() => handleTypeChange("text")}
                     className={`p-3 rounded-lg transition-colors ${
                       selectedType === "text"
-                        ? "bg-[var(--text-primary)] text-[var(--bg-primary)]"
+                        ? "bg-[var(--accent-primary)] text-white"
                         : "hover:bg-[var(--bg-tertiary)] text-[var(--text-tertiary)]"
                     }`}
                     title="Text note"
@@ -323,7 +330,7 @@ const CreateNoteButton = ({ className = "" }) => {
                     onClick={() => handleTypeChange("todo")}
                     className={`p-3 rounded-lg transition-colors ${
                       selectedType === "todo"
-                        ? "bg-[var(--text-primary)] text-[var(--bg-primary)]"
+                        ? "bg-[var(--accent-primary)] text-white"
                         : "hover:bg-[var(--bg-tertiary)] text-[var(--text-tertiary)]"
                     }`}
                     title="Todo list"
@@ -334,7 +341,7 @@ const CreateNoteButton = ({ className = "" }) => {
                     onClick={() => handleTypeChange("timetable")}
                     className={`p-3 rounded-lg transition-colors ${
                       selectedType === "timetable"
-                        ? "bg-[var(--text-primary)] text-[var(--bg-primary)]"
+                        ? "bg-[var(--accent-primary)] text-white"
                         : "hover:bg-[var(--bg-tertiary)] text-[var(--text-tertiary)]"
                     }`}
                     title="Timetable"
@@ -346,7 +353,7 @@ const CreateNoteButton = ({ className = "" }) => {
                 <div className="flex space-x-3">
                   <button
                     onClick={handleSave}
-                    className="px-6 py-2.5 text-sm font-medium text-[var(--bg-primary)] bg-[var(--text-primary)] hover:opacity-80 rounded-lg transition-opacity"
+                    className="px-6 py-2.5 text-sm font-medium text-white bg-[var(--accent-primary)] hover:bg-[var(--accent-secondary)] rounded-lg transition-colors"
                   >
                     Save
                   </button>
@@ -358,14 +365,6 @@ const CreateNoteButton = ({ className = "" }) => {
                   </button>
                 </div>
               </div>
-              
-              {/* Close button */}
-              <button
-                onClick={handleCloseModal}
-                className="absolute top-4 right-4 p-2 text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)] rounded-lg transition-colors"
-              >
-                <XMarkIcon className="w-5 h-5" />
-              </button>
               </div>
             </motion.div>
           </motion.div>

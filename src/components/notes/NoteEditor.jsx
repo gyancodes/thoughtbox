@@ -256,11 +256,8 @@ const NoteEditor = ({
               damping: 30,
               duration: 0.3 
             }}
-            className="rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col border border-[var(--border-primary)] overflow-hidden"
+            className="rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col border border-[var(--border-primary)] overflow-hidden bg-[var(--bg-secondary)]"
             style={{
-              background: 'var(--bg-secondary)',
-              backdropFilter: 'blur(30px)',
-              WebkitBackdropFilter: 'blur(30px)',
               boxShadow: 'var(--shadow-xl)',
             }}
             onClick={(e) => e.stopPropagation()}
@@ -270,7 +267,7 @@ const NoteEditor = ({
             aria-labelledby="note-editor-title"
           >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-[var(--border-primary)] bg-[var(--bg-tertiary)] backdrop-blur-sm">
+        <div className="flex items-center justify-between p-6 border-b border-[var(--border-primary)] bg-[var(--bg-tertiary)]">
           <div className="flex items-center space-x-4">
             <h2 id="note-editor-title" className="text-xl font-semibold text-[var(--text-primary)]">
               {isCreating ? 'Create Note' : 'Edit Note'}
@@ -319,7 +316,7 @@ const NoteEditor = ({
         </div>
 
         {/* Footer */}
-        <div className="p-6 border-t border-[var(--border-primary)] bg-[var(--bg-tertiary)] backdrop-blur-sm">
+        <div className="p-6 border-t border-[var(--border-primary)] bg-[var(--bg-tertiary)]">
           <div className="flex items-center justify-between">
                           <div className="text-sm text-[var(--text-secondary)]">
               <div>

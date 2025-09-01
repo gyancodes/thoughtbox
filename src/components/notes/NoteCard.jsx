@@ -114,27 +114,52 @@ const NoteCard = ({ note, onClick, onEdit, onDelete, onConflictResolve, searchQu
 
   // Format date for display
   const formatDate = (dateString) => {
-    if (!dateString) return 'Unknown date';
-    
-    const date = new Date(dateString);
-    
-    // Check if date is valid
-    if (isNaN(date.getTime())) {
-      return 'Invalid date';
+    if (!dateString) {
+      // If no date provided, show current date
+      return 'Just now';
     }
     
-    const now = new Date();
-    const diffTime = Math.abs(now - date);
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    if (diffDays === 1) return 'Today';
-    if (diffDays === 2) return 'Yesterday';
-    if (diffDays <= 7) return `${diffDays - 1} days ago`;
-    
     try {
+      const date = new Date(dateString);
+      
+      // Check if date is valid
+      if (isNaN(date.getTime())) {
+        return 'Just now';
+      }
+      
+      const now = new Date();
+      const diffTime = now.getTime() - date.getTime();
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+      const diffHours = Math.floor(diffTime / (1000 * 60 * 60));
+      const diffMinutes = Math.floor(diffTime / (1000 * 60));
+
+      // Handle future dates
+      if (diffTime < 0) {
+        return date.toLocaleDateString();
+      }
+
+      // Less than 1 minute ago
+      if (diffMinutes < 1) return 'Just now';
+      
+      // Less than 1 hour ago
+      if (diffMinutes < 60) return `${diffMinutes}m ago`;
+      
+      // Less than 24 hours ago
+      if (diffHours < 24) return `${diffHours}h ago`;
+      
+      // Today
+      if (diffDays === 0) return 'Today';
+      
+      // Yesterday
+      if (diffDays === 1) return 'Yesterday';
+      
+      // Within a week
+      if (diffDays <= 7) return `${diffDays} days ago`;
+      
+      // Older than a week
       return date.toLocaleDateString();
     } catch (error) {
-      return 'Invalid date';
+      return 'Just now';
     }
   };
 
@@ -191,10 +216,10 @@ const NoteCard = ({ note, onClick, onEdit, onDelete, onConflictResolve, searchQu
       {/* Note Header */}
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1 min-w-0">
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white truncate mb-1">
+          <h3 className="text-lg font-semibold text-[var(--text-primary)] truncate mb-1">
             {note.title || 'Untitled'}
           </h3>
-          <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-300">
+          <div className="flex items-center space-x-2 text-sm text-[var(--text-secondary)]">
             <span className="capitalize">{note.type}</span>
             {note.updatedAt && (
               <>
@@ -238,15 +263,15 @@ const NoteCard = ({ note, onClick, onEdit, onDelete, onConflictResolve, searchQu
                 }`}></div>
                 <span className={`text-sm ${
                   todo.completed 
-                    ? 'text-gray-500 dark:text-gray-400 line-through' 
-                    : 'text-gray-700 dark:text-gray-300'
+                    ? 'text-[var(--text-tertiary)] line-through' 
+                    : 'text-[var(--text-primary)]'
                 }`}>
                   {todo.text}
                 </span>
               </div>
             ))}
             {note.content?.items && note.content.items.length > 3 && (
-              <p className="text-xs text-gray-500 dark:text-gray-400">
+              <p className="text-xs text-[var(--text-tertiary)]">
                 +{note.content.items.length - 3} more items
               </p>
             )}
@@ -255,22 +280,22 @@ const NoteCard = ({ note, onClick, onEdit, onDelete, onConflictResolve, searchQu
           <div className="space-y-2">
             {note.content?.entries && note.content.entries.slice(0, 3).map((item, index) => (
               <div key={index} className="flex items-center space-x-2 text-sm">
-                <span className="text-gray-900 dark:text-white font-medium">
+                <span className="text-[var(--text-primary)] font-medium">
                   {item.time}
                 </span>
-                <span className="text-gray-700 dark:text-gray-300">
+                <span className="text-[var(--text-secondary)]">
                   {item.description}
                 </span>
               </div>
             ))}
             {note.content?.entries && note.content.entries.length > 3 && (
-              <p className="text-xs text-gray-500 dark:text-gray-400">
+              <p className="text-xs text-[var(--text-tertiary)]">
                 +{note.content.entries.length - 3} more activities
               </p>
             )}
           </div>
         ) : (
-          <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
+          <p className="text-[var(--text-primary)] text-sm leading-relaxed">
             {note.content?.text ? (
               note.content.text.length > 120 
                 ? `${note.content.text.substring(0, 120)}...` 
@@ -285,7 +310,7 @@ const NoteCard = ({ note, onClick, onEdit, onDelete, onConflictResolve, searchQu
       {/* Note Footer */}
       <div className="flex items-center justify-between text-xs text-[var(--text-tertiary)]">
         <div className="flex items-center space-x-2">
-          <span>ID: {note.id}</span>
+          <span>{formatDate(note.createdAt || note.updatedAt)}</span>
           {note.syncStatus && (
             <span className={`px-2 py-1 rounded-full text-xs ${
               note.syncStatus === 'synced' 

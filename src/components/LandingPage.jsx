@@ -94,7 +94,7 @@ const LandingPage = () => {
               className="flex items-center space-x-2"
               whileHover={{ scale: 1.02 }}
             >
-              <div className="w-7 h-7 bg-blue-600 rounded-lg flex items-center justify-center">
+              <div className="w-7 h-7 bg-[var(--accent-primary)] rounded-lg flex items-center justify-center">
                 <svg
                   className="w-4 h-4 text-white"
                   fill="none"

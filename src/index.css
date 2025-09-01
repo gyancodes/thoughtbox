@@ -1,67 +1,74 @@
 @import "tailwindcss";
 
 /* Import Inter font for enhanced typography */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
 
 /* CSS Variables for theming */
 :root {
-  /* Light theme - Minimal black and white */
+  /* Light theme - Blue accent with black and white */
   --bg-primary: #ffffff;
-  --bg-secondary: #ffffff;
-  --bg-tertiary: #f8f9fa;
-  --text-primary: #000000;
-  --text-secondary: #6b7280;
-  --text-tertiary: #9ca3af;
-  --border-primary: #e5e7eb;
-  --border-secondary: #d1d5db;
-  --accent-primary: #000000;
-  --accent-secondary: #374151;
-  --success: #000000;
-  --warning: #000000;
-  --error: #000000;
-  
+  --bg-secondary: #fafbfc;
+  --bg-tertiary: #f1f5f9;
+  --text-primary: #1a1a1a;
+  --text-secondary: #374151;
+  --text-tertiary: #6b7280;
+  --border-primary: #e2e8f0;
+  --border-secondary: #cbd5e1;
+  --accent-primary: #3b82f6;
+  --accent-secondary: #1d4ed8;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --error: #ef4444;
+
   /* Toast variables */
   --toast-bg: rgba(255, 255, 255, 0.95);
-  --toast-border: rgba(0, 0, 0, 0.1);
-  --toast-text: #000000;
-  
+  --toast-border: rgba(59, 130, 246, 0.2);
+  --toast-text: #1a1a1a;
+
   /* Shadow variables */
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
 html.dark {
-  /* Dark theme - Minimal black and white */
-  --bg-primary: #000000;
-  --bg-secondary: #111111;
-  --bg-tertiary: #1a1a1a;
+  /* Dark theme - Blue accent with black and white */
+  --bg-primary: #0f0f0f;
+  --bg-secondary: #1a1a1a;
+  --bg-tertiary: #262626;
   --text-primary: #ffffff;
-  --text-secondary: #a1a1aa;
-  --text-tertiary: #71717a;
-  --border-primary: #27272a;
-  --border-secondary: #3f3f46;
-  --accent-primary: #ffffff;
-  --accent-secondary: #d4d4d8;
-  --success: #ffffff;
-  --warning: #ffffff;
-  --error: #ffffff;
-  
+  --text-secondary: #d1d5db;
+  --text-tertiary: #9ca3af;
+  --border-primary: #374151;
+  --border-secondary: #4b5563;
+  --accent-primary: #60a5fa;
+  --accent-secondary: #3b82f6;
+  --success: #34d399;
+  --warning: #fbbf24;
+  --error: #f87171;
+
   /* Toast variables */
-  --toast-bg: rgba(17, 17, 17, 0.95);
-  --toast-border: rgba(255, 255, 255, 0.1);
+  --toast-bg: rgba(26, 26, 26, 0.95);
+  --toast-border: rgba(96, 165, 250, 0.3);
   --toast-text: #ffffff;
-  
+
   /* Shadow variables */
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.8);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.8), 0 2px 4px -1px rgba(0, 0, 0, 0.6);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.8), 0 4px 6px -2px rgba(0, 0, 0, 0.6);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.8), 0 10px 10px -5px rgba(0, 0, 0, 0.6);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.8),
+    0 2px 4px -1px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.8),
+    0 4px 6px -2px rgba(0, 0, 0, 0.6);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.8),
+    0 10px 10px -5px rgba(0, 0, 0, 0.6);
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
@@ -70,29 +77,35 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Force theme variables to override Tailwind defaults */
-html.dark * {
+/* Force theme variables to override Tailwind defaults - but exclude toasts */
+html.dark *:not([data-hot-toast-container] *):not([data-hot-toast-container]) {
   color: inherit;
 }
 
-html.dark .text-gray-900,
-html.dark .text-gray-800,
-html.dark .text-gray-700,
-html.dark .text-gray-600,
-html.dark .text-gray-500,
-html.dark .text-gray-400,
-html.dark .text-gray-300 {
+html.dark .text-gray-900:not([data-hot-toast-container] *),
+html.dark .text-gray-800:not([data-hot-toast-container] *),
+html.dark .text-gray-700:not([data-hot-toast-container] *),
+html.dark .text-gray-600:not([data-hot-toast-container] *),
+html.dark .text-gray-500:not([data-hot-toast-container] *),
+html.dark .text-gray-400:not([data-hot-toast-container] *),
+html.dark .text-gray-300:not([data-hot-toast-container] *) {
   color: var(--text-primary) !important;
 }
 
-html.dark .bg-white,
-html.dark .bg-gray-50,
-html.dark .bg-gray-100 {
+html.dark .bg-white:not([data-hot-toast-container] *),
+html.dark .bg-gray-50:not([data-hot-toast-container] *),
+html.dark .bg-gray-100:not([data-hot-toast-container] *) {
   background-color: var(--bg-secondary) !important;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
   font-weight: 300;
   letter-spacing: -0.025em;
   line-height: 1.2;
@@ -100,8 +113,14 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Enhanced typography */
-h1, h2, h3, h4, h5, h6 {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
   font-weight: 300;
   letter-spacing: -0.025em;
   line-height: 1.2;
@@ -167,7 +186,8 @@ html {
 
 /* Smooth transitions for theme switching */
 * {
-  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  transition: background-color 0.2s ease, border-color 0.2s ease,
+    color 0.2s ease;
 }
 
 /* Ensure theme variables work in dark mode */
@@ -224,4 +244,296 @@ html.dark .bg-\[var\(--bg-secondary\)\] {
 
 html.dark .bg-\[var\(--bg-tertiary\)\] {
   background-color: var(--bg-tertiary) !important;
+}
+
+/* Fix logo visibility in dark mode */
+html.dark .w-8.h-8.bg-\[var\(--text-primary\)\] {
+  background-color: var(--accent-primary) !important;
+}
+
+html.dark .w-7.h-7.bg-blue-600 {
+  background-color: var(--accent-primary) !important;
+}
+
+/* Fix modal editor background animation issues */
+html.dark .note-editor-modal,
+html.dark .note-editor-modal * {
+  background-color: var(--bg-secondary) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Remove problematic transitions that cause text visibility issues */
+html.dark input,
+html.dark textarea,
+html.dark .note-editor input,
+html.dark .note-editor textarea {
+  background-color: var(--bg-tertiary) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-primary) !important;
+  transition: none !important;
+}
+
+html.dark input:focus,
+html.dark textarea:focus,
+html.dark .note-editor input:focus,
+html.dark .note-editor textarea:focus {
+  background-color: var(--bg-tertiary) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--accent-primary) !important;
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.2) !important;
+}
+
+/* Fix note card text contrast in light mode */
+.note-card h3 {
+  color: var(--text-primary) !important;
+  font-weight: 600 !important;
+}
+
+.note-card p,
+.note-card span,
+.note-card div {
+  color: var(--text-secondary) !important;
+}
+
+/* Ensure proper contrast for note content */
+.note-card .text-gray-700 {
+  color: var(--text-primary) !important;
+}
+
+.note-card .text-gray-600 {
+  color: var(--text-secondary) !important;
+}
+
+.note-card .text-gray-500 {
+  color: var(--text-tertiary) !important;
+}
+
+/* Fix button visibility in dark mode */
+html.dark button {
+  color: var(--text-primary) !important;
+}
+
+html.dark .bg-blue-600 {
+  background-color: var(--accent-primary) !important;
+}
+
+html.dark .hover\:bg-blue-700:hover {
+  background-color: var(--accent-secondary) !important;
+}
+
+/* Fix search bar in dark mode */
+html.dark .search-bar input {
+  background-color: var(--bg-tertiary) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-primary) !important;
+}
+
+/* Fix dropdown menus in dark mode */
+html.dark select {
+  background-color: var(--bg-tertiary) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-primary) !important;
+}
+/* Additional fixes for blue accent theme */
+
+/* Ensure all buttons use accent colors properly */
+.bg-blue-600,
+.hover\:bg-blue-700:hover,
+button[class*="blue"] {
+  background-color: var(--accent-primary) !important;
+}
+
+.bg-blue-700,
+.hover\:bg-blue-700:hover {
+  background-color: var(--accent-secondary) !important;
+}
+
+/* Fix text colors in buttons */
+button {
+  color: var(--text-primary);
+}
+
+button.bg-blue-600,
+button[class*="bg-blue"] {
+  color: white !important;
+}
+
+/* Fix input and textarea styling */
+input,
+textarea,
+select {
+  background-color: var(--bg-tertiary) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-primary) !important;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--accent-primary) !important;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1) !important;
+}
+
+html.dark input:focus,
+html.dark textarea:focus,
+html.dark select:focus {
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.2) !important;
+}
+
+/* Fix placeholder colors */
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-tertiary) !important;
+}
+
+/* Remove glass morphism effects that cause visibility issues */
+html.dark *[style*="backdrop-filter"],
+html.dark *[style*="backdropFilter"] {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Ensure proper contrast for all text elements */
+html.dark h1,
+html.dark h2,
+html.dark h3,
+html.dark h4,
+html.dark h5,
+html.dark h6 {
+  color: var(--text-primary) !important;
+}
+
+html.dark p,
+html.dark span,
+html.dark div {
+  color: inherit;
+}
+
+/* Fix modal backgrounds */
+html.dark .modal,
+html.dark [role="dialog"] {
+  background-color: var(--bg-secondary) !important;
+}
+
+/* Fix dropdown and select styling */
+html.dark option {
+  background-color: var(--bg-secondary) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Ensure proper visibility for all interactive elements */
+html.dark .hover\:text-blue-600:hover {
+  color: var(--accent-primary) !important;
+}
+
+html.dark .text-blue-600 {
+  color: var(--accent-primary) !important;
+}
+
+html.dark .text-blue-700 {
+  color: var(--accent-secondary) !important;
+}
+
+/* Fix border colors for blue theme */
+.border-blue-200 {
+  border-color: rgba(59, 130, 246, 0.2) !important;
+}
+
+html.dark .border-blue-200 {
+  border-color: rgba(96, 165, 250, 0.3) !important;
+}
+
+/* Fix background colors for blue theme */
+.bg-blue-50 {
+  background-color: rgba(59, 130, 246, 0.05) !important;
+}
+
+html.dark .bg-blue-50 {
+  background-color: rgba(96, 165, 250, 0.1) !important;
+}
+
+.bg-blue-100 {
+  background-color: rgba(59, 130, 246, 0.1) !important;
+}
+
+html.dark .bg-blue-100 {
+  background-color: rgba(96, 165, 250, 0.15) !important;
+}
+
+/* Fix text colors for blue theme */
+.text-blue-700 {
+  color: var(--accent-secondary) !important;
+}
+
+.text-blue-600 {
+  color: var(--accent-primary) !important;
+}
+
+/* Ensure proper scrollbar styling */
+html.dark ::-webkit-scrollbar-track {
+  background: var(--bg-tertiary);
+}
+
+html.dark ::-webkit-scrollbar-thumb {
+  background: var(--border-primary);
+}
+
+html.dark ::-webkit-scrollbar-thumb:hover {
+  background: var(--border-secondary);
+} /* Cre
+ate Note Modal Fixes */
+.create-note-modal input,
+.create-note-modal textarea {
+  background-color: var(--bg-tertiary) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-primary) !important;
+}
+
+.create-note-modal input:focus,
+.create-note-modal textarea:focus {
+  border-color: var(--accent-primary) !important;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1) !important;
+}
+
+html.dark .create-note-modal input:focus,
+html.dark .create-note-modal textarea:focus {
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.2) !important;
+}
+
+/* Fix checkbox styling */
+input[type="checkbox"] {
+  accent-color: var(--accent-primary) !important;
+}
+
+/* Fix time input styling */
+input[type="time"] {
+  background-color: var(--bg-tertiary) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-primary) !important;
+}
+
+input[type="time"]:focus {
+  border-color: var(--accent-primary) !important;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1) !important;
+}
+
+html.dark input[type="time"]:focus {
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.2) !important;
+}
+
+/* Ensure proper modal backdrop */
+.modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.4) !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+html.dark .modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.6) !important;
+} /* Fix modal z-index to ensure toasts appear above */
+.create-note-modal {
+  z-index: 40 !important;
+}
+
+.modal-backdrop {
+  z-index: 39 !important;
 }

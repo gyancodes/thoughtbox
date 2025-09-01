@@ -63,35 +63,7 @@ function App() {
               </Routes>
 
               {/* Toast notifications */}
-              <Toaster
-                position="top-right"
-                toastOptions={{
-                  duration: 4000,
-                  style: {
-                    background: "var(--toast-bg)",
-                    backdropFilter: "blur(10px)",
-                    border: "1px solid var(--toast-border)",
-                    borderRadius: "12px",
-                    color: "var(--toast-text)",
-                    fontSize: "14px",
-                    fontWeight: "500",
-                    boxShadow:
-                      "0 10px 25px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05)",
-                  },
-                  success: {
-                    iconTheme: {
-                      primary: "#10B981",
-                      secondary: "#FFFFFF",
-                    },
-                  },
-                  error: {
-                    iconTheme: {
-                      primary: "#EF4444",
-                      secondary: "#FFFFFF",
-                    },
-                  },
-                }}
-              />
+              <Toaster />
             </div>
           </Router>
         </ClerkAuthProvider>

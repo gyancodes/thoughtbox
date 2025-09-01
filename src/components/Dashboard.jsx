@@ -70,8 +70,8 @@ const Dashboard = () => {
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-[var(--text-primary)] rounded flex items-center justify-center">
-                  <svg className="w-4 h-4 text-[var(--bg-primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-8 h-8 bg-[var(--accent-primary)] rounded flex items-center justify-center">
+                  <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                 </div>
@@ -201,12 +201,12 @@ const DashboardContent = ({  onEditNote }) => {
 
   const handleDeleteNote = async (note) => {
     toast((t) => (
-      <div className="flex items-center space-x-3">
-        <div className="flex-1">
-          <p className="font-medium">Delete note?</p>
-          <p className="text-sm text-[var(--text-secondary)]">"{note.title || 'Untitled'}" will be permanently deleted.</p>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div style={{ flex: 1 }}>
+          <p style={{ fontWeight: '500', color: '#111827', margin: 0, marginBottom: '4px' }}>Delete note?</p>
+          <p style={{ fontSize: '14px', color: '#6b7280', margin: 0 }}>"{note.title || 'Untitled'}" will be permanently deleted.</p>
         </div>
-        <div className="flex space-x-2">
+        <div style={{ display: 'flex', gap: '8px' }}>
           <button
             onClick={() => {
               toast.dismiss(t.id);
@@ -214,13 +214,35 @@ const DashboardContent = ({  onEditNote }) => {
                 // Error handling is done in NotesContext
               });
             }}
-            className="px-3 py-1 bg-[var(--text-primary)] text-[var(--bg-primary)] text-sm rounded-md hover:opacity-80 transition-opacity"
+            style={{
+              padding: '4px 12px',
+              backgroundColor: '#dc2626',
+              color: '#ffffff',
+              fontSize: '14px',
+              borderRadius: '6px',
+              border: 'none',
+              cursor: 'pointer',
+              transition: 'background-color 0.2s'
+            }}
+            onMouseEnter={(e) => e.target.style.backgroundColor = '#b91c1c'}
+            onMouseLeave={(e) => e.target.style.backgroundColor = '#dc2626'}
           >
             Delete
           </button>
           <button
             onClick={() => toast.dismiss(t.id)}
-            className="px-3 py-1 bg-[var(--bg-tertiary)] text-[var(--text-primary)] text-sm rounded-md hover:bg-[var(--border-primary)] transition-colors"
+            style={{
+              padding: '4px 12px',
+              backgroundColor: '#f3f4f6',
+              color: '#374151',
+              fontSize: '14px',
+              borderRadius: '6px',
+              border: 'none',
+              cursor: 'pointer',
+              transition: 'background-color 0.2s'
+            }}
+            onMouseEnter={(e) => e.target.style.backgroundColor = '#e5e7eb'}
+            onMouseLeave={(e) => e.target.style.backgroundColor = '#f3f4f6'}
           >
             Cancel
           </button>

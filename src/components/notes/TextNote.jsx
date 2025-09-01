@@ -196,26 +196,15 @@ const TextNote = ({
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.3, delay: 0.1 }}
       >
-        <motion.input
+        <input
           ref={titleRef}
           type="text"
           value={title}
           onChange={handleTitleChange}
           onBlur={handleBlur}
           placeholder="Note title..."
-          className="w-full text-xl font-semibold text-gray-900 placeholder-gray-400 border-none outline-none bg-transparent resize-none transition-all duration-300 focus:placeholder-gray-300 p-2 rounded-lg"
+          className="w-full text-xl font-semibold text-[var(--text-primary)] placeholder-[var(--text-tertiary)] border border-[var(--border-primary)] outline-none bg-[var(--bg-tertiary)] resize-none p-3 rounded-lg focus:border-[var(--accent-primary)] focus:ring-2 focus:ring-[var(--accent-primary)] focus:ring-opacity-20"
           data-testid="text-note-title"
-          style={{
-            background: 'rgba(255, 255, 255, 0.3)',
-            backdropFilter: 'blur(10px)',
-            WebkitBackdropFilter: 'blur(10px)',
-          }}
-          whileFocus={{ 
-            scale: 1.02,
-            background: 'rgba(255, 255, 255, 0.5)',
-            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.4)',
-          }}
-          transition={{ type: "spring", stiffness: 300, damping: 30 }}
         />
       </motion.div>
 
@@ -226,86 +215,48 @@ const TextNote = ({
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.3, delay: 0.2 }}
       >
-        <motion.textarea
+        <textarea
           ref={contentRefCallback}
           value={content}
           onChange={handleContentChange}
           onBlur={handleBlur}
           placeholder="Start writing your note..."
-          className="w-full text-gray-700 placeholder-gray-400 border-none outline-none resize-none min-h-[200px] leading-relaxed transition-all duration-300 focus:placeholder-gray-300 p-4 rounded-xl"
+          className="w-full text-[var(--text-primary)] placeholder-[var(--text-tertiary)] border border-[var(--border-primary)] outline-none bg-[var(--bg-tertiary)] resize-none min-h-[200px] leading-relaxed p-4 rounded-lg focus:border-[var(--accent-primary)] focus:ring-2 focus:ring-[var(--accent-primary)] focus:ring-opacity-20"
           data-testid="text-note-content"
-          style={{
-            background: 'rgba(255, 255, 255, 0.2)',
-            backdropFilter: 'blur(15px)',
-            WebkitBackdropFilter: 'blur(15px)',
-            border: '1px solid rgba(255, 255, 255, 0.2)',
-          }}
-          whileFocus={{ 
-            scale: 1.01,
-            background: 'rgba(255, 255, 255, 0.4)',
-            boxShadow: '0 8px 30px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.5)',
-            borderColor: 'rgba(255, 255, 255, 0.4)',
-          }}
-          transition={{ type: "spring", stiffness: 300, damping: 30 }}
         />
       </motion.div>
 
       {/* Status indicator */}
-      <motion.div 
-        className="flex items-center justify-between mt-4 text-sm text-gray-500"
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.3 }}
-      >
+      <div className="flex items-center justify-between mt-4 text-sm text-[var(--text-secondary)]">
         <div className="flex items-center space-x-2">
           {isSaving && (
-            <motion.span 
-              className="flex items-center space-x-1"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-            >
-              <div className="w-3 h-3 border border-gray-300 border-t-blue-500 rounded-full animate-spin"></div>
+            <span className="flex items-center space-x-1">
+              <div className="w-3 h-3 border border-[var(--border-primary)] border-t-[var(--accent-primary)] rounded-full animate-spin"></div>
               <span>Saving...</span>
-            </motion.span>
+            </span>
           )}
           {hasChanges && !isSaving && (
-            <motion.span 
-              className="text-yellow-600"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-            >
+            <span className="text-[var(--warning)]">
               Unsaved changes
-            </motion.span>
+            </span>
           )}
           {!hasChanges && !isSaving && note && (
-            <motion.span 
-              className="text-green-600"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-            >
+            <span className="text-[var(--success)]">
               Saved
-            </motion.span>
+            </span>
           )}
         </div>
         
-        <div className="text-xs text-gray-400">
+        <div className="text-xs text-[var(--text-tertiary)]">
           {content.length} characters
         </div>
-      </motion.div>
+      </div>
 
       {/* Keyboard shortcuts hint */}
-      <motion.div 
-        className="mt-2 text-xs text-gray-400"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.3, delay: 0.4 }}
-      >
+      <div className="mt-2 text-xs text-[var(--text-tertiary)]">
         <span>Ctrl+S to save</span>
         {onCancel && <span className="ml-4">Esc to cancel</span>}
-      </motion.div>
+      </div>
     </motion.div>
   );
 };
