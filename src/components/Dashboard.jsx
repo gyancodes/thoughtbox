@@ -201,12 +201,12 @@ const DashboardContent = ({  onEditNote }) => {
 
   const handleDeleteNote = async (note) => {
     toast((t) => (
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-        <div style={{ flex: 1 }}>
-          <p style={{ fontWeight: '500', color: '#111827', margin: 0, marginBottom: '4px' }}>Delete note?</p>
-          <p style={{ fontSize: '14px', color: '#6b7280', margin: 0 }}>"{note.title || 'Untitled'}" will be permanently deleted.</p>
+      <div className="delete-toast-content">
+        <div className="delete-toast-text">
+          <p className="delete-toast-title">Delete note?</p>
+          <p className="delete-toast-subtitle">"{note.title || 'Untitled'}" will be permanently deleted.</p>
         </div>
-        <div style={{ display: 'flex', gap: '8px' }}>
+        <div className="delete-toast-buttons">
           <button
             onClick={() => {
               toast.dismiss(t.id);
@@ -214,35 +214,13 @@ const DashboardContent = ({  onEditNote }) => {
                 // Error handling is done in NotesContext
               });
             }}
-            style={{
-              padding: '4px 12px',
-              backgroundColor: '#dc2626',
-              color: '#ffffff',
-              fontSize: '14px',
-              borderRadius: '6px',
-              border: 'none',
-              cursor: 'pointer',
-              transition: 'background-color 0.2s'
-            }}
-            onMouseEnter={(e) => e.target.style.backgroundColor = '#b91c1c'}
-            onMouseLeave={(e) => e.target.style.backgroundColor = '#dc2626'}
+            className="delete-toast-delete-btn"
           >
             Delete
           </button>
           <button
             onClick={() => toast.dismiss(t.id)}
-            style={{
-              padding: '4px 12px',
-              backgroundColor: '#f3f4f6',
-              color: '#374151',
-              fontSize: '14px',
-              borderRadius: '6px',
-              border: 'none',
-              cursor: 'pointer',
-              transition: 'background-color 0.2s'
-            }}
-            onMouseEnter={(e) => e.target.style.backgroundColor = '#e5e7eb'}
-            onMouseLeave={(e) => e.target.style.backgroundColor = '#f3f4f6'}
+            className="delete-toast-cancel-btn"
           >
             Cancel
           </button>
@@ -252,6 +230,9 @@ const DashboardContent = ({  onEditNote }) => {
       duration: Infinity,
       style: {
         maxWidth: '400px',
+        background: 'var(--toast-bg)',
+        color: 'var(--toast-text)',
+        border: '1px solid var(--toast-border)',
       },
     });
   };

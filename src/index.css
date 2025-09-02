@@ -21,8 +21,8 @@
   --error: #ef4444;
 
   /* Toast variables */
-  --toast-bg: rgba(255, 255, 255, 0.95);
-  --toast-border: rgba(59, 130, 246, 0.2);
+  --toast-bg: rgba(255, 255, 255, 0.98);
+  --toast-border: rgba(59, 130, 246, 0.3);
   --toast-text: #1a1a1a;
 
   /* Shadow variables */
@@ -52,8 +52,8 @@ html.dark {
   --error: #f87171;
 
   /* Toast variables */
-  --toast-bg: rgba(26, 26, 26, 0.95);
-  --toast-border: rgba(96, 165, 250, 0.3);
+  --toast-bg: rgba(26, 26, 26, 0.98);
+  --toast-border: rgba(96, 165, 250, 0.4);
   --toast-text: #ffffff;
 
   /* Shadow variables */
@@ -558,7 +558,8 @@ html.dark .text-green-400 {
 
 /* Ensure proper contrast for all landing page elements */
 .landing-page * {
-  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  transition: background-color 0.3s ease, color 0.3s ease,
+    border-color 0.3s ease;
 }
 
 /* Fix backdrop blur for dark mode */
@@ -596,4 +597,176 @@ html.dark .group:hover .group-hover\:bg-blue-600 {
 
 html.dark .group:hover .group-hover\:text-white {
   color: white !important;
+}
+
+/* Toast Styling */
+[data-hot-toast-container] {
+  z-index: 9999 !important;
+}
+
+[data-hot-toast-container] > div {
+  background: var(--toast-bg) !important;
+  color: var(--toast-text) !important;
+  border: 1px solid var(--toast-border) !important;
+  border-radius: 8px !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  box-shadow: var(--shadow-lg) !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  font-family: "Inter", sans-serif !important;
+}
+
+/* Toast text styling */
+[data-hot-toast-container] div[role="status"] {
+  color: var(--toast-text) !important;
+}
+
+[data-hot-toast-container] div[role="status"] * {
+  color: var(--toast-text) !important;
+}
+
+/* Toast button styling */
+[data-hot-toast-container] button {
+  background: var(--accent-primary) !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 6px !important;
+  padding: 6px 12px !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: background-color 0.2s ease !important;
+}
+
+[data-hot-toast-container] button:hover {
+  background: var(--accent-secondary) !important;
+}
+
+/* Toast cancel button styling */
+[data-hot-toast-container] button:last-child {
+  background: transparent !important;
+  color: var(--text-tertiary) !important;
+  border: 1px solid var(--border-primary) !important;
+}
+
+[data-hot-toast-container] button:last-child:hover {
+  background: var(--bg-tertiary) !important;
+  color: var(--text-secondary) !important;
+}
+
+/* Success toast styling */
+[data-hot-toast-container] [data-type="success"] {
+  border-left: 4px solid var(--success) !important;
+}
+
+/* Error toast styling */
+[data-hot-toast-container] [data-type="error"] {
+  border-left: 4px solid var(--error) !important;
+}
+
+/* Loading toast styling */
+[data-hot-toast-container] [data-type="loading"] {
+  border-left: 4px solid var(--accent-primary) !important;
+}
+
+/* Toast icon styling */
+[data-hot-toast-container] svg {
+  color: inherit !important;
+  fill: currentColor !important;
+}
+
+/* Ensure toast container is above modals */
+[data-hot-toast-container] {
+  z-index: 10000 !important;
+}
+
+/* Dark mode specific toast adjustments */
+html.dark [data-hot-toast-container] > div {
+  background: var(--toast-bg) !important;
+  border-color: var(--toast-border) !important;
+  color: var(--toast-text) !important;
+}
+
+html.dark [data-hot-toast-container] div[role="status"],
+html.dark [data-hot-toast-container] div[role="status"] * {
+  color: var(--toast-text) !important;
+}
+
+/* Delete Toast Styling */
+.delete-toast-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--toast-text) !important;
+}
+
+.delete-toast-text {
+  flex: 1;
+}
+
+.delete-toast-title {
+  font-weight: 500;
+  color: var(--toast-text) !important;
+  margin: 0;
+  margin-bottom: 4px;
+  font-size: 14px;
+}
+
+.delete-toast-subtitle {
+  font-size: 13px;
+  color: var(--text-tertiary) !important;
+  margin: 0;
+  opacity: 0.8;
+}
+
+.delete-toast-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.delete-toast-delete-btn {
+  padding: 6px 12px;
+  background-color: var(--error) !important;
+  color: white !important;
+  font-size: 13px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+.delete-toast-delete-btn:hover {
+  background-color: #dc2626 !important;
+}
+
+.delete-toast-cancel-btn {
+  padding: 6px 12px;
+  background-color: var(--bg-tertiary) !important;
+  color: var(--text-secondary) !important;
+  font-size: 13px;
+  border-radius: 6px;
+  border: 1px solid var(--border-primary);
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.delete-toast-cancel-btn:hover {
+  background-color: var(--border-primary) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Ensure delete toast content inherits proper colors */
+[data-hot-toast-container] .delete-toast-content * {
+  color: inherit;
+}
+
+[data-hot-toast-container] .delete-toast-title {
+  color: var(--toast-text) !important;
+}
+
+[data-hot-toast-container] .delete-toast-subtitle {
+  color: var(--text-tertiary) !important;
 }
