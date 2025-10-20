@@ -3,67 +3,73 @@
 /* Import Inter font for enhanced typography */
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
 
-/* CSS Variables for theming */
+/* Enhanced CSS Variables for theming */
 :root {
-  /* Light theme - Blue accent with black and white */
+  /* Base colors - Google Keep inspired */
   --bg-primary: #ffffff;
-  --bg-secondary: #fafbfc;
-  --bg-tertiary: #f1f5f9;
-  --text-primary: #1a1a1a;
-  --text-secondary: #374151;
-  --text-tertiary: #6b7280;
-  --border-primary: #e2e8f0;
-  --border-secondary: #cbd5e1;
-  --accent-primary: #3b82f6;
-  --accent-secondary: #1d4ed8;
-  --success: #10b981;
-  --warning: #f59e0b;
-  --error: #ef4444;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #f1f3f4;
+  --text-primary: #202124;
+  --text-secondary: #5f6368;
+  --text-tertiary: #80868b;
+  --border-primary: #e0e0e0;
+  --border-secondary: #dadce0;
+  --accent-primary: #fbbc04;
+  --accent-secondary: #4285f4;
+  --success: #34a853;
+  --warning: #fbbc04;
+  --error: #ea4335;
+
+  /* Enhanced gradients */
+  --gradient-primary: linear-gradient(135deg, #fbbc04 0%, #f9a825 100%);
+  --gradient-secondary: linear-gradient(135deg, #f1f3f4 0%, #e0e0e0 100%);
+  --gradient-accent: linear-gradient(135deg, #fbbc04 0%, #4285f4 100%);
 
   /* Toast variables */
   --toast-bg: rgba(255, 255, 255, 0.98);
-  --toast-border: rgba(59, 130, 246, 0.3);
-  --toast-text: #1a1a1a;
+  --toast-border: rgba(251, 188, 4, 0.3);
+  --toast-text: #202124;
 
-  /* Shadow variables */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-    0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
-    0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
-    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  /* Enhanced shadow variables - Minimal */
+  --shadow-sm: 0 1px 2px 0 rgba(60, 64, 67, 0.05);
+  --shadow-md: 0 2px 6px 0 rgba(60, 64, 67, 0.12);
+  --shadow-lg: 0 3px 8px 0 rgba(60, 64, 67, 0.14);
+  --shadow-xl: 0 4px 12px 0 rgba(60, 64, 67, 0.16);
+  --shadow-glow: 0 0 20px rgba(251, 188, 4, 0.15);
 }
 
 html.dark {
-  /* Dark theme - Blue accent with black and white */
-  --bg-primary: #0f0f0f;
-  --bg-secondary: #1a1a1a;
-  --bg-tertiary: #262626;
-  --text-primary: #ffffff;
-  --text-secondary: #d1d5db;
-  --text-tertiary: #9ca3af;
-  --border-primary: #374151;
-  --border-secondary: #4b5563;
-  --accent-primary: #60a5fa;
-  --accent-secondary: #3b82f6;
-  --success: #34d399;
-  --warning: #fbbf24;
-  --error: #f87171;
+  /* Dark theme - Google Keep-like minimal dark theme */
+  --bg-primary: #202124;
+  --bg-secondary: #202124;
+  --bg-tertiary: #2d2e30;
+  --text-primary: #e8eaed;
+  --text-secondary: #9aa0a6;
+  --text-tertiary: #80868b;
+  --border-primary: #5f6368;
+  --border-secondary: #3c4043;
+  --accent-primary: #fbbc04;
+  --accent-secondary: #4285f4;
+  --success: #34a853;
+  --warning: #fbbc04;
+  --error: #ea4335;
 
-  /* Toast variables */
-  --toast-bg: rgba(26, 26, 26, 0.98);
-  --toast-border: rgba(96, 165, 250, 0.4);
-  --toast-text: #ffffff;
+  /* Enhanced gradients for dark mode */
+  --gradient-primary: linear-gradient(135deg, #fbbc04 0%, #f9a825 100%);
+  --gradient-secondary: linear-gradient(135deg, #2d2e30 0%, #202124 100%);
+  --gradient-accent: linear-gradient(135deg, #fbbc04 0%, #4285f4 100%);
 
-  /* Shadow variables */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.8);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.8),
-    0 2px 4px -1px rgba(0, 0, 0, 0.6);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.8),
-    0 4px 6px -2px rgba(0, 0, 0, 0.6);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.8),
-    0 10px 10px -5px rgba(0, 0, 0, 0.6);
+  /* Toast variables for dark mode */
+  --toast-bg: rgba(32, 33, 36, 0.95);
+  --toast-border: rgba(251, 188, 4, 0.3);
+  --toast-text: #e8eaed;
+
+  /* Enhanced shadow variables for dark mode - Minimal */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 2px 6px 0 rgba(0, 0, 0, 0.25);
+  --shadow-lg: 0 3px 8px 0 rgba(0, 0, 0, 0.3);
+  --shadow-xl: 0 4px 12px 0 rgba(0, 0, 0, 0.35);
+  --shadow-glow: 0 0 15px rgba(251, 188, 4, 0.2);
 }
 
 body {
@@ -74,7 +80,16 @@ body {
   text-rendering: optimizeLegibility;
   background-color: var(--bg-primary) !important;
   color: var(--text-primary) !important;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+              color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Enhanced global transitions for theme switching */
+* {
+  transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Force theme variables to override Tailwind defaults - but exclude toasts */

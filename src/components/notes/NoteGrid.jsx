@@ -100,18 +100,24 @@ const NoteGrid = ({
       {/* Google Keep style masonry grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 auto-rows-min">
         {notes.map((note) => (
-          <div key={note.id} className="break-inside-avoid">
+          <motion.div
+            key={note.id}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2 }}
+            className="break-inside-avoid"
+          >
             <NoteCard
               note={note}
-              onClick={onNoteClick}
-              onEdit={onNoteEdit}
-              onDelete={onNoteDelete}
+              onClick={() => onNoteClick && onNoteClick(note)}
+              onEdit={() => onNoteEdit && onNoteEdit(note)}
+              onDelete={() => onNoteDelete && onNoteDelete(note)}
               onConflictResolve={onConflictResolve}
               isSelected={selectedNotes.has(note.id)}
               onSelect={() => handleNoteSelect(note.id)}
               searchQuery={searchQuery}
             />
-          </div>
+          </motion.div>
         ))}
       </div>
 
