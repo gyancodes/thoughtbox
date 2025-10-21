@@ -133,6 +133,11 @@ const Dashboard = () => {
                 </svg>
               </button>
             </div>
+            <div className="flex items-center space-x-3 mt-2">
+              <a
+                href="https://docs.thoughtbox.app"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors flex items-center space-x-1"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
