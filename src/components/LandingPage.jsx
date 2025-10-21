@@ -126,12 +126,6 @@ const LandingPage = () => {
                 Features
               </a>
               <a
-                href="#pricing"
-                className="text-[var(--text-secondary)] hover:text-[var(--accent-primary)] transition-colors text-sm font-medium"
-              >
-                Pricing
-              </a>
-              <a
                 href="https://docs.thoughtbox.dev"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -708,169 +702,7 @@ const LandingPage = () => {
           </div>
         </div>
 
-        {/* Pricing Section */}
-        <div
-          id="pricing"
-          className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-24"
-        >
-          <motion.div
-            className="text-center mb-16"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-          >
-            <h2 className="text-3xl sm:text-4xl font-light text-[var(--text-primary)] mb-4 tracking-tight">
-              Simple, transparent pricing
-            </h2>
-            <p className="text-lg text-[var(--text-secondary)] font-light">
-              Start free, upgrade when you need more features
-            </p>
-          </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-            {[
-              {
-                name: "Free",
-                price: "$0",
-                period: "forever",
-                features: [
-                  "Up to 1,000 notes",
-                  "Basic search",
-                  "Web access",
-                  "Community support",
-                ],
-                cta: "Get Started",
-                popular: false,
-              },
-              {
-                name: "Pro",
-                price: "$8",
-                period: "per month",
-                features: [
-                  "Unlimited notes",
-                  "Advanced search",
-                  "Mobile & desktop apps",
-                  "Priority support",
-                  "End-to-end encryption",
-                  "API access",
-                ],
-                cta: "Start Free Trial",
-                popular: true,
-              },
-              {
-                name: "Enterprise",
-                price: "Custom",
-                period: "contact us",
-                features: [
-                  "Everything in Pro",
-                  "Self-hosted deployment",
-                  "SSO integration",
-                  "Audit logs",
-                  "Dedicated support",
-                  "Custom integrations",
-                ],
-                cta: "Contact Sales",
-                popular: false,
-              },
-            ].map((plan, index) => (
-              <motion.div
-                key={plan.name}
-                className={`relative rounded-xl p-6 ${
-                  plan.popular
-                    ? "bg-[var(--accent-primary)] text-white"
-                    : "bg-[var(--bg-primary)] border border-[var(--border-primary)]"
-                }`}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                whileHover={{ y: -2 }}
-              >
-                {plan.popular && (
-                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                    <span className="bg-[var(--accent-secondary)] text-white px-3 py-1 rounded-full text-xs font-medium">
-                      Most Popular
-                    </span>
-                  </div>
-                )}
-
-                <div className="text-center">
-                  <h3
-                    className={`text-lg font-medium mb-3 ${
-                      plan.popular ? "text-white" : "text-[var(--text-primary)]"
-                    }`}
-                  >
-                    {plan.name}
-                  </h3>
-
-                  <div className="mb-6">
-                    <span
-                      className={`text-3xl font-light ${
-                        plan.popular ? "text-white" : "text-[var(--text-primary)]"
-                      }`}
-                    >
-                      {plan.price}
-                    </span>
-                    <span
-                      className={`text-sm ${
-                        plan.popular ? "text-blue-100" : "text-[var(--text-secondary)]"
-                      }`}
-                    >
-                      /{plan.period}
-                    </span>
-                  </div>
-
-                  <ul className="space-y-2 mb-6">
-                    {plan.features.map((feature, featureIndex) => (
-                      <li
-                        key={featureIndex}
-                        className="flex items-center text-sm"
-                      >
-                        <svg
-                          className={`w-4 h-4 mr-2 flex-shrink-0 ${
-                            plan.popular ? "text-blue-200" : "text-[var(--accent-primary)]"
-                          }`}
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M5 13l4 4L19 7"
-                          />
-                        </svg>
-                        <span
-                          className={
-                            plan.popular ? "text-blue-100" : "text-[var(--text-secondary)]"
-                          }
-                        >
-                          {feature}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-
-                  <SignUpButton mode="modal">
-                    <motion.button
-                      className={`w-full py-2 px-4 rounded-lg font-medium transition-colors text-sm ${
-                        plan.popular
-                          ? "bg-white text-[var(--accent-primary)] hover:bg-gray-50"
-                          : "bg-[var(--accent-primary)] text-white hover:bg-[var(--accent-secondary)]"
-                      }`}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                    >
-                      {plan.cta}
-                    </motion.button>
-                  </SignUpButton>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
 
         {/* Final CTA */}
         <div className="bg-[var(--bg-tertiary)] text-[var(--text-primary)]">
@@ -962,14 +794,6 @@ const LandingPage = () => {
                       className="text-[var(--text-secondary)] hover:text-[var(--accent-primary)] text-sm transition-colors font-light"
                     >
                       Features
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#pricing"
-                      className="text-[var(--text-secondary)] hover:text-[var(--accent-primary)] text-sm transition-colors font-light"
-                    >
-                      Pricing
                     </a>
                   </li>
                   <li>
