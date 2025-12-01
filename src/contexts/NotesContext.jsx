@@ -347,11 +347,11 @@ export const NotesProvider = ({ children }) => {
       const updatedNotes = notes.filter(note => note.id !== noteId);
       setNotes(updatedNotes);
 
-      if (useLocalStorage) {
-        // Save to localStorage
-        saveNotesToStorage(updatedNotes);
-      } else {
-        // Delete from API
+      // Always update localStorage mirror so local notes stay in sync
+      saveNotesToStorage(updatedNotes);
+
+      if (!useLocalStorage) {
+        // Delete from API when using server storage
         const response = await fetch(`${API_BASE_URL}/notes/${noteId}`, {
           method: 'DELETE',
           headers: {
@@ -359,14 +359,15 @@ export const NotesProvider = ({ children }) => {
           },
         });
 
-        if (!response.ok) {
+        // Treat 404 as success for local-only notes that don't exist on the server
+        if (!response.ok && response.status !== 404) {
           throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
       }
       
       toast.success('Note deleted successfully');
     } catch (error) {
-      // Restore note if delete failed
+      // Restore note if delete failed in a real way
       setNotes(prev => [noteToDelete, ...prev]);
       console.error('Failed to delete note:', error);
       toast.error('Failed to delete note');

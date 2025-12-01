@@ -224,34 +224,20 @@ const DashboardContent = ({ onCreateNote, onEditNote }) => {
   return (
     <div className="space-y-6">
       {/* Google Keep-like Quick Note Input */}
-      <div className="max-w-xl mx-auto mb-8">
-        <div 
+      <div className="max-w-2xl mx-auto mb-6">
+        <button
+          type="button"
           onClick={() => onCreateNote('text')}
-          className="bg-[var(--bg-secondary)]/50 hover:bg-[var(--bg-secondary)] border border-[var(--border-primary)]/30 rounded-lg p-3 cursor-pointer shadow-sm transition-all duration-200"
+          className="w-full bg-[var(--bg-secondary)] border border-[var(--border-primary)]/60 rounded-xl px-4 py-3 shadow-sm hover:shadow-md hover:border-[var(--border-primary)] transition-all duration-150 flex items-center gap-3 text-left"
         >
-          <div className="flex items-center text-[var(--text-secondary)]">
-            <input 
-              type="text" 
-              placeholder="Take a note..." 
-              className="bg-transparent border-none outline-none w-full text-[var(--text-primary)]"
-              onClick={(e) => {
-                e.preventDefault();
-                onCreateNote('text');
-              }}
-              readOnly
-            />
-            <div className="flex space-x-2">
-              <button className="p-2 rounded-full hover:bg-[var(--bg-tertiary)]/20" title="New list">
-                <ListBulletIcon className="w-5 h-5" />
-              </button>
-              <button className="p-2 rounded-full hover:bg-[var(--bg-tertiary)]/20" title="New note with image">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-              </button>
-            </div>
-          </div>
-        </div>
+          <span className="flex-1 text-sm text-[var(--text-secondary)]">
+            Take a note...
+          </span>
+          <span className="flex items-center gap-2 text-[var(--text-tertiary)]">
+            <ListBulletIcon className="w-4 h-4 hidden sm:inline" />
+            <PlusIcon className="w-4 h-4" />
+          </span>
+        </button>
       </div>
 
       {/* Notes Masonry Grid */}
