@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
-import { useNotes } from '../../contexts/NotesContext';
 import TextNote from './TextNote';
 import TodoNote from './TodoNote';
 import TimetableNote from './TimetableNote';
@@ -13,7 +12,6 @@ const NoteEditor = ({
   initialType = 'text',
   className = "" 
 }) => {
-  const { createNote } = useNotes();
   
   // Local state
   const [currentNote, setCurrentNote] = useState(note);
@@ -49,96 +47,19 @@ const NoteEditor = ({
     }
   }, [isOpen, note, initialType]);
 
-  // Separate effect for creating new notes
-  useEffect(() => {
-    if (isOpen && !note && !currentNote && !isSaving) {
-      // Create note immediately when opening modal for new note
-      const createInitialNote = async () => {
-        try {
-          setIsSaving(true);
-          
-          // Create initial content based on type
-          let initialContent;
-          switch (initialType) {
-            case 'text':
-              initialContent = { text: '' };
-              break;
-            case 'todo':
-              initialContent = { items: [] };
-              break;
-            case 'timetable':
-              initialContent = { entries: [] };
-              break;
-            default:
-              initialContent = { text: '' };
-          }
-
-          const newNote = await createNote(initialType, initialContent, '');
-          setCurrentNote(newNote);
-          setIsCreating(false);
-        } catch (error) {
-          console.error('Failed to create note:', error);
-        } finally {
-          setIsSaving(false);
-        }
-      };
-
-      createInitialNote();
-    }
-  }, [isOpen, note, currentNote, initialType, createNote, isSaving]);
-
-  // Handle note creation for new notes
-  const handleCreateNote = useCallback(async (type) => {
-    try {
-      setIsSaving(true);
-      
-      // Create initial content based on type
-      let initialContent;
-      switch (type) {
-        case 'text':
-          initialContent = { text: '' };
-          break;
-        case 'todo':
-          initialContent = { items: [] };
-          break;
-        case 'timetable':
-          initialContent = { entries: [] };
-          break;
-        default:
-          initialContent = { text: '' };
-      }
-
-      const newNote = await createNote(type, initialContent, 'New Note');
-      setCurrentNote(newNote);
-      setIsCreating(false);
-      return newNote;
-    } catch (error) {
-      console.error('Failed to create note:', error);
-      throw error;
-    } finally {
-      setIsSaving(false);
-    }
-  }, [createNote]);
-
   // Handle note save
   const handleNoteSave = useCallback((updatedNote) => {
     setCurrentNote(updatedNote);
   }, []);
 
   // Handle note type change (only for new notes)
-  const handleTypeChange = useCallback(async (newType) => {
+  const handleTypeChange = useCallback((newType) => {
     if (!isCreating) return; // Can't change type of existing notes
     
     setNoteType(newType);
-    
-    // Reset current note and create a new one with the new type
+    // For new notes we just switch the in-memory type; creation happens via the editor when user types
     setCurrentNote(null);
-    try {
-      await handleCreateNote(newType);
-    } catch (error) {
-      console.error('Failed to change note type:', error);
-    }
-  }, [isCreating, handleCreateNote]);
+  }, [isCreating]);
 
   // Handle modal close
   const handleClose = useCallback(() => {
@@ -193,18 +114,7 @@ const NoteEditor = ({
 
   // Render note editor based on type
   const renderNoteEditor = () => {
-    // Don't render editor until we have a note (for new notes) or if we have an existing note
-    if (isCreating && !currentNote) {
-      return (
-        <div className="flex-1 flex items-center justify-center">
-          <div className="text-center">
-            <div className="w-8 h-8 border-2 border-[var(--border-primary)] border-t-[var(--accent-primary)] rounded-full animate-spin mx-auto mb-2"></div>
-            <p className="text-[var(--text-secondary)]">Creating note...</p>
-          </div>
-        </div>
-      );
-    }
-    
+    // For new notes, render an empty in-memory note immediately (no loading state)
     const noteToEdit = currentNote || { type: noteType, title: '', content: {} };
     
     const commonProps = {

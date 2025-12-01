@@ -124,8 +124,24 @@ export const NotesProvider = ({ children }) => {
       }
 
       const fetchedNotes = await response.json();
-      setNotes(fetchedNotes);
-      console.log('✅ Loaded notes from API:', fetchedNotes.length, 'notes');
+
+      // Also load any local notes and merge them in (without duplicates)
+      let mergedNotes = fetchedNotes;
+      try {
+        const storageKey = getStorageKey();
+        const storedNotesRaw = localStorage.getItem(storageKey);
+        if (storedNotesRaw) {
+          const storedNotes = JSON.parse(storedNotesRaw);
+          const existingIds = new Set(fetchedNotes.map((n) => n.id));
+          const localOnly = storedNotes.filter((n) => !existingIds.has(n.id));
+          mergedNotes = [...localOnly, ...fetchedNotes];
+        }
+      } catch (storageError) {
+        console.error('Failed to merge local notes:', storageError);
+      }
+
+      setNotes(mergedNotes);
+      console.log('✅ Loaded notes from API:', fetchedNotes.length, 'server notes; total after merge:', mergedNotes.length);
     } catch (error) {
       console.error('Failed to load notes from API:', error);
       setError('Failed to load notes from server - using local storage as fallback');

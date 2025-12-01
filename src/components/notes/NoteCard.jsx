@@ -197,6 +197,7 @@ const NoteCard = ({ note, onClick, onEdit, onDelete, onConflictResolve, searchQu
   return (
     <div 
       className={`
+        note-card
         bg-[var(--bg-secondary)] 
         rounded-lg 
         border border-[var(--border-primary)] 

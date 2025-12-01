@@ -9,19 +9,31 @@ const TextNote = ({
   autoFocus = false,
   className = ""
 }) => {
-  const { updateNote } = useNotes();
+  const { updateNote, createNote } = useNotes();
   
   // Local state for editing
   const [title, setTitle] = useState(note?.title || '');
   const [content, setContent] = useState(note?.content?.text || '');
   const [isSaving, setIsSaving] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
+  const [noteId, setNoteId] = useState(note?.id || null);
   
   // Refs for auto-focus and debouncing
   const titleRef = useRef(null);
   const contentRef = useRef(null);
   const saveTimeoutRef = useRef(null);
   const initialDataRef = useRef({ title: note?.title || '', content: note?.content?.text || '' });
+
+  // Keep local noteId in sync when parent provides a saved note
+  useEffect(() => {
+    if (note?.id && note?.id !== noteId) {
+      setNoteId(note.id);
+      initialDataRef.current = {
+        title: note.title || '',
+        content: note.content?.text || '',
+      };
+    }
+  }, [note, noteId]);
 
   // Auto-focus on mount if requested
   useEffect(() => {
@@ -39,15 +51,24 @@ const TextNote = ({
 
   // Debounced auto-save function
   const debouncedSave = useCallback(async () => {
-    if (!note || !hasChanges) return;
+    if (!hasChanges) return;
 
     try {
       setIsSaving(true);
-      
-      const updatedNote = await updateNote(note.id, {
-        title: title.trim(),
-        content: { text: content }
-      });
+
+      let savedNote;
+
+      if (!noteId) {
+        // Create a new note the first time user types
+        savedNote = await createNote('text', { text: content }, title.trim());
+        setNoteId(savedNote.id);
+      } else {
+        // Update existing note
+        savedNote = await updateNote(noteId, {
+          title: title.trim(),
+          content: { text: content },
+        });
+      }
 
       // Update initial data reference
       initialDataRef.current = { 
@@ -56,18 +77,18 @@ const TextNote = ({
       };
       
       setHasChanges(false);
-      onSave?.(updatedNote);
+      onSave?.(savedNote);
     } catch (error) {
       console.error('Failed to save note:', error);
       // Note: Error handling is managed by NotesContext
     } finally {
       setIsSaving(false);
     }
-  }, [note, title, content, hasChanges, updateNote, onSave]);
+  }, [hasChanges, title, content, noteId, createNote, updateNote, onSave]);
 
   // Auto-save with debouncing - reduced delay for instant sync
   useEffect(() => {
-    if (!hasChanges || !note) return;
+    if (!hasChanges) return;
 
     // Clear existing timeout
     if (saveTimeoutRef.current) {
@@ -89,7 +110,7 @@ const TextNote = ({
 
   // Auto-save on blur/focus loss for instant sync
   const handleBlur = useCallback(() => {
-    if (hasChanges && note) {
+    if (hasChanges) {
       // Clear timeout and save immediately
       if (saveTimeoutRef.current) {
         clearTimeout(saveTimeoutRef.current);
@@ -157,7 +178,7 @@ const TextNote = ({
   // Listen for force save events (page visibility change, etc.)
   useEffect(() => {
     const handleForceSave = () => {
-      if (hasChanges && note) {
+          if (hasChanges) {
         if (saveTimeoutRef.current) {
           clearTimeout(saveTimeoutRef.current);
         }
@@ -240,7 +261,7 @@ const TextNote = ({
               Unsaved changes
             </span>
           )}
-          {!hasChanges && !isSaving && note && (
+          {!hasChanges && !isSaving && noteId && (
             <span className="text-[var(--success)]">
               Saved
             </span>

@@ -97,7 +97,7 @@ const NoteGrid = ({
 
   return (
     <div className={`w-full ${className}`}>
-      {/* Google Keep style masonry grid */}
+      {/* Google Keep style responsive grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 auto-rows-min">
         {notes.map((note) => (
           <motion.div
@@ -122,7 +122,7 @@ const NoteGrid = ({
       </div>
 
       {/* Fixed selection info box */}
-      {selectedNotes.length > 0 && (
+      {selectedNotes.size > 0 && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -131,7 +131,7 @@ const NoteGrid = ({
         >
           <div className="bg-[var(--bg-secondary)] border border-[var(--border-primary)] rounded-xl shadow-lg px-6 py-3 flex items-center space-x-4">
             <span className="text-sm text-[var(--text-primary)]">
-              {selectedNotes.length} note{selectedNotes.length !== 1 ? 's' : ''} selected
+              {selectedNotes.size} note{selectedNotes.size !== 1 ? 's' : ''} selected
             </span>
             <div className="flex items-center space-x-2">
               <button
