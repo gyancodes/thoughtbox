@@ -32,7 +32,7 @@ const LandingPage = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[var(--bg-primary)] relative overflow-hidden">
+  <div className="min-h-screen bg-[var(--bg-primary)] relative overflow-hidden landing-page">
       {/* Subtle background pattern */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
@@ -204,13 +204,13 @@ const LandingPage = () => {
           <div className="text-center max-w-4xl mx-auto mb-16">
             {/* Status Badge */}
             <motion.div
-              className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium mb-6 bg-[var(--bg-tertiary)] border border-[var(--border-primary)] text-[var(--accent-primary)]"
+              className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium mb-6 bg-[var(--bg-tertiary)]/80 border border-[var(--border-primary)] text-[var(--accent-primary)] shadow-sm"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
             >
               <span className="w-2 h-2 bg-[var(--accent-primary)] rounded-full mr-2"></span>
-              Open Source • Privacy First • Non-Commercial
+              Loved by students, founders & creators
             </motion.div>
 
             {/* Main Headline */}
@@ -220,10 +220,10 @@ const LandingPage = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.1 }}
             >
-              Your digital workspace
+              Think faster.
               <br />
               <span className="text-[var(--accent-primary)] font-normal">
-                for capturing thoughts
+                Capture everything in one place.
               </span>
             </motion.h1>
 
@@ -234,9 +234,9 @@ const LandingPage = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.3 }}
             >
-              A minimal, fast note-taking application that works offline and
-              puts your privacy first. Organize your thoughts with text notes,
-              todo lists, and timetables—all synced across your devices.
+              ThoughtBox is a calm, consumer‑friendly notes app for ideas, tasks,
+              and schedules. Simple enough for daily life, powerful enough to
+              run your side projects.
             </motion.p>
 
             {/* CTA Buttons */}
@@ -252,7 +252,7 @@ const LandingPage = () => {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
-                  Start Free Trial
+                  Get started — it&apos;s free
                 </motion.button>
               </SignUpButton>
 
@@ -260,7 +260,7 @@ const LandingPage = () => {
                 href="https://demo.thoughtbox.dev"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="border border-[var(--border-primary)] hover:border-[var(--accent-primary)] text-[var(--text-primary)] hover:text-[var(--accent-primary)] px-8 py-3 rounded-lg font-medium transition-colors inline-flex items-center justify-center"
+                className="border border-[var(--border-primary)] hover:border-[var(--accent-primary)] text-[var(--text-primary)] hover:text-[var(--accent-primary)] px-8 py-3 rounded-lg font-medium transition-colors inline-flex items-center justify-center bg-[var(--bg-primary)]/70"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
@@ -276,18 +276,18 @@ const LandingPage = () => {
               transition={{ duration: 0.8, delay: 0.7 }}
             >
               <div className="space-y-1">
-                <div className="text-xl font-medium text-[var(--text-primary)]">10,000+</div>
-                <div className="text-sm text-[var(--text-tertiary)]">Active Users</div>
+                <div className="text-xl font-medium text-[var(--text-primary)]">4.9/5</div>
+                <div className="text-sm text-[var(--text-tertiary)]">Average user rating</div>
               </div>
               <div className="space-y-1">
-                <div className="text-xl font-medium text-[var(--text-primary)]">99.9%</div>
-                <div className="text-sm text-[var(--text-tertiary)]">Uptime</div>
+                <div className="text-xl font-medium text-[var(--text-primary)]">Minutes</div>
+                <div className="text-sm text-[var(--text-tertiary)]">to feel at home</div>
               </div>
               <div className="space-y-1">
                 <div className="text-xl font-medium text-[var(--text-primary)]">
-                  Open Source
+                  No credit card
                 </div>
-                <div className="text-sm text-[var(--text-tertiary)]">CC BY-NC-SA 4.0</div>
+                <div className="text-sm text-[var(--text-tertiary)]">Start in one click</div>
               </div>
             </motion.div>
           </div>
@@ -400,21 +400,20 @@ const LandingPage = () => {
           id="features"
           className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-24"
         >
-          <motion.div
-            className="text-center mb-16"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-          >
-            <h2 className="text-3xl sm:text-4xl font-light text-[var(--text-primary)] mb-4 tracking-tight">
-              Everything you need to capture ideas
-            </h2>
-            <p className="text-lg text-[var(--text-secondary)] max-w-2xl mx-auto font-light">
-              Designed for productivity with features that help you organize,
-              search, and sync your thoughts seamlessly.
-            </p>
-          </motion.div>
+            <motion.div
+              className="text-center mb-16"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: true }}
+            >
+              <h2 className="text-3xl sm:text-4xl font-light text-[var(--text-primary)] mb-4 tracking-tight">
+                Built for everyday life
+              </h2>
+              <p className="text-lg text-[var(--text-secondary)] max-w-2xl mx-auto font-light">
+                Capture class notes, plan launches, or just empty your head. ThoughtBox stays out of your way so you can focus on the ideas.
+              </p>
+            </motion.div>
 
           <div className="grid lg:grid-cols-3 gap-8 mb-16">
             {[
