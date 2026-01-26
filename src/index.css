@@ -1,787 +1,131 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/inter";
 
-/* Import Inter font for enhanced typography */
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+@custom-variant dark (&:is(.dark *));
 
-/* Enhanced CSS Variables for theming */
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --font-sans: 'Inter Variable', sans-serif;
+}
+
 :root {
-  /* Base colors - Google Keep inspired */
-  --bg-primary: #ffffff;
-  --bg-secondary: #ffffff;
-  --bg-tertiary: #f1f3f4;
-  --text-primary: #202124;
-  --text-secondary: #5f6368;
-  --text-tertiary: #80868b;
-  --border-primary: #e0e0e0;
-  --border-secondary: #dadce0;
-  --accent-primary: #fbbc04;
-  --accent-secondary: #4285f4;
-  --success: #34a853;
-  --warning: #fbbc04;
-  --error: #ea4335;
-
-  /* Enhanced gradients */
-  --gradient-primary: linear-gradient(135deg, #fbbc04 0%, #f9a825 100%);
-  --gradient-secondary: linear-gradient(135deg, #f1f3f4 0%, #e0e0e0 100%);
-  --gradient-accent: linear-gradient(135deg, #fbbc04 0%, #4285f4 100%);
-
-  /* Toast variables */
-  --toast-bg: rgba(255, 255, 255, 0.98);
-  --toast-border: rgba(251, 188, 4, 0.3);
-  --toast-text: #202124;
-
-  /* Enhanced shadow variables - Minimal */
-  --shadow-sm: 0 1px 2px 0 rgba(60, 64, 67, 0.05);
-  --shadow-md: 0 2px 6px 0 rgba(60, 64, 67, 0.12);
-  --shadow-lg: 0 3px 8px 0 rgba(60, 64, 67, 0.14);
-  --shadow-xl: 0 4px 12px 0 rgba(60, 64, 67, 0.16);
-  --shadow-glow: 0 0 20px rgba(251, 188, 4, 0.15);
+  --radius: 0.625rem;
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.147 0.004 49.25);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.147 0.004 49.25);
+  --primary: oklch(0.67 0.16 58);
+  --primary-foreground: oklch(0.99 0.02 95);
+  --secondary: oklch(0.967 0.001 286.375);
+  --secondary-foreground: oklch(0.21 0.006 285.885);
+  --muted: oklch(0.97 0.001 106.424);
+  --muted-foreground: oklch(0.553 0.013 58.071);
+  --accent: oklch(0.97 0.001 106.424);
+  --accent-foreground: oklch(0.216 0.006 56.043);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.923 0.003 48.717);
+  --input: oklch(0.923 0.003 48.717);
+  --ring: oklch(0.709 0.01 56.259);
+  --chart-1: oklch(0.88 0.15 92);
+  --chart-2: oklch(0.77 0.16 70);
+  --chart-3: oklch(0.67 0.16 58);
+  --chart-4: oklch(0.56 0.15 49);
+  --chart-5: oklch(0.47 0.12 46);
+  --sidebar: oklch(0.985 0.001 106.423);
+  --sidebar-foreground: oklch(0.147 0.004 49.25);
+  --sidebar-primary: oklch(0.67 0.16 58);
+  --sidebar-primary-foreground: oklch(0.99 0.02 95);
+  --sidebar-accent: oklch(0.97 0.001 106.424);
+  --sidebar-accent-foreground: oklch(0.216 0.006 56.043);
+  --sidebar-border: oklch(0.923 0.003 48.717);
+  --sidebar-ring: oklch(0.709 0.01 56.259);
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.147 0.004 49.25);
 }
 
-html.dark {
-  /* Dark theme - Google Keep-like minimal dark theme */
-  --bg-primary: #202124;
-  --bg-secondary: #202124;
-  --bg-tertiary: #2d2e30;
-  --text-primary: #e8eaed;
-  --text-secondary: #9aa0a6;
-  --text-tertiary: #80868b;
-  --border-primary: #5f6368;
-  --border-secondary: #3c4043;
-  --accent-primary: #fbbc04;
-  --accent-secondary: #4285f4;
-  --success: #34a853;
-  --warning: #fbbc04;
-  --error: #ea4335;
-
-  /* Enhanced gradients for dark mode */
-  --gradient-primary: linear-gradient(135deg, #fbbc04 0%, #f9a825 100%);
-  --gradient-secondary: linear-gradient(135deg, #2d2e30 0%, #202124 100%);
-  --gradient-accent: linear-gradient(135deg, #fbbc04 0%, #4285f4 100%);
-
-  /* Toast variables for dark mode */
-  --toast-bg: rgba(32, 33, 36, 0.95);
-  --toast-border: rgba(251, 188, 4, 0.3);
-  --toast-text: #e8eaed;
-
-  /* Enhanced shadow variables for dark mode - Minimal */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.2);
-  --shadow-md: 0 2px 6px 0 rgba(0, 0, 0, 0.25);
-  --shadow-lg: 0 3px 8px 0 rgba(0, 0, 0, 0.3);
-  --shadow-xl: 0 4px 12px 0 rgba(0, 0, 0, 0.35);
-  --shadow-glow: 0 0 15px rgba(251, 188, 4, 0.2);
+.dark {
+  --background: oklch(0.147 0.004 49.25);
+  --foreground: oklch(0.985 0.001 106.423);
+  --card: oklch(0.216 0.006 56.043);
+  --card-foreground: oklch(0.985 0.001 106.423);
+  --popover: oklch(0.216 0.006 56.043);
+  --popover-foreground: oklch(0.985 0.001 106.423);
+  --primary: oklch(0.77 0.16 70);
+  --primary-foreground: oklch(0.28 0.07 46);
+  --secondary: oklch(0.274 0.006 286.033);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.268 0.007 34.298);
+  --muted-foreground: oklch(0.709 0.01 56.259);
+  --accent: oklch(0.268 0.007 34.298);
+  --accent-foreground: oklch(0.985 0.001 106.423);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.553 0.013 58.071);
+  --chart-1: oklch(0.88 0.15 92);
+  --chart-2: oklch(0.77 0.16 70);
+  --chart-3: oklch(0.67 0.16 58);
+  --chart-4: oklch(0.56 0.15 49);
+  --chart-5: oklch(0.47 0.12 46);
+  --sidebar: oklch(0.216 0.006 56.043);
+  --sidebar-foreground: oklch(0.985 0.001 106.423);
+  --sidebar-primary: oklch(0.77 0.16 70);
+  --sidebar-primary-foreground: oklch(0.28 0.07 46);
+  --sidebar-accent: oklch(0.268 0.007 34.298);
+  --sidebar-accent-foreground: oklch(0.985 0.001 106.423);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.553 0.013 58.071);
 }
 
-body {
-  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    "Helvetica Neue", Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
-  background-color: var(--bg-primary) !important;
-  color: var(--text-primary) !important;
-  transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
-              color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Enhanced global transitions for theme switching */
-* {
-  transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-              border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-              color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-              box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Force theme variables to override Tailwind defaults - but exclude toasts */
-html.dark *:not([data-hot-toast-container] *):not([data-hot-toast-container]) {
-  color: inherit;
-}
-
-html.dark .text-gray-900:not([data-hot-toast-container] *),
-html.dark .text-gray-800:not([data-hot-toast-container] *),
-html.dark .text-gray-700:not([data-hot-toast-container] *),
-html.dark .text-gray-600:not([data-hot-toast-container] *),
-html.dark .text-gray-500:not([data-hot-toast-container] *),
-html.dark .text-gray-400:not([data-hot-toast-container] *),
-html.dark .text-gray-300:not([data-hot-toast-container] *) {
-  color: var(--text-primary) !important;
-}
-
-html.dark .bg-white:not([data-hot-toast-container] *),
-html.dark .bg-gray-50:not([data-hot-toast-container] *),
-html.dark .bg-gray-100:not([data-hot-toast-container] *) {
-  background-color: var(--bg-secondary) !important;
-}
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    "Helvetica Neue", Arial, sans-serif;
-  font-weight: 300;
-  letter-spacing: -0.025em;
-  line-height: 1.2;
-  color: var(--text-primary);
-}
-
-/* Enhanced typography */
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    "Helvetica Neue", Arial, sans-serif;
-  font-weight: 300;
-  letter-spacing: -0.025em;
-  line-height: 1.2;
-}
-
-/* Custom utilities for note components */
-.line-clamp-4 {
-  display: -webkit-box;
-  -webkit-line-clamp: 4;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-/* Offline indicator animations */
-@keyframes slide-in-right {
-  from {
-    transform: translateX(100%);
-    opacity: 0;
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+    @apply border-border outline-ring/50;
   }
-  to {
-    transform: translateX(0);
-    opacity: 1;
+  body {
+    @apply bg-background text-foreground;
+    @apply font-sans bg-background text-foreground;
   }
-}
-
-.animate-slide-in-right {
-  animation: slide-in-right 0.3s ease-out;
-}
-
-/* Enhanced focus states */
-.focus-visible {
-  outline: 2px solid transparent;
-  outline-offset: 2px;
-  box-shadow: 0 0 0 2px var(--accent-primary);
-}
-
-/* Smooth scrolling */
-html {
-  scroll-behavior: smooth;
-}
-
-/* Selection styles */
-::selection {
-  background-color: rgba(59, 130, 246, 0.2);
-  color: inherit;
-}
-
-::-moz-selection {
-  background-color: rgba(59, 130, 246, 0.2);
-  color: inherit;
-}
-
-/* Dark mode selection */
-.dark ::selection {
-  background-color: rgba(96, 165, 250, 0.3);
-  color: inherit;
-}
-
-.dark ::-moz-selection {
-  background-color: rgba(96, 165, 250, 0.3);
-  color: inherit;
-}
-
-/* Smooth transitions for theme switching */
-* {
-  transition: background-color 0.2s ease, border-color 0.2s ease,
-    color 0.2s ease;
-}
-
-/* Ensure theme variables work in dark mode */
-html.dark {
-  color-scheme: dark;
-}
-
-html.dark .note-card,
-html.dark .note-card * {
-  color: var(--text-primary);
-}
-
-html.dark .note-card h3,
-html.dark .note-card p,
-html.dark .note-card span,
-html.dark .note-card div {
-  color: inherit;
-}
-
-/* Override any hardcoded text colors in dark mode */
-html.dark [class*="text-gray"] {
-  color: var(--text-secondary) !important;
-}
-
-html.dark [class*="text-black"] {
-  color: var(--text-primary) !important;
-}
-
-/* Force note text to be visible in dark mode */
-html.dark .note-card * {
-  color: var(--text-primary) !important;
-}
-
-html.dark .text-\[var\(--text-primary\)\] {
-  color: var(--text-primary) !important;
-}
-
-html.dark .text-\[var\(--text-secondary\)\] {
-  color: var(--text-secondary) !important;
-}
-
-html.dark .text-\[var\(--text-tertiary\)\] {
-  color: var(--text-tertiary) !important;
-}
-
-/* Ensure backgrounds are correct */
-html.dark .bg-\[var\(--bg-primary\)\] {
-  background-color: var(--bg-primary) !important;
-}
-
-html.dark .bg-\[var\(--bg-secondary\)\] {
-  background-color: var(--bg-secondary) !important;
-}
-
-html.dark .bg-\[var\(--bg-tertiary\)\] {
-  background-color: var(--bg-tertiary) !important;
-}
-
-/* Fix logo visibility in dark mode */
-html.dark .w-8.h-8.bg-\[var\(--text-primary\)\] {
-  background-color: var(--accent-primary) !important;
-}
-
-html.dark .w-7.h-7.bg-blue-600 {
-  background-color: var(--accent-primary) !important;
-}
-
-/* Fix modal editor background animation issues */
-html.dark .note-editor-modal,
-html.dark .note-editor-modal * {
-  background-color: var(--bg-secondary) !important;
-  color: var(--text-primary) !important;
-}
-
-/* Remove problematic transitions that cause text visibility issues */
-html.dark input,
-html.dark textarea,
-html.dark .note-editor input,
-html.dark .note-editor textarea {
-  background-color: var(--bg-tertiary) !important;
-  color: var(--text-primary) !important;
-  border-color: var(--border-primary) !important;
-  transition: none !important;
-}
-
-html.dark input:focus,
-html.dark textarea:focus,
-html.dark .note-editor input:focus,
-html.dark .note-editor textarea:focus {
-  background-color: var(--bg-tertiary) !important;
-  color: var(--text-primary) !important;
-  border-color: var(--accent-primary) !important;
-  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.2) !important;
-}
-
-/* Fix note card text contrast in light mode */
-.note-card h3 {
-  color: var(--text-primary) !important;
-  font-weight: 600 !important;
-}
-
-.note-card p,
-.note-card span,
-.note-card div {
-  color: var(--text-secondary) !important;
-}
-
-/* Ensure proper contrast for note content */
-.note-card .text-gray-700 {
-  color: var(--text-primary) !important;
-}
-
-.note-card .text-gray-600 {
-  color: var(--text-secondary) !important;
-}
-
-.note-card .text-gray-500 {
-  color: var(--text-tertiary) !important;
-}
-
-/* Fix button visibility in dark mode */
-html.dark button {
-  color: var(--text-primary) !important;
-}
-
-html.dark .bg-blue-600 {
-  background-color: var(--accent-primary) !important;
-}
-
-html.dark .hover\:bg-blue-700:hover {
-  background-color: var(--accent-secondary) !important;
-}
-
-/* Fix search bar in dark mode */
-html.dark .search-bar input {
-  background-color: var(--bg-tertiary) !important;
-  color: var(--text-primary) !important;
-  border-color: var(--border-primary) !important;
-}
-
-/* Fix dropdown menus in dark mode */
-html.dark select {
-  background-color: var(--bg-tertiary) !important;
-  color: var(--text-primary) !important;
-  border-color: var(--border-primary) !important;
-}
-/* Additional fixes for blue accent theme */
-
-/* Ensure all buttons use accent colors properly */
-.bg-blue-600,
-.hover\:bg-blue-700:hover,
-button[class*="blue"] {
-  background-color: var(--accent-primary) !important;
-}
-
-.bg-blue-700,
-.hover\:bg-blue-700:hover {
-  background-color: var(--accent-secondary) !important;
-}
-
-/* Fix text colors in buttons */
-button {
-  color: var(--text-primary);
-}
-
-button.bg-blue-600,
-button[class*="bg-blue"] {
-  color: white !important;
-}
-
-/* Fix input and textarea styling */
-input,
-textarea,
-select {
-  background-color: var(--bg-tertiary) !important;
-  color: var(--text-primary) !important;
-  border-color: var(--border-primary) !important;
-}
-
-input:focus,
-textarea:focus,
-select:focus {
-  border-color: var(--accent-primary) !important;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1) !important;
-}
-
-html.dark input:focus,
-html.dark textarea:focus,
-html.dark select:focus {
-  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.2) !important;
-}
-
-/* Fix placeholder colors */
-input::placeholder,
-textarea::placeholder {
-  color: var(--text-tertiary) !important;
-}
-
-/* Remove glass morphism effects that cause visibility issues */
-html.dark *[style*="backdrop-filter"],
-html.dark *[style*="backdropFilter"] {
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-}
-
-/* Ensure proper contrast for all text elements */
-html.dark h1,
-html.dark h2,
-html.dark h3,
-html.dark h4,
-html.dark h5,
-html.dark h6 {
-  color: var(--text-primary) !important;
-}
-
-html.dark p,
-html.dark span,
-html.dark div {
-  color: inherit;
-}
-
-/* Fix modal backgrounds */
-html.dark .modal,
-html.dark [role="dialog"] {
-  background-color: var(--bg-secondary) !important;
-}
-
-/* Fix dropdown and select styling */
-html.dark option {
-  background-color: var(--bg-secondary) !important;
-  color: var(--text-primary) !important;
-}
-
-/* Ensure proper visibility for all interactive elements */
-html.dark .hover\:text-blue-600:hover {
-  color: var(--accent-primary) !important;
-}
-
-html.dark .text-blue-600 {
-  color: var(--accent-primary) !important;
-}
-
-html.dark .text-blue-700 {
-  color: var(--accent-secondary) !important;
-}
-
-/* Fix border colors for blue theme */
-.border-blue-200 {
-  border-color: rgba(59, 130, 246, 0.2) !important;
-}
-
-html.dark .border-blue-200 {
-  border-color: rgba(96, 165, 250, 0.3) !important;
-}
-
-/* Fix background colors for blue theme */
-.bg-blue-50 {
-  background-color: rgba(59, 130, 246, 0.05) !important;
-}
-
-html.dark .bg-blue-50 {
-  background-color: rgba(96, 165, 250, 0.1) !important;
-}
-
-.bg-blue-100 {
-  background-color: rgba(59, 130, 246, 0.1) !important;
-}
-
-html.dark .bg-blue-100 {
-  background-color: rgba(96, 165, 250, 0.15) !important;
-}
-
-/* Fix text colors for blue theme */
-.text-blue-700 {
-  color: var(--accent-secondary) !important;
-}
-
-.text-blue-600 {
-  color: var(--accent-primary) !important;
-}
-
-/* Ensure proper scrollbar styling */
-html.dark ::-webkit-scrollbar-track {
-  background: var(--bg-tertiary);
-}
-
-html.dark ::-webkit-scrollbar-thumb {
-  background: var(--border-primary);
-}
-
-html.dark ::-webkit-scrollbar-thumb:hover {
-  background: var(--border-secondary);
-} /* Cre
-ate Note Modal Fixes */
-.create-note-modal input,
-.create-note-modal textarea {
-  background-color: var(--bg-tertiary) !important;
-  color: var(--text-primary) !important;
-  border-color: var(--border-primary) !important;
-}
-
-.create-note-modal input:focus,
-.create-note-modal textarea:focus {
-  border-color: var(--accent-primary) !important;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1) !important;
-}
-
-html.dark .create-note-modal input:focus,
-html.dark .create-note-modal textarea:focus {
-  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.2) !important;
-}
-
-/* Fix checkbox styling */
-input[type="checkbox"] {
-  accent-color: var(--accent-primary) !important;
-}
-
-/* Fix time input styling */
-input[type="time"] {
-  background-color: var(--bg-tertiary) !important;
-  color: var(--text-primary) !important;
-  border-color: var(--border-primary) !important;
-}
-
-input[type="time"]:focus {
-  border-color: var(--accent-primary) !important;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1) !important;
-}
-
-html.dark input[type="time"]:focus {
-  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.2) !important;
-}
-
-/* Ensure proper modal backdrop */
-.modal-backdrop {
-  background-color: rgba(0, 0, 0, 0.4) !important;
-  backdrop-filter: blur(8px) !important;
-}
-
-html.dark .modal-backdrop {
-  background-color: rgba(0, 0, 0, 0.6) !important;
-} /* Fix modal z-index to ensure toasts appear above */
-.create-note-modal {
-  z-index: 40 !important;
-}
-
-.modal-backdrop {
-  z-index: 39 !important;
-}
-
-/* Landing page specific dark mode fixes */
-html.dark .floating-bg {
-  opacity: 0.1 !important;
-}
-
-/* Terminal styling for dark mode */
-html.dark .bg-gray-900 {
-  background-color: var(--bg-tertiary) !important;
-}
-
-html.dark .text-gray-400 {
-  color: var(--text-tertiary) !important;
-}
-
-html.dark .text-green-400 {
-  color: var(--success) !important;
-}
-
-/* Ensure proper contrast for all landing page elements */
-.landing-page * {
-  transition: background-color 0.3s ease, color 0.3s ease,
-    border-color 0.3s ease;
-}
-
-/* Fix backdrop blur for dark mode */
-html.dark .backdrop-blur-sm {
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-}
-
-/* Ensure proper shadow colors in dark mode */
-html.dark .shadow-xl {
-  box-shadow: var(--shadow-xl);
-}
-
-html.dark .shadow-lg {
-  box-shadow: var(--shadow-lg);
-}
-
-html.dark .shadow-md {
-  box-shadow: var(--shadow-md);
-}
-
-html.dark .shadow-sm {
-  box-shadow: var(--shadow-sm);
-}
-
-/* Fix hover states for dark mode */
-html.dark .hover\:shadow-xl:hover {
-  box-shadow: var(--shadow-xl);
-}
-
-/* Ensure proper visibility for all interactive elements in landing page */
-html.dark .group:hover .group-hover\:bg-blue-600 {
-  background-color: var(--accent-primary) !important;
-}
-
-html.dark .group:hover .group-hover\:text-white {
-  color: white !important;
-}
-
-/* Toast Styling */
-[data-hot-toast-container] {
-  z-index: 9999 !important;
-}
-
-[data-hot-toast-container] > div {
-  background: var(--toast-bg) !important;
-  color: var(--toast-text) !important;
-  border: 1px solid var(--toast-border) !important;
-  border-radius: 8px !important;
-  backdrop-filter: blur(8px) !important;
-  -webkit-backdrop-filter: blur(8px) !important;
-  box-shadow: var(--shadow-lg) !important;
-  font-size: 14px !important;
-  font-weight: 500 !important;
-  font-family: "Inter", sans-serif !important;
-}
-
-/* Toast text styling */
-[data-hot-toast-container] div[role="status"] {
-  color: var(--toast-text) !important;
-}
-
-[data-hot-toast-container] div[role="status"] * {
-  color: var(--toast-text) !important;
-}
-
-/* Toast button styling */
-[data-hot-toast-container] button {
-  background: var(--accent-primary) !important;
-  color: white !important;
-  border: none !important;
-  border-radius: 6px !important;
-  padding: 6px 12px !important;
-  font-size: 12px !important;
-  font-weight: 500 !important;
-  cursor: pointer !important;
-  transition: background-color 0.2s ease !important;
-}
-
-[data-hot-toast-container] button:hover {
-  background: var(--accent-secondary) !important;
-}
-
-/* Toast cancel button styling */
-[data-hot-toast-container] button:last-child {
-  background: transparent !important;
-  color: var(--text-tertiary) !important;
-  border: 1px solid var(--border-primary) !important;
-}
-
-[data-hot-toast-container] button:last-child:hover {
-  background: var(--bg-tertiary) !important;
-  color: var(--text-secondary) !important;
-}
-
-/* Success toast styling */
-[data-hot-toast-container] [data-type="success"] {
-  border-left: 4px solid var(--success) !important;
-}
-
-/* Error toast styling */
-[data-hot-toast-container] [data-type="error"] {
-  border-left: 4px solid var(--error) !important;
-}
-
-/* Loading toast styling */
-[data-hot-toast-container] [data-type="loading"] {
-  border-left: 4px solid var(--accent-primary) !important;
-}
-
-/* Toast icon styling */
-[data-hot-toast-container] svg {
-  color: inherit !important;
-  fill: currentColor !important;
-}
-
-/* Ensure toast container is above modals */
-[data-hot-toast-container] {
-  z-index: 10000 !important;
-}
-
-/* Dark mode specific toast adjustments */
-html.dark [data-hot-toast-container] > div {
-  background: var(--toast-bg) !important;
-  border-color: var(--toast-border) !important;
-  color: var(--toast-text) !important;
-}
-
-html.dark [data-hot-toast-container] div[role="status"],
-html.dark [data-hot-toast-container] div[role="status"] * {
-  color: var(--toast-text) !important;
-}
-
-/* Delete Toast Styling */
-.delete-toast-content {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  color: var(--toast-text) !important;
-}
-
-.delete-toast-text {
-  flex: 1;
-}
-
-.delete-toast-title {
-  font-weight: 500;
-  color: var(--toast-text) !important;
-  margin: 0;
-  margin-bottom: 4px;
-  font-size: 14px;
-}
-
-.delete-toast-subtitle {
-  font-size: 13px;
-  color: var(--text-tertiary) !important;
-  margin: 0;
-  opacity: 0.8;
-}
-
-.delete-toast-buttons {
-  display: flex;
-  gap: 8px;
-}
-
-.delete-toast-delete-btn {
-  padding: 6px 12px;
-  background-color: var(--error) !important;
-  color: white !important;
-  font-size: 13px;
-  border-radius: 6px;
-  border: none;
-  cursor: pointer;
-  font-weight: 500;
-  transition: background-color 0.2s ease;
-}
-
-.delete-toast-delete-btn:hover {
-  background-color: #dc2626 !important;
-}
-
-.delete-toast-cancel-btn {
-  padding: 6px 12px;
-  background-color: var(--bg-tertiary) !important;
-  color: var(--text-secondary) !important;
-  font-size: 13px;
-  border-radius: 6px;
-  border: 1px solid var(--border-primary);
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.2s ease;
-}
-
-.delete-toast-cancel-btn:hover {
-  background-color: var(--border-primary) !important;
-  color: var(--text-primary) !important;
-}
-
-/* Ensure delete toast content inherits proper colors */
-[data-hot-toast-container] .delete-toast-content * {
-  color: inherit;
-}
-
-[data-hot-toast-container] .delete-toast-title {
-  color: var(--toast-text) !important;
-}
-
-[data-hot-toast-container] .delete-toast-subtitle {
-  color: var(--text-tertiary) !important;
+  html {
+    @apply font-sans;
+  }
 }
