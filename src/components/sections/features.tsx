@@ -2,42 +2,42 @@ import { motion } from "motion/react";
 import { 
   Zap, 
   Shield, 
-  Smartphone, 
+  Cloud, 
   Palette, 
-  Share2, 
-  Search 
+  Search,
+  Smartphone
 } from "lucide-react";
 
 const features = [
   {
     icon: Zap,
     title: "Lightning Fast",
-    description: "Built with performance in mind. Opens instantly, syncs in real-time."
+    description: "Built with Vite and React 19 for instant loading and smooth interactions."
+  },
+  {
+    icon: Cloud,
+    title: "Cloud Sync",
+    description: "Your notes are securely stored and synced via Appwrite's reliable cloud infrastructure."
   },
   {
     icon: Shield,
-    title: "Local First",
-    description: "Your data belongs to you. Everything is stored locally and encrypted."
-  },
-  {
-    icon: Palette,
-    title: "Themable",
-    description: "Choose from our curated themes or create your own visual system."
-  },
-  {
-    icon: Smartphone,
-    title: "Cross Platform",
-    description: "Seamless experience across Web, iOS, and Android devices."
+    title: "Secure Authentication",
+    description: "Enterprise-grade security with Appwrite authentication. Your data stays protected."
   },
   {
     icon: Search,
     title: "Powerful Search",
-    description: "Find anything instantly with our fuzzy search and tagging system."
+    description: "Find any note instantly with real-time search across all your content."
   },
   {
-    icon: Share2,
-    title: "Easy Sharing",
-    description: "Collaborate on notes or publish them to the web with one click."
+    icon: Palette,
+    title: "Beautiful Design",
+    description: "Modern, minimalist interface with smooth animations powered by Framer Motion."
+  },
+  {
+    icon: Smartphone,
+    title: "Responsive",
+    description: "Works seamlessly on desktop, tablet, and mobile devices with adaptive layouts."
   }
 ];
 

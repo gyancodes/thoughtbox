@@ -3,10 +3,18 @@ import { Route as rootRoute } from './routes/__root';
 
 // Import all routes
 import { Route as indexRoute } from './routes/index';
+import { Route as loginRoute } from './routes/login';
+import { Route as signupRoute } from './routes/signup';
+import { Route as dashboardRoute } from './routes/dashboard';
 
 // Create the router instance
 const router = createRouter({
-  routeTree: rootRoute.addChildren([indexRoute]),
+  routeTree: rootRoute.addChildren([
+    indexRoute,
+    loginRoute,
+    signupRoute,
+    dashboardRoute,
+  ]),
   defaultPreload: 'intent',
 });
 
