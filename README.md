@@ -1,237 +1,152 @@
-<div align="center">
-  <h1>📝 ThoughtBox</h1>
-  <p><strong>A modern, minimalist note-taking application for organizing your thoughts</strong></p>
-  
-  <p>
-    <a href="#features">Features</a> •
-    <a href="#tech-stack">Tech Stack</a> •
-    <a href="#getting-started">Getting Started</a> •
-    <a href="#configuration">Configuration</a> •
-    <a href="#deployment">Deployment</a>
-  </p>
+# ThoughtBox
 
-  <img src="https://img.shields.io/badge/React-19.2-61DAFB?style=flat-square&logo=react" alt="React" />
-  <img src="https://img.shields.io/badge/TypeScript-5.9-3178C6?style=flat-square&logo=typescript" alt="TypeScript" />
-  <img src="https://img.shields.io/badge/Vite-7.2-646CFF?style=flat-square&logo=vite" alt="Vite" />
-  <img src="https://img.shields.io/badge/Appwrite-21.5-F02E65?style=flat-square&logo=appwrite" alt="Appwrite" />
-  <img src="https://img.shields.io/badge/TailwindCSS-4.1-06B6D4?style=flat-square&logo=tailwindcss" alt="Tailwind" />
-</div>
+ThoughtBox is a note-taking app with a simple writing space, account login, and cloud-backed note storage.
 
----
+This README is written for two people:
 
-## ✨ Features
+- A user who wants to understand what the app does
+- A developer who wants to run or work on the project
 
-- **📝 Rich Note Management** - Create, edit, and organize notes with a clean, distraction-free interface
-- **🔍 Powerful Search** - Instantly find notes with real-time search functionality
-- **🔐 Secure Authentication** - User authentication powered by Appwrite
-- **☁️ Cloud Sync** - Notes are securely stored and synced via Appwrite Database
-- **🎨 Modern UI** - Beautiful, responsive design with smooth animations using Framer Motion
-- **⚡ Lightning Fast** - Built with Vite for instant hot module replacement and optimized builds
-- **📱 Responsive Design** - Works seamlessly across desktop, tablet, and mobile devices
+## What the app does
 
-## 🛠️ Tech Stack
+ThoughtBox lets people:
 
-| Category | Technology |
-|----------|------------|
-| **Frontend** | React 19, TypeScript |
-| **Build Tool** | Vite 7 |
-| **Styling** | Tailwind CSS 4, tw-animate-css |
-| **Routing** | TanStack Router |
-| **State Management** | Zustand, TanStack Query |
-| **Backend/Auth** | Appwrite (BaaS) |
-| **Animations** | Framer Motion |
-| **UI Components** | Radix UI, Base UI |
-| **Icons** | Lucide React |
+- create an account
+- sign in
+- write and edit notes
+- search notes
+- keep notes available across sessions
 
-## 🚀 Getting Started
+## User flow
 
-### Prerequisites
+1. Open the landing page
+2. Create an account or sign in
+3. Go to the dashboard
+4. Create, edit, search, and manage notes
 
-- [Node.js](https://nodejs.org/) (v18 or higher) or [Bun](https://bun.sh/)
-- [Appwrite](https://appwrite.io/) account (free tier available)
+## Tech used
 
-### Installation
+- React
+- TypeScript
+- Vite
+- Tailwind CSS
+- TanStack Router
+- TanStack Query
+- Appwrite
+- Motion
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/yourusername/thoughtbox.git
-   cd thoughtbox
-   ```
+## Run locally
 
-2. **Install dependencies**
-   ```bash
-   # Using npm
-   npm install
+### Requirements
 
-   # Using bun (recommended)
-   bun install
-   ```
+- Node.js 18 or newer
+- npm
+- An Appwrite project
 
-3. **Set up environment variables**
-   ```bash
-   cp .env.example .env
-   ```
+### Install
 
-4. **Configure your `.env` file** (see [Configuration](#configuration))
+```bash
+npm install
+```
 
-5. **Start the development server**
-   ```bash
-   # Using npm
-   npm run dev
+### Environment variables
 
-   # Using bun
-   bun run dev
-   ```
-
-6. **Open your browser** and navigate to `http://localhost:5173`
-
-## ⚙️ Configuration
-
-### Environment Variables
-
-Create a `.env` file in the root directory with the following variables:
+Create a `.env` file in the project root and add:
 
 ```env
-# Appwrite Configuration
-VITE_APPWRITE_ENDPOINT="https://cloud.appwrite.io/v1"
 VITE_APPWRITE_PROJECT_ID="your-project-id"
 VITE_APPWRITE_PROJECT_NAME="thoughtbox"
+VITE_APPWRITE_ENDPOINT="https://your-appwrite-endpoint/v1"
 VITE_APPWRITE_DATABASE_ID="your-database-id"
 VITE_APPWRITE_NOTES_COLLECTION_ID="notes"
+VITE_APPWRITE_ENCRYPTED_NOTES_ID="encrypted_notes"
+VITE_APPWRITE_USER_KEYS_ID="user_keys"
 ```
 
-### Appwrite Setup
+### Start the app
 
-1. **Create an Appwrite Project**
-   - Go to [Appwrite Console](https://cloud.appwrite.io/)
-   - Create a new project
-
-2. **Create a Database**
-   - Navigate to Databases → Create Database
-   - Note the Database ID
-
-3. **Create the Notes Collection**
-   - Create a collection named `notes`
-   - Add the following attributes:
-
-   | Attribute | Type | Required |
-   |-----------|------|----------|
-   | `noteId` | Integer | Yes |
-   | `userId` | Integer | Yes |
-   | `title` | String (255) | Yes |
-   | `content` | String (10000) | No |
-   | `createdDate` | DateTime | Yes |
-   | `modifiedDate` | DateTime | No |
-
-4. **Configure Collection Permissions**
-   - Go to Collection Settings → Permissions
-   - Add **Users** role with Create, Read, Update, Delete permissions
-
-5. **Create Indexes** (for better performance)
-   - Create an index on `userId` (ASC)
-   - Create an index on `$updatedAt` (DESC)
-
-## 📁 Project Structure
-
-```
-thoughtbox/
-├── public/                 # Static assets
-├── src/
-│   ├── assets/            # Images and media
-│   ├── components/
-│   │   ├── layout/        # Navbar, Footer
-│   │   ├── sections/      # Hero, Features, Deployment
-│   │   └── ui/            # Reusable UI components
-│   ├── hooks/             # Custom React hooks
-│   ├── lib/
-│   │   ├── api.ts         # API functions for notes CRUD
-│   │   ├── appwrite.ts    # Appwrite client configuration
-│   │   ├── queryClient.ts # TanStack Query client
-│   │   └── utils.ts       # Utility functions
-│   ├── pages/
-│   │   ├── auth.tsx       # Login/Signup page
-│   │   ├── dashboard.tsx  # Main notes dashboard
-│   │   └── home.tsx       # Landing page
-│   ├── routes/            # TanStack Router routes
-│   ├── App.tsx            # Root component
-│   ├── main.tsx           # Entry point
-│   └── router.ts          # Router configuration
-├── .env                   # Environment variables
-├── package.json
-├── tailwind.config.ts
-├── tsconfig.json
-└── vite.config.ts
+```bash
+npm run dev
 ```
 
-## 📜 Available Scripts
+Then open `http://localhost:5173`.
 
-| Command | Description |
-|---------|-------------|
-| `bun run dev` | Start development server |
-| `bun run build` | Build for production |
-| `bun run preview` | Preview production build |
-| `bun run lint` | Run ESLint |
+## Appwrite setup
 
-## 🚢 Deployment
+Create these in Appwrite:
 
-### Vercel (Recommended)
+### Database
 
-1. Push your code to GitHub
-2. Import the project in [Vercel](https://vercel.com/)
-3. Add environment variables in Vercel dashboard
-4. Deploy!
+- one database for the app
 
-### Netlify
+### Collections
 
-1. Push your code to GitHub
-2. Import the project in [Netlify](https://netlify.com/)
-3. Set build command: `bun run build`
-4. Set publish directory: `dist`
-5. Add environment variables
-6. Deploy!
+- `notes`
+- `encrypted_notes`
+- `user_keys`
 
-### Docker
+### Minimum setup notes
 
-```dockerfile
-FROM node:20-alpine AS builder
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci
-COPY . .
-RUN npm run build
+- make sure the project values match your `.env`
+- allow signed-in users to work with their own data
+- create the fields your app expects before testing note creation
 
-FROM nginx:alpine
-COPY --from=builder /app/dist /usr/share/nginx/html
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+If you are onboarding as a developer, the fastest path is to open the existing Appwrite schema used by the team and mirror it in your own project.
+
+## Scripts
+
+```bash
+npm run dev
+npm run build
+npm run preview
+npm run lint
 ```
 
-## 🤝 Contributing
+## Project structure
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+```text
+src/
+  components/   reusable UI and page sections
+  lib/          appwrite, api, crypto, and helpers
+  pages/        landing, auth, and dashboard pages
+  routes/       route definitions
+  main.tsx      app entry
+  router.ts     router setup
+```
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+## Main files for onboarding
 
-## 📄 License
+If you are new to the codebase, start here:
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+- `src/pages/home.tsx` for the landing page
+- `src/pages/auth.tsx` for login and signup
+- `src/pages/dashboard.tsx` for the main note experience
+- `src/lib/api.ts` for note and auth calls
+- `src/lib/appwrite.ts` for Appwrite client setup
+- `src/index.css` for global theme and styles
 
-## 🙏 Acknowledgments
+## Build
 
-- [Appwrite](https://appwrite.io/) for the amazing backend-as-a-service
-- [Radix UI](https://www.radix-ui.com/) for accessible UI primitives
-- [Lucide](https://lucide.dev/) for beautiful icons
-- [TanStack](https://tanstack.com/) for powerful routing and data fetching
+```bash
+npm run build
+```
 
----
+The production output is written to `dist/`.
 
-<div align="center">
-  <p>Made with ❤️ by the ThoughtBox Team</p>
-  <p>
-    <a href="https://github.com/yourusername/thoughtbox">⭐ Star us on GitHub</a>
-  </p>
-</div>
+## Common setup checks
+
+- If login fails, check your Appwrite endpoint, project ID, and permissions
+- If notes do not load, check the database ID and collection IDs
+- If the app starts but looks broken, confirm dependencies installed correctly with `npm install`
+
+## Contributing
+
+When making changes:
+
+- keep the UI simple and readable
+- avoid changing unrelated files
+- run `npm run build` before handing work off
+
+## License
+
+This project is licensed under the MIT License. See [LICENSE](LICENSE).
