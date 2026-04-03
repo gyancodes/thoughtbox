@@ -13,7 +13,7 @@ import {
   LogOut,
   Settings
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "motion/react";
 import { formatDistanceToNow } from "date-fns";
 import type { NoteUI } from "@/lib/api";
 
@@ -72,7 +72,7 @@ export function Sidebar({
           <div className="p-5 border-b border-border/30">
             <div className="flex items-center justify-between mb-5">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-lg shadow-primary/20">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-foreground shadow-lg shadow-primary/20">
                   <FileText className="w-4 h-4 text-primary-foreground" />
                 </div>
                 <div>
@@ -193,7 +193,7 @@ export function Sidebar({
           <div className="p-4 border-t border-border/30 bg-secondary/20">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-primary/20 to-secondary">
                   <User className="w-4 h-4 text-primary" />
                 </div>
                 <div className="flex flex-col">

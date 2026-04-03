@@ -13,7 +13,7 @@ import {
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "motion/react";
 import {
   isCryptoSupported,
   getEncryptionStatus,
@@ -68,12 +68,12 @@ export function EncryptionStatusPanel({ isEnabled, onToggle }: EncryptionStatusP
       >
         <div className="flex items-center gap-3">
           {isEnabled ? (
-            <div className="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center">
-              <ShieldCheck className="w-5 h-5 text-green-500" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/12">
+              <ShieldCheck className="w-5 h-5 text-primary" />
             </div>
           ) : (
-            <div className="w-10 h-10 rounded-full bg-amber-500/20 flex items-center justify-center">
-              <Shield className="w-5 h-5 text-amber-500" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary">
+              <Shield className="w-5 h-5 text-secondary-foreground" />
             </div>
           )}
           <div className="text-left">
@@ -89,7 +89,7 @@ export function EncryptionStatusPanel({ isEnabled, onToggle }: EncryptionStatusP
         </div>
         <div className="flex items-center gap-2">
           {isEnabled && (
-            <span className="px-2 py-1 bg-green-500/20 text-green-600 text-xs font-medium rounded-full">
+            <span className="rounded-full bg-primary/12 px-2 py-1 text-xs font-medium text-primary">
               Protected
             </span>
           )}
@@ -147,8 +147,8 @@ export function EncryptionStatusPanel({ isEnabled, onToggle }: EncryptionStatusP
                 <span
                   className={`text-xs px-2 py-1 rounded-full ${
                     sessionActive
-                      ? "bg-green-500/20 text-green-600"
-                      : "bg-amber-500/20 text-amber-600"
+                      ? "bg-primary/12 text-primary"
+                      : "bg-secondary text-secondary-foreground"
                   }`}
                 >
                   {sessionActive ? "Active" : "Idle"}
@@ -166,7 +166,7 @@ export function EncryptionStatusPanel({ isEnabled, onToggle }: EncryptionStatusP
                         className="flex items-center gap-2 text-xs p-2 bg-secondary/30 rounded"
                       >
                         {event.success ? (
-                          <CheckCircle className="w-3 h-3 text-green-500" />
+                          <CheckCircle className="w-3 h-3 text-primary" />
                         ) : (
                           <X className="w-3 h-3 text-destructive" />
                         )}
@@ -224,8 +224,8 @@ export function EncryptionIndicator({ isEnabled }: { isEnabled: boolean }) {
     <div
       className={`flex items-center gap-1.5 px-2 py-1 rounded text-xs font-medium ${
         isEnabled
-          ? "bg-green-500/20 text-green-600"
-          : "bg-amber-500/20 text-amber-600"
+          ? "bg-primary/12 text-primary"
+          : "bg-secondary text-secondary-foreground"
       }`}
       title={isEnabled ? "End-to-end encryption active" : "Encryption disabled"}
     >

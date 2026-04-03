@@ -269,7 +269,6 @@ function getDeviceId(): string {
 class SecureSession {
   private sessionTimeout: number = 30 * 60 * 1000; // 30 minutes
   private timeoutId: number | null = null;
-  private lastActivity: number = Date.now();
 
   start(): void {
     this.resetTimeout();
@@ -323,7 +322,6 @@ class SecureSession {
   }
 
   private onActivity(): void {
-    this.lastActivity = Date.now();
     this.resetTimeout();
   }
 }

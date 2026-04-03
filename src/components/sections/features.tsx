@@ -1,77 +1,110 @@
 import { motion } from "motion/react";
-import { 
-  Zap, 
-  Shield, 
-  Cloud, 
-  Palette, 
+import {
+  Cloud,
+  LayoutTemplate,
+  LockKeyhole,
+  ScanSearch,
   Search,
-  Smartphone
+  Sparkles,
+  Workflow,
+  Zap,
 } from "lucide-react";
 
 const features = [
   {
+    icon: LayoutTemplate,
+    title: "Clean",
+    description: "A simple layout keeps your notes easy on the eyes.",
+  },
+  {
     icon: Zap,
-    title: "Lightning Fast",
-    description: "Built with Vite and React 19 for instant loading and smooth interactions."
-  },
-  {
-    icon: Cloud,
-    title: "Cloud Sync",
-    description: "Your notes are securely stored and synced via Appwrite's reliable cloud infrastructure."
-  },
-  {
-    icon: Shield,
-    title: "Secure Authentication",
-    description: "Enterprise-grade security with Appwrite authentication. Your data stays protected."
+    title: "Quick",
+    description: "Everything feels light and smooth while you write.",
   },
   {
     icon: Search,
-    title: "Powerful Search",
-    description: "Find any note instantly with real-time search across all your content."
+    title: "Easy to find",
+    description: "Your notes are easy to come back to when you need them.",
   },
   {
-    icon: Palette,
-    title: "Beautiful Design",
-    description: "Modern, minimalist interface with smooth animations powered by Framer Motion."
+    icon: Cloud,
+    title: "Always there",
+    description: "Your writing stays with you, ready when you return.",
   },
   {
-    icon: Smartphone,
-    title: "Responsive",
-    description: "Works seamlessly on desktop, tablet, and mobile devices with adaptive layouts."
-  }
+    icon: LockKeyhole,
+    title: "Private",
+    description: "Your space feels personal, safe, and made for your own thoughts.",
+  },
+  {
+    icon: Workflow,
+    title: "Peaceful",
+    description: "Less noise, less clutter, and more room to think clearly.",
+  },
 ];
 
 export function Features() {
   return (
-    <section id="features" className="py-24 bg-secondary/30 border-t border-border/50">
+    <section id="features" className="border-t border-border/60 py-24">
       <div className="container mx-auto px-4 md:px-6">
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <h2 className="text-3xl md:text-4xl font-display font-bold mb-4">
-            Crafted for <span className="text-primary">flow state.</span>
+        <div className="mx-auto mb-16 max-w-3xl text-center">
+          <div className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/80 px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground shadow-sm">
+            <Sparkles className="h-3.5 w-3.5 text-primary" />
+            Made to feel easy
+          </div>
+          <h2 className="mt-6 text-3xl font-display font-bold md:text-5xl">
+            A note app that feels light and clear.
           </h2>
-          <p className="text-muted-foreground text-lg">
-            Every interaction is designed to keep you in the zone. No clutter, just your thoughts.
+          <p className="mt-4 text-lg leading-8 text-muted-foreground">
+            Everything is kept simple so writing feels natural and calm.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
           {features.map((feature, index) => (
             <motion.div
-              key={index}
+              key={feature.title}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.1 }}
-              className="p-6 rounded-2xl bg-card/50 border border-border/50 hover:border-primary/30 hover:bg-card transition-all duration-300 group"
+              className="group rounded-[1.75rem] border border-border/70 bg-background/75 p-7 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/25 hover:shadow-[0_24px_60px_-40px_rgba(37,99,235,0.45)] backdrop-blur"
             >
-              <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
-                <feature.icon className="w-6 h-6 text-primary" />
+              <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl border border-primary/10 bg-primary/10 transition-colors group-hover:bg-primary/15">
+                <feature.icon className="h-6 w-6 text-primary" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                {feature.description}
-              </p>
+              <h3 className="mb-2 text-xl font-semibold">{feature.title}</h3>
+              <p className="leading-7 text-muted-foreground">{feature.description}</p>
             </motion.div>
+          ))}
+        </div>
+
+        <div className="mt-10 grid gap-4 rounded-[2rem] border border-border/70 bg-[linear-gradient(135deg,color-mix(in_oklab,var(--secondary)_85%,white)_0%,color-mix(in_oklab,var(--card)_80%,white)_100%)] p-6 md:grid-cols-3">
+          {[
+            {
+              icon: ScanSearch,
+              title: "Easy to read",
+              text: "Words, spacing, and contrast feel softer and clearer.",
+            },
+            {
+              icon: Cloud,
+              title: "Steady",
+              text: "The whole app now feels more balanced from page to page.",
+            },
+            {
+              icon: LockKeyhole,
+              title: "Comforting",
+              text: "The overall tone is quieter, warmer, and easier to trust.",
+            },
+          ].map((item) => (
+            <div
+              key={item.title}
+              className="rounded-[1.25rem] border border-border/60 bg-background/70 p-5"
+            >
+              <item.icon className="h-5 w-5 text-primary" />
+              <h3 className="mt-4 text-base font-semibold">{item.title}</h3>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">{item.text}</p>
+            </div>
           ))}
         </div>
       </div>
