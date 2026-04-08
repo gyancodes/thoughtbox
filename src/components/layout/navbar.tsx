@@ -1,128 +1,142 @@
 import { Link } from "@tanstack/react-router";
-import { motion } from "motion/react";
-import { LogIn, Menu, Server, Sparkles } from "lucide-react";
+import { motion, useScroll, useSpring } from "motion/react";
+import { Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
+  const [open, setOpen] = useState(false);
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 });
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
-
+    const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   return (
-    <motion.nav
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      className="fixed top-4 left-0 right-0 z-50 px-4 transition-all duration-300"
-    >
-      <div
-        className={`container mx-auto flex h-16 items-center justify-between rounded-full border px-5 md:px-6 ${
-          scrolled
-            ? "border-border/70 bg-background/82 shadow-lg shadow-black/5 backdrop-blur-xl"
-            : "border-border/40 bg-background/55 backdrop-blur-md"
+    <>
+      <motion.nav
+        initial={{ y: -100 }}
+        animate={{ y: 0 }}
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+          scrolled ? "bg-background/80 backdrop-blur-md" : "bg-transparent"
         }`}
       >
-        <Link to="/" className="group flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-xl font-bold text-primary-foreground transition-transform group-hover:scale-105">
-            T
-          </div>
-          <span className="font-display text-xl font-bold tracking-tight text-foreground">
-            ThoughtBox
-          </span>
-        </Link>
-
-        <div className="hidden items-center gap-6 md:flex">
-          <a
-            href="#features"
-            className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
-          >
-            Features
-          </a>
-          <a
-            href="#deploy"
-            className="flex items-center gap-1 text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
-          >
-            <Server className="h-3.5 w-3.5" />
-            Simple
-          </a>
-          <a
-            href="#features"
-            className="flex items-center gap-1 text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
-          >
-            <Sparkles className="h-3.5 w-3.5" />
-            Why ThoughtBox
-          </a>
-          <div className="mx-2 h-4 w-px bg-border/50" />
-          <Link to="/login">
-            <Button
-              variant="ghost"
-              className="text-muted-foreground hover:bg-transparent hover:text-foreground"
+        <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
+          <Link to="/" className="group flex items-center gap-2">
+            <motion.div
+              whileHover={{ rotate: 5, scale: 1.05 }}
+              className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-lg font-bold text-primary-foreground"
             >
-              <LogIn className="mr-2 h-4 w-4" />
-              Login
-            </Button>
+              T
+            </motion.div>
+            <span className="text-lg font-semibold tracking-tight text-foreground">
+              ThoughtBox
+            </span>
           </Link>
-          <Link to="/signup">
-            <Button className="rounded-full bg-primary px-6 font-semibold text-primary-foreground shadow-lg shadow-primary/15 hover:bg-primary/90">
-              Get Started
-            </Button>
-          </Link>
-        </div>
 
-        <div className="md:hidden">
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <Menu className="h-6 w-6" />
+          <div className="hidden items-center gap-8 md:flex">
+            <motion.div whileHover={{ y: -2 }}>
+              <Link
+                to="/login"
+                className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              >
+                Sign in
+              </Link>
+            </motion.div>
+            <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.95 }}>
+              <Button
+                asChild
+                className="rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+              >
+                <Link to="/signup">Get started</Link>
               </Button>
-            </SheetTrigger>
-            <SheetContent className="border-border bg-background">
-              <div className="mt-8 flex flex-col gap-4">
-                <a href="#features" className="text-lg font-medium text-foreground">
-                  Features
-                </a>
-                <a
-                  href="#deploy"
-                  className="flex items-center gap-2 text-lg font-medium text-foreground"
+            </motion.div>
+          </div>
+
+          <div className="md:hidden">
+            <Sheet open={open} onOpenChange={setOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" aria-label="Open menu">
+                  <Menu className="h-5 w-5" />
+                </Button>
+              </SheetTrigger>
+
+              <SheetContent
+                side="right"
+                showCloseButton={false}
+                className="border-0 bg-background/96 p-0 backdrop-blur-xl"
+              >
+                <motion.div
+                  initial={{ x: "100%" }}
+                  animate={{ x: 0 }}
+                  exit={{ x: "100%" }}
+                  className="flex min-h-screen flex-col"
                 >
-                  <Server className="h-4 w-4" />
-                  Simple
-                </a>
-                <a
-                  href="#features"
-                  className="flex items-center gap-2 text-lg font-medium text-foreground"
-                >
-                  <Sparkles className="h-4 w-4" />
-                  Why ThoughtBox
-                </a>
-                <div className="my-2 h-px bg-border/50" />
-                <Link to="/login">
-                  <Button
-                    variant="ghost"
-                    className="justify-start px-0 text-lg font-medium hover:bg-transparent hover:text-primary"
-                  >
-                    <LogIn className="mr-2 h-5 w-5" />
-                    Login
-                  </Button>
-                </Link>
-                <Link to="/signup">
-                  <Button className="w-full rounded-full bg-primary text-primary-foreground">
-                    Get Started
-                  </Button>
-                </Link>
-              </div>
-            </SheetContent>
-          </Sheet>
+                  <div className="flex items-center justify-between border-b border-border/60 px-5 py-5">
+                    <Link
+                      to="/"
+                      className="flex items-center gap-2"
+                      onClick={() => setOpen(false)}
+                    >
+                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-lg font-bold text-primary-foreground">
+                        T
+                      </div>
+                      <span className="text-lg font-semibold tracking-tight text-foreground">
+                        ThoughtBox
+                      </span>
+                    </Link>
+
+                    <SheetClose asChild>
+                      <Button variant="ghost" size="icon" aria-label="Close menu">
+                        <X className="h-5 w-5" />
+                      </Button>
+                    </SheetClose>
+                  </div>
+
+                  <div className="flex flex-1 flex-col px-5 py-6">
+                    <div className="flex flex-col gap-2">
+                      <SheetClose asChild>
+                        <Link
+                          to="/login"
+                          className="rounded-xl px-4 py-3 text-base font-medium text-foreground transition-colors hover:bg-secondary/30"
+                          onClick={() => setOpen(false)}
+                        >
+                          Sign in
+                        </Link>
+                      </SheetClose>
+                    </div>
+
+                    <div className="mt-auto flex flex-col gap-3 pt-6">
+                      <SheetClose asChild>
+                        <Button
+                          asChild
+                          className="w-full rounded-full bg-primary text-primary-foreground"
+                        >
+                          <Link to="/signup">Get started</Link>
+                        </Button>
+                      </SheetClose>
+                    </div>
+                  </div>
+                </motion.div>
+              </SheetContent>
+            </Sheet>
+          </div>
         </div>
-      </div>
-    </motion.nav>
+      </motion.nav>
+      <motion.div
+        className="fixed top-0 left-0 right-0 z-[60] h-1 origin-left bg-primary/50"
+        style={{ scaleX, opacity: scrollYProgress }}
+      />
+    </>
   );
 }
