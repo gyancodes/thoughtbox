@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import {
   Trash2,
@@ -13,6 +13,9 @@ import {
 import { formatDistanceToNow } from "date-fns";
 import type { NoteUI } from "@/lib/api";
 import { Button } from "@/components/ui/button";
+import { useCodeMirror } from "@/hooks/use-codemirror";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 interface NoteEditorProps {
   note: NoteUI | null;
@@ -20,22 +23,82 @@ interface NoteEditorProps {
   onDelete: (noteId: string) => Promise<void>;
 }
 
+// Markdown preview components for the preview pane
+const markdownComponents = {
+  h1: ({ node, ...props }: Record<string, any>) => <h1 className="text-3xl font-bold mt-8 mb-4 border-b border-border/50 pb-2" {...props} />,
+  h2: ({ node, ...props }: Record<string, any>) => <h2 className="text-2xl font-semibold mt-6 mb-3 border-b border-border/50 pb-2" {...props} />,
+  h3: ({ node, ...props }: Record<string, any>) => <h3 className="text-xl font-medium mt-5 mb-2" {...props} />,
+  p: ({ node, ...props }: Record<string, any>) => <p className="leading-7 mb-4 text-foreground/90" {...props} />,
+  ul: ({ node, ...props }: Record<string, any>) => <ul className="list-disc pl-6 mb-4 space-y-1" {...props} />,
+  ol: ({ node, ...props }: Record<string, any>) => <ol className="list-decimal pl-6 mb-4 space-y-1" {...props} />,
+  li: ({ node, ...props }: Record<string, any>) => <li className="leading-7" {...props} />,
+  code: ({ node, inline, className, children, ...props }: Record<string, any>) => {
+    return !inline ? (
+      <pre className="bg-secondary/40 p-4 rounded-lg overflow-x-auto mb-4 border border-border/50 text-sm">
+        <code className={className} {...props}>{children}</code>
+      </pre>
+    ) : (
+      <code className="bg-secondary/60 px-1.5 py-0.5 rounded-md text-sm font-mono text-primary" {...props}>
+        {children}
+      </code>
+    );
+  },
+  blockquote: ({ node, ...props }: Record<string, any>) => <blockquote className="border-l-4 border-primary/40 pl-4 py-1 italic bg-secondary/10 text-foreground/80 mb-4 rounded-r-md" {...props} />,
+  a: ({ node, ...props }: Record<string, any>) => <a className="text-primary hover:underline" target="_blank" rel="noopener noreferrer" {...props} />,
+  strong: ({ node, ...props }: Record<string, any>) => <strong className="font-bold text-foreground" {...props} />,
+  em: ({ node, ...props }: Record<string, any>) => <em className="italic" {...props} />,
+  table: ({ node, ...props }: Record<string, any>) => <div className="overflow-x-auto mb-4"><table className="min-w-full border-collapse border border-border/50" {...props} /></div>,
+  th: ({ node, ...props }: Record<string, any>) => <th className="border border-border/70 bg-secondary/30 px-4 py-2 font-semibold text-left" {...props} />,
+  td: ({ node, ...props }: Record<string, any>) => <td className="border border-border/50 px-4 py-2" {...props} />,
+  hr: ({ node, ...props }: Record<string, any>) => <hr className="my-8 border-t border-border/50" {...props} />,
+};
+
 export function NoteEditor({ note, onSave, onDelete }: NoteEditorProps) {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [isSaving, setIsSaving] = useState(false);
-  const [showPreview, setShowPreview] = useState(true);
+  const [showPreview, setShowPreview] = useState(false);
   const [focusMode, setFocusMode] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
 
+  // Content ref to track latest content for save handler
+  const contentRef = useRef(content);
+  const titleRef = useRef(title);
+  contentRef.current = content;
+  titleRef.current = title;
+
+  const handleContentChange = useCallback((newContent: string) => {
+    setContent(newContent);
+  }, []);
+
+  // Main editor CodeMirror instance
+  const { containerRef: editorRef, setDoc } = useCodeMirror({
+    initialDoc: note?.content || "",
+    onChange: handleContentChange,
+    placeholderText: "Start writing your thoughts...",
+    lineNumbersEnabled: true,
+  });
+
+  // Focus mode CodeMirror instance
+  const { containerRef: focusEditorRef, setDoc: setFocusDoc } = useCodeMirror({
+    initialDoc: note?.content || "",
+    onChange: handleContentChange,
+    placeholderText: "Start writing your thoughts...",
+    lineNumbersEnabled: false,
+  });
+
+  // Sync note data when note changes
   useEffect(() => {
     if (note) {
       setTitle(note.title);
       setContent(note.content);
+      setDoc(note.content);
+      setFocusDoc(note.content);
       setHasChanges(false);
     }
   }, [note?.id]);
 
+  // Track changes
   useEffect(() => {
     if (note) {
       const titleChanged = title !== note.title;
@@ -44,32 +107,26 @@ export function NoteEditor({ note, onSave, onDelete }: NoteEditorProps) {
     }
   }, [title, content, note]);
 
+  // Sync content between editors when toggling focus mode
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === "s") {
-        e.preventDefault();
-        handleSave();
-      }
-      if (e.key === "Escape" && focusMode) {
-        setFocusMode(false);
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [title, content, note, focusMode]);
+    if (focusMode) {
+      setFocusDoc(contentRef.current);
+    } else {
+      setDoc(contentRef.current);
+    }
+  }, [focusMode]);
 
   const handleSave = useCallback(async () => {
     if (!note || !hasChanges) return;
 
     setIsSaving(true);
     try {
-      await onSave(note.id, { title, content });
+      await onSave(note.id, { title: titleRef.current, content: contentRef.current });
       setHasChanges(false);
     } finally {
       setIsSaving(false);
     }
-  }, [note, title, content, hasChanges, onSave]);
+  }, [note, hasChanges, onSave]);
 
   const handleDelete = useCallback(async () => {
     if (!note) return;
@@ -79,22 +136,23 @@ export function NoteEditor({ note, onSave, onDelete }: NoteEditorProps) {
     }
   }, [note, onDelete]);
 
-  const renderMarkdown = (text: string) => {
-    return text
-      .replace(/\*\*(.*?)\*\*/g, `<strong class="font-semibold">$1</strong>`)
-      .replace(/\*(.*?)\*/g, `<em>$1</em>`)
-      .replace(
-        /`(.*?)`/g,
-        `<code class="px-1.5 py-0.5 bg-secondary rounded text-sm font-mono">$1</code>`
-      )
-      .replace(/^### (.*$)/gm, `<h3 class="text-lg font-semibold mt-6 mb-2">$1</h3>`)
-      .replace(/^## (.*$)/gm, `<h2 class="text-xl font-semibold mt-8 mb-3">$1</h2>`)
-      .replace(/^# (.*$)/gm, `<h1 class="text-2xl font-bold mt-8 mb-4">$1</h1>`)
-      .replace(/^- (.*$)/gm, `<li class="ml-4 list-disc">$1</li>`)
-      .replace(/\n\n/g, `</p><p class="mb-4">`)
-      .replace(/\n/g, `<br>`);
-  };
+  // Global keyboard shortcuts
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "s") {
+        e.preventDefault();
+        handleSave();
+      }
+      if (e.key === "Escape" && focusMode) {
+        setFocusMode(false);
+      }
+    };
 
+    window.addEventListener("keydown", handleGlobalKeyDown);
+    return () => window.removeEventListener("keydown", handleGlobalKeyDown);
+  }, [handleSave, focusMode]);
+
+  // Empty state
   if (!note) {
     return (
       <div className="flex h-full items-center justify-center text-muted-foreground">
@@ -109,6 +167,7 @@ export function NoteEditor({ note, onSave, onDelete }: NoteEditorProps) {
     );
   }
 
+  // Focus mode
   if (focusMode) {
     return (
       <motion.div
@@ -144,47 +203,44 @@ export function NoteEditor({ note, onSave, onDelete }: NoteEditorProps) {
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto">
-          <div className="mx-auto max-w-3xl px-8 py-12">
+        <div className="flex-1 overflow-hidden">
+          <div className="mx-auto h-full max-w-4xl flex flex-col">
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Untitled"
-              className="mb-8 w-full border-none bg-transparent text-4xl font-bold outline-none placeholder:text-muted-foreground/40"
+              className="shrink-0 border-none bg-transparent px-8 pt-12 pb-4 text-4xl font-bold outline-none placeholder:text-muted-foreground/40"
             />
-            <textarea
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              placeholder="Start writing your thoughts..."
-              className="min-h-[60vh] w-full resize-none border-none bg-transparent text-lg leading-relaxed outline-none placeholder:text-muted-foreground/40"
-            />
+            <div ref={focusEditorRef} className="flex-1 overflow-hidden" />
           </div>
         </div>
       </motion.div>
     );
   }
 
+  // Normal mode
   return (
     <div className="flex h-full flex-col">
-      <div className="flex items-center justify-between border-b border-border/30 bg-card/30 px-6 py-4">
-        <div className="flex items-center gap-4">
+      {/* Toolbar */}
+      <div className="flex items-center justify-between border-b border-border/30 bg-card/30 px-6 py-3">
+        <div className="flex items-center gap-4 flex-1 min-w-0">
           <input
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Untitled"
-            className="border-none bg-transparent text-xl font-semibold outline-none placeholder:text-muted-foreground/40"
+            className="flex-1 min-w-0 border-none bg-transparent text-xl font-semibold outline-none placeholder:text-muted-foreground/40"
           />
           {hasChanges && (
-            <span className="flex items-center gap-1 text-xs text-primary">
+            <span className="shrink-0 flex items-center gap-1 text-xs text-primary">
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />
               Unsaved
             </span>
           )}
         </div>
 
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 shrink-0 ml-4">
           <Button
             variant="ghost"
             size="icon"
@@ -225,19 +281,14 @@ export function NoteEditor({ note, onSave, onDelete }: NoteEditorProps) {
         </div>
       </div>
 
+      {/* Editor + Preview */}
       <div className="flex flex-1 overflow-hidden">
+        {/* CodeMirror Editor Pane */}
         <div className={`flex flex-col ${showPreview ? "w-1/2 border-r border-border/30" : "w-full"}`}>
-          <div className="flex-1 overflow-y-auto">
-            <textarea
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              placeholder="Start writing your thoughts..."
-              className="h-full w-full resize-none border-none bg-transparent p-6 font-mono text-base leading-relaxed outline-none placeholder:text-muted-foreground/40"
-              style={{ minHeight: "100%" }}
-            />
-          </div>
+          <div ref={editorRef} className="flex-1 overflow-hidden" />
         </div>
 
+        {/* Markdown Preview Pane */}
         <AnimatePresence>
           {showPreview && (
             <motion.div
@@ -252,14 +303,16 @@ export function NoteEditor({ note, onSave, onDelete }: NoteEditorProps) {
                 </span>
               </div>
               <div className="flex-1 overflow-y-auto p-6">
-                <h1 className="mb-6 text-2xl font-bold">{title || "Untitled"}</h1>
+                <h1 className="mb-6 text-3xl font-bold">{title || "Untitled"}</h1>
                 {content ? (
-                  <div
-                    className="prose prose-sm max-w-none text-foreground"
-                    dangerouslySetInnerHTML={{
-                      __html: `<p class="mb-4">${renderMarkdown(content)}</p>`,
-                    }}
-                  />
+                  <div className="max-w-none text-foreground break-words overflow-hidden">
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm]}
+                      components={markdownComponents as any}
+                    >
+                      {content}
+                    </ReactMarkdown>
+                  </div>
                 ) : (
                   <p className="italic text-muted-foreground/60">No content yet</p>
                 )}
@@ -269,20 +322,26 @@ export function NoteEditor({ note, onSave, onDelete }: NoteEditorProps) {
         </AnimatePresence>
       </div>
 
-      <div className="flex items-center justify-between border-t border-border/30 bg-card/30 px-6 py-3 text-xs text-muted-foreground">
+      {/* Status Bar */}
+      <div className="flex items-center justify-between border-t border-border/30 bg-card/30 px-6 py-2.5 text-xs text-muted-foreground">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-1.5">
             <Clock className="h-3.5 w-3.5" />
             <span>Edited {formatDistanceToNow(new Date(note.updatedAt), { addSuffix: true })}</span>
           </div>
-          <span className="text-muted-foreground/50">/</span>
-          <span>{content.length} characters</span>
-          <span className="text-muted-foreground/50">/</span>
+          <span className="text-muted-foreground/50">·</span>
+          <span>{content.length} chars</span>
+          <span className="text-muted-foreground/50">·</span>
           <span>{content.split(/\s+/).filter(Boolean).length} words</span>
+          <span className="text-muted-foreground/50">·</span>
+          <span>{content.split("\n").length} lines</span>
         </div>
         <div className="flex items-center gap-2">
           <kbd className="rounded bg-secondary px-1.5 py-0.5 text-[10px] font-mono">Ctrl+S</kbd>
-          <span>to save</span>
+          <span>save</span>
+          <span className="text-muted-foreground/30">|</span>
+          <kbd className="rounded bg-secondary px-1.5 py-0.5 text-[10px] font-mono">Ctrl+F</kbd>
+          <span>find</span>
         </div>
       </div>
     </div>
