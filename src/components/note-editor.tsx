@@ -57,7 +57,7 @@ export function NoteEditor({ note, onSave, onDelete }: NoteEditorProps) {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [isSaving, setIsSaving] = useState(false);
-  const [showPreview, setShowPreview] = useState(false);
+  const [showPreview, setShowPreview] = useState(true);
   const [focusMode, setFocusMode] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
 

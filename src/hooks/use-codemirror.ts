@@ -27,6 +27,7 @@ const thoughtboxTheme = EditorView.theme({
     caretColor: "var(--primary)",
     lineHeight: "1.7",
     minHeight: "100%",
+    cursor: "text",
   },
   ".cm-cursor, .cm-dropCursor": {
     borderLeftColor: "var(--primary)",
@@ -101,14 +102,14 @@ const thoughtboxTheme = EditorView.theme({
 
 // Markdown-specific syntax highlighting
 const markdownHighlighting = HighlightStyle.define([
-  { tag: tags.heading1, fontSize: "1.8em", fontWeight: "700", color: "var(--foreground)", margin: "0.5em 0" },
-  { tag: tags.heading2, fontSize: "1.5em", fontWeight: "600", color: "var(--foreground)", margin: "0.4em 0" },
-  { tag: tags.heading3, fontSize: "1.25em", fontWeight: "600", color: "var(--foreground)", margin: "0.3em 0" },
+  { tag: tags.heading1, fontSize: "1.8em", fontWeight: "700", color: "var(--primary)", margin: "0.5em 0" },
+  { tag: tags.heading2, fontSize: "1.5em", fontWeight: "600", color: "var(--primary)", margin: "0.4em 0" },
+  { tag: tags.heading3, fontSize: "1.25em", fontWeight: "600", color: "var(--primary)", margin: "0.3em 0" },
   { tag: tags.emphasis, fontStyle: "italic", color: "var(--foreground)" },
   { tag: tags.strong, fontWeight: "700", color: "var(--foreground)" },
   { tag: tags.link, color: "var(--primary)", textDecoration: "underline" },
   { tag: tags.monospace, fontFamily: "inherit", backgroundColor: "color-mix(in oklab, var(--secondary) 60%, transparent)", borderRadius: "3px", padding: "1px 4px" },
-  { tag: tags.quote, color: "var(--muted-foreground)", fontStyle: "italic" },
+  { tag: tags.quote, color: "var(--muted-foreground)", fontStyle: "italic", borderLeft: "2px solid var(--primary)" },
   { tag: tags.list, color: "var(--primary)" },
 ]);
 
@@ -129,7 +130,7 @@ export function useCodeMirror({
   const viewRef = useRef<EditorView | null>(null);
   const onChangeRef = useRef(onChange);
 
-  // Use a callback ref to handle container switching (e.g. Focus Mode toggle)
+  // Use a callback ref to handle container switching
   const containerRef = useCallback((node: HTMLDivElement | null) => {
     setContainer(node);
   }, []);
@@ -152,6 +153,8 @@ export function useCodeMirror({
   useEffect(() => {
     if (!container) return;
 
+    // We only create the state once on mount (or when container changes)
+    // To prevent loss of focus/cursor, we don't depend on initialDoc here
     const state = EditorState.create({
       doc: initialDoc,
       extensions: [
@@ -196,7 +199,7 @@ export function useCodeMirror({
       view.destroy();
       viewRef.current = null;
     };
-  }, [container, lineNumbersEnabled, initialDoc]); // React to container changes
+  }, [container, lineNumbersEnabled]); // Removed initialDoc as dependency to avoid re-mounting on every change
 
   return { containerRef, viewRef, setDoc };
 }
